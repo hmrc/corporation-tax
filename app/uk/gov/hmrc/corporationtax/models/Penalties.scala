@@ -26,10 +26,10 @@ object Penalties {
 }
 
 case class PenaltyTransaction(
-                               penaltyDate: LocalDate,
-                               `type`: String,
-                               postingAmount: BigDecimal
-                             )
+  penaltyDate: LocalDate,
+  `type`: String,
+  postingAmount: BigDecimal
+)
 
 object PenaltyTransaction {
   implicit val format: OFormat[PenaltyTransaction] = Json.format[PenaltyTransaction]

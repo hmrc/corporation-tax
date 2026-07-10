@@ -24,21 +24,24 @@ import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.Future
 
-
 class PenaltiesConnector @Inject() // (http: HttpClientV2)
-                                   // (implicit ec: ExecutionContext)
+// (implicit ec: ExecutionContext)
     extends Logging {
-  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long): Future[Either[Error, Penalties]] = {
+
+  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long): Future[Either[Error, Penalties]] =
     Future.successful(
       Right(
         Penalties(
           List(
-            PenaltyTransaction(penaltyDate = LocalDate.of(2025, 5, 1), `type` = "F", postingAmount = BigDecimal(100.13)),
+            PenaltyTransaction(
+              penaltyDate = LocalDate.of(2025, 5, 1),
+              `type` = "F",
+              postingAmount = BigDecimal(100.13)
+            ),
             PenaltyTransaction(penaltyDate = LocalDate.of(2021, 3, 7), `type` = "G", postingAmount = BigDecimal(27.19))
           )
         )
       )
     )
-  } 
-    
+
 }

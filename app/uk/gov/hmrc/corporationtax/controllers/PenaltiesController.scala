@@ -26,11 +26,13 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class PenaltiesController @Inject()(
-                                     cc: ControllerComponents,
-                                     penaltiesConnector: PenaltiesConnector
-                                     //auth: IdentifierAction
-                                   )(implicit ec: ExecutionContext) extends BackendController(cc) with Logging {
+class PenaltiesController @Inject() (
+  cc: ControllerComponents,
+  penaltiesConnector: PenaltiesConnector
+  // auth: IdentifierAction
+)(implicit ec: ExecutionContext)
+    extends BackendController(cc)
+    with Logging {
 
   def getPenaltyTransactionList(taxRef: Long, accPeriod: Long): Action[AnyContent] = Action.async { implicit request =>
     penaltiesConnector
@@ -38,14 +40,15 @@ class PenaltiesController @Inject()(
       .map {
         case Right(penalties) =>
           Ok(Json.toJson(penalties))
-        case Left(ex) =>
+        case Left(ex)         =>
           logger.error("Error while retrieving penalties", ex)
           InternalServerError(Json.obj("error" -> "Failed to retrieve penalties"))
-      }.recover { case ex: Exception =>
+      }
+      .recover { case ex: Exception =>
         logger.error("Error while retrieving penalties", ex)
         InternalServerError(Json.obj("error" -> "Failed to retrieve penalties"))
       }
-    
+
   }
 
 }
