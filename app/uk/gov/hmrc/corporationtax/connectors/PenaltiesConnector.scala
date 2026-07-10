@@ -17,31 +17,53 @@
 package uk.gov.hmrc.corporationtax.connectors
 
 import play.api.Logging
-import uk.gov.hmrc.corporationtax.models.{Penalties, PenaltyTransaction}
-//import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.*
+import uk.gov.hmrc.corporationtax.models.Penalties
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-import java.time.LocalDate
+import java.net.URL
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class PenaltiesConnector @Inject() // (http: HttpClientV2)
-// (implicit ec: ExecutionContext)
+class PenaltiesConnector @Inject()(http:
+                                   HttpClientV2,
+                                   config: ServicesConfig)
+  (implicit ec: ExecutionContext)
     extends Logging {
 
-  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long): Future[Either[Error, Penalties]] =
-    Future.successful(
-      Right(
-        Penalties(
-          List(
-            PenaltyTransaction(
-              penaltyDate = LocalDate.of(2025, 5, 1),
-              `type` = "F",
-              postingAmount = BigDecimal(100.13)
-            ),
-            PenaltyTransaction(penaltyDate = LocalDate.of(2021, 3, 7), `type` = "G", postingAmount = BigDecimal(27.19))
-          )
-        )
-      )
-    )
+  // TODO: add configuration
+  private val dataProxyPath = config.baseUrl("rds-datacache-proxy") + "/rds-datacache-proxy"
+
+  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long)
+                               (implicit hc: HeaderCarrier): Future[Penalties] = {
+    println(s"URL-ABC: $dataProxyPath")
+    val url: URL =  url"$dataProxyPath/corporation-tax/penalty-transactions/$taxRef/$accPeriod"
+
+
+    http.get(url)
+      .execute[Penalties]
+      .recover {
+        case e: Throwable =>
+          logger.error(s"[PenaltiesConnector][getPenaltyTransactionList]: ${e.getMessage}")
+          throw new RuntimeException(e.getMessage)
+      }
+  }
+//    Future.successful(
+//      Right(
+//        Penalties(
+//          List(
+//            PenaltyTransaction(
+//              penaltyDate = LocalDate.of(2025, 5, 1),
+//              `type` = "F",
+//              postingAmount = BigDecimal(100.13)
+//            ),
+//            PenaltyTransaction(penaltyDate = LocalDate.of(2021, 3, 7), `type` = "G", postingAmount = BigDecimal(27.19))
+//          )
+//        )
+//      )
+//    )
 
 }

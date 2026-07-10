@@ -16,18 +16,15 @@
 
 package uk.gov.hmrc.corporationtax.connectors
 
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
-import com.github.tomakehurst.wiremock.client.WireMock.*
 import play.api.http.Status.*
 import uk.gov.hmrc.corporationtax.helpers.PenaltiesHelper
-import uk.gov.hmrc.corporationtax.models.{Penalties, PenaltyTransaction}
+import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.http.HeaderCarrier
-
-import java.time.LocalDate
 
 class PenaltiesConnectorISpec
     extends AnyWordSpec
@@ -44,9 +41,10 @@ class PenaltiesConnectorISpec
 
   "getPenaltyTransactionList" should {
 
-    def url(taxRef: Long, accPeriod: Long) = s"/corporation-tax/penalty-transactions/$taxRef/$accPeriod"
+    def url(taxRef: Long, accPeriod: Long) =
+      s"/rds-datacache-proxy/corporation-tax/penalty-transactions/$taxRef/$accPeriod"
 
-    "return Penalties list from BE with status code OK" in {
+    "return Penalties list (single item) from BE with status code OK" in {
 
       stubFor(
         get(urlPathEqualTo(url(1L, 5L)))
@@ -55,17 +53,18 @@ class PenaltiesConnectorISpec
               .withStatus(OK)
               .withBody(
                 s"""{
-                   |"penaltyTransactions":[
-                   |  {"penalty_date":"2005-03-30","type":"F","posting_amount":-10},
-                   |  {"penalty_date":"2005-03-30","type":"G","posting_amount":-100}
+                   |"penaltyTransactions":
+                   |[
+                   |  {"penaltyDate":"2025-05-01","type":"F","postingAmount":100.13 },
+                   |  {"penaltyDate":"2021-03-07","type":"G","postingAmount":27.19 }
                    |]}""".stripMargin
               )
           )
       )
 
       val result = connector.getPenaltyTransactionList(1L, 5L).futureValue
-
-      result mustBe Right(penaltiesSingleItemList)
+      println(s"DATA: $result")
+      result.penaltyTransactions must contain allElementsOf penaltiesSingleItemList.penaltyTransactions
     }
 
   }

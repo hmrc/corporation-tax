@@ -26,23 +26,19 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class PenaltiesController @Inject() (
-  cc: ControllerComponents,
-  penaltiesConnector: PenaltiesConnector
-  // auth: IdentifierAction
-)(implicit ec: ExecutionContext)
-    extends BackendController(cc)
+class PenaltiesController @Inject()(
+                                     cc: ControllerComponents,
+                                     penaltiesConnector: PenaltiesConnector
+                                     // auth: IdentifierAction
+                                   )(implicit ec: ExecutionContext)
+  extends BackendController(cc)
     with Logging {
 
   def getPenaltyTransactionList(taxRef: Long, accPeriod: Long): Action[AnyContent] = Action.async { implicit request =>
     penaltiesConnector
       .getPenaltyTransactionList(taxRef, accPeriod)
-      .map {
-        case Right(penalties) =>
-          Ok(Json.toJson(penalties))
-        case Left(ex)         =>
-          logger.error("Error while retrieving penalties", ex)
-          InternalServerError(Json.obj("error" -> "Failed to retrieve penalties"))
+      .map { penalties =>
+        Ok(Json.toJson(penalties))
       }
       .recover { case ex: Exception =>
         logger.error("Error while retrieving penalties", ex)
