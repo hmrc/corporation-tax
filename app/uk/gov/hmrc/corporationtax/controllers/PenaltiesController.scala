@@ -29,11 +29,13 @@ import scala.concurrent.ExecutionContext
 class PenaltiesController @Inject() (
   cc: ControllerComponents,
   penaltiesConnector: PenaltiesConnector
+  // TODO: enable AuthIdentifier when it will be implemented
   // auth: IdentifierAction
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
+  // TODO: use auth.async when it will be available
   def getPenaltyTransactionList(taxRef: Long, accPeriod: Long): Action[AnyContent] = Action.async { implicit request =>
     penaltiesConnector
       .getPenaltyTransactionList(taxRef, accPeriod)
