@@ -23,29 +23,27 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
 import play.api.{Application, Environment, Mode}
 
-
 trait ApplicationWithWiremock
-  extends AnyWordSpec
+    extends AnyWordSpec
     with GuiceOneServerPerSuite
     with BeforeAndAfterAll
     with BeforeAndAfterEach {
 
   lazy val wireMock = new WireMock
 
-  val extraConfig: Map[String, Any] = {
+  val extraConfig: Map[String, Any] =
     Map[String, Any](
-      "microservice.services.auth.host" -> WireMockConstants.stubHost,
-      "microservice.services.auth.port" -> WireMockConstants.stubPort,
-      "microservice.services.chris.host" -> WireMockConstants.stubHost,
-      "microservice.services.chris.port" -> WireMockConstants.stubPort,
-      "microservice.services.rds-datacache-proxy.host" -> WireMockConstants.stubHost,
-      "microservice.services.rds-datacache-proxy.port" -> WireMockConstants.stubPort,
-      "microservice.services.formp-proxy.host" -> WireMockConstants.stubHost,
-      "microservice.services.formp-proxy.port" -> WireMockConstants.stubPort,
+      "microservice.services.auth.host"                     -> WireMockConstants.stubHost,
+      "microservice.services.auth.port"                     -> WireMockConstants.stubPort,
+      "microservice.services.chris.host"                    -> WireMockConstants.stubHost,
+      "microservice.services.chris.port"                    -> WireMockConstants.stubPort,
+      "microservice.services.rds-datacache-proxy.host"      -> WireMockConstants.stubHost,
+      "microservice.services.rds-datacache-proxy.port"      -> WireMockConstants.stubPort,
+      "microservice.services.formp-proxy.host"              -> WireMockConstants.stubHost,
+      "microservice.services.formp-proxy.port"              -> WireMockConstants.stubPort,
       "microservice.services.stamp-duty-land-tax-stub.port" -> WireMockConstants.stubPort,
       "microservice.services.stamp-duty-land-tax-stub.host" -> WireMockConstants.stubHost
     )
-  }
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .in(Environment.simple(mode = Mode.Dev))

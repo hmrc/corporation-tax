@@ -23,17 +23,20 @@ import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import play.api.http.Status.*
+import uk.gov.hmrc.corporationtax.helpers.PenaltiesHelper
 import uk.gov.hmrc.corporationtax.models.{Penalties, PenaltyTransaction}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
 
-class PenaltiesConnectorISpec extends AnyWordSpec
-  with Matchers
-  with ScalaFutures
-  with IntegrationPatience
-  with ApplicationWithWiremock
-  with BeforeAndAfterEach {
+class PenaltiesConnectorISpec
+    extends AnyWordSpec
+    with Matchers
+    with ScalaFutures
+    with IntegrationPatience
+    with ApplicationWithWiremock
+    with BeforeAndAfterEach
+    with PenaltiesHelper {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -47,7 +50,6 @@ class PenaltiesConnectorISpec extends AnyWordSpec
 
       stubFor(
         get(urlPathEqualTo(url(1L, 5L)))
-          //.withRequestBody(equalToJson(Json.stringify(payloadJson), true, true))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -63,20 +65,8 @@ class PenaltiesConnectorISpec extends AnyWordSpec
 
       val result = connector.getPenaltyTransactionList(1L, 5L).futureValue
 
-      result mustBe Right(
-        Penalties(
-          List(
-            PenaltyTransaction(
-              penaltyDate = LocalDate.of(2025, 5, 1),
-              `type` = "F",
-              postingAmount = BigDecimal(100.13)
-            ),
-            PenaltyTransaction(penaltyDate = LocalDate.of(2021, 3, 7), `type` = "G", postingAmount = BigDecimal(27.19))
-          )
-        )
-      )
+      result mustBe Right(penaltiesSingleItemList)
     }
 
   }
-
 }
