@@ -26,12 +26,12 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class PenaltiesController @Inject()(
-                                     cc: ControllerComponents,
-                                     penaltiesConnector: PenaltiesConnector
-                                     // auth: IdentifierAction
-                                   )(implicit ec: ExecutionContext)
-  extends BackendController(cc)
+class PenaltiesController @Inject() (
+  cc: ControllerComponents,
+  penaltiesConnector: PenaltiesConnector
+  // auth: IdentifierAction
+)(implicit ec: ExecutionContext)
+    extends BackendController(cc)
     with Logging {
 
   def getPenaltyTransactionList(taxRef: Long, accPeriod: Long): Action[AnyContent] = Action.async { implicit request =>

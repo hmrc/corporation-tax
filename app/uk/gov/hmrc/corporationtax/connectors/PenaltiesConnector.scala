@@ -28,42 +28,21 @@ import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PenaltiesConnector @Inject()(http:
-                                   HttpClientV2,
-                                   config: ServicesConfig)
-  (implicit ec: ExecutionContext)
+class PenaltiesConnector @Inject() (http: HttpClientV2, config: ServicesConfig)(implicit ec: ExecutionContext)
     extends Logging {
 
-  // TODO: add configuration
   private val dataProxyPath = config.baseUrl("rds-datacache-proxy") + "/rds-datacache-proxy"
 
-  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long)
-                               (implicit hc: HeaderCarrier): Future[Penalties] = {
-    println(s"URL-ABC: $dataProxyPath")
-    val url: URL =  url"$dataProxyPath/corporation-tax/penalty-transactions/$taxRef/$accPeriod"
+  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[Penalties] = {
+    val url: URL = url"$dataProxyPath/corporation-tax/penalty-transactions/$taxRef/$accPeriod"
 
-
-    http.get(url)
+    http
+      .get(url)
       .execute[Penalties]
-      .recover {
-        case e: Throwable =>
-          logger.error(s"[PenaltiesConnector][getPenaltyTransactionList]: ${e.getMessage}")
-          throw new RuntimeException(e.getMessage)
+      .recover { case e: Throwable =>
+        logger.error(s"[PenaltiesConnector][getPenaltyTransactionList]: ${e.getMessage}")
+        throw new RuntimeException(e.getMessage)
       }
   }
-//    Future.successful(
-//      Right(
-//        Penalties(
-//          List(
-//            PenaltyTransaction(
-//              penaltyDate = LocalDate.of(2025, 5, 1),
-//              `type` = "F",
-//              postingAmount = BigDecimal(100.13)
-//            ),
-//            PenaltyTransaction(penaltyDate = LocalDate.of(2021, 3, 7), `type` = "G", postingAmount = BigDecimal(27.19))
-//          )
-//        )
-//      )
-//    )
 
 }
