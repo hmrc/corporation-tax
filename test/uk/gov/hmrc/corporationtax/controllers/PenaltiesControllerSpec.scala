@@ -43,11 +43,13 @@ class PenaltiesControllerSpec extends AnyWordSpec with Matchers with PenaltiesHe
     implicit val hc: HeaderCarrier    = HeaderCarrier()
 
     val fakeRequest = FakeRequest("GET", "/")
+    val fakePostRequest = FakeRequest("GET", "/WrongUrl")
     val controller  = new PenaltiesController(Helpers.stubControllerComponents(), mockPenaltiesConnector)
   }
 
   "GET /" should {
-    "return 200" in new Fixture {
+
+    "return 200: OK" in new Fixture {
       when(mockPenaltiesConnector.getPenaltyTransactionList(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(penalties))
 
@@ -58,6 +60,27 @@ class PenaltiesControllerSpec extends AnyWordSpec with Matchers with PenaltiesHe
 
       verify(mockPenaltiesConnector).getPenaltyTransactionList(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }
+
+    "return 500: INTERNAL_SERVER_ERROR" in new Fixture {
+      when(mockPenaltiesConnector.getPenaltyTransactionList(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("unexpected")))
+
+      val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L)(fakeRequest)
+      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+
+      verify(mockPenaltiesConnector).getPenaltyTransactionList(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
+    }
+
+    "return 400: BAD_REQUEST" in new Fixture {
+      when(mockPenaltiesConnector.getPenaltyTransactionList(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(penalties))
+
+      val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L)(fakePostRequest)
+      status(result) shouldBe Status.BAD_REQUEST
+
+      verify(mockPenaltiesConnector).getPenaltyTransactionList(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
+    }
+
   }
 
 }
