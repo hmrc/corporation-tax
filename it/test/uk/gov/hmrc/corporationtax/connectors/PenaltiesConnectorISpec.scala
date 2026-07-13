@@ -27,7 +27,7 @@ import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.http.HeaderCarrier
 
 class PenaltiesConnectorISpec
-    extends AnyWordSpec
+  extends AnyWordSpec
     with Matchers
     with ScalaFutures
     with IntegrationPatience
@@ -39,13 +39,52 @@ class PenaltiesConnectorISpec
 
   private val connector: PenaltiesConnector = app.injector.instanceOf[PenaltiesConnector]
 
+  // TODO: add auth stub and relevant cases
   "getPenaltyTransactionList" should {
 
     def url(taxRef: Long, accPeriod: Long) =
       s"/rds-datacache-proxy/corporation-tax/penalty-transactions/$taxRef/$accPeriod"
 
-    "return Penalties list (single item) from BE with status code OK" in {
+    "return Penalties empty list from BE with status code OK" in {
+      stubFor(
+        get(urlPathEqualTo(url(1L, 5L)))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                s"""{
+                   |"penaltyTransactions":
+                   |[
+                   |]}""".stripMargin
+              )
+          )
+      )
 
+      val result = connector.getPenaltyTransactionList(1L, 5L).futureValue
+      result.penaltyTransactions must contain allElementsOf penaltiesEmptyList.penaltyTransactions
+    }
+
+    "return Penalties list (single item) from BE with status code OK" in {
+      stubFor(
+        get(urlPathEqualTo(url(1L, 5L)))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                s"""{
+                   |"penaltyTransactions":
+                   |[
+                   |  {"penaltyDate":"2025-05-01","type":"F","postingAmount":100.13 }
+                   |]}""".stripMargin
+              )
+          )
+      )
+
+      val result = connector.getPenaltyTransactionList(1L, 5L).futureValue
+      result.penaltyTransactions must contain allElementsOf penaltiesSingleItemList.penaltyTransactions
+    }
+
+    "return Penalties list (two items) from BE with status code OK" in {
       stubFor(
         get(urlPathEqualTo(url(1L, 5L)))
           .willReturn(
@@ -56,14 +95,13 @@ class PenaltiesConnectorISpec
                    |"penaltyTransactions":
                    |[
                    |  {"penaltyDate":"2025-05-01","type":"F","postingAmount":100.13 },
-                   |  {"penaltyDate":"2021-03-07","type":"G","postingAmount":27.19 }
+                   |  {"penaltyDate":"2021-03-07","type":"G","postingAmount":29.13 }
                    |]}""".stripMargin
               )
           )
       )
 
       val result = connector.getPenaltyTransactionList(1L, 5L).futureValue
-      println(s"DATA: $result")
       result.penaltyTransactions must contain allElementsOf penaltiesSingleItemList.penaltyTransactions
     }
 
