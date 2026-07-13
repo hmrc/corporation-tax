@@ -38,13 +38,13 @@ class PenaltiesControllerSpec extends AnyWordSpec with Matchers with PenaltiesHe
   private trait Fixture {
     val mockPenaltiesConnector: PenaltiesConnector = mock[PenaltiesConnector]
 
-    val cc = Helpers.stubControllerComponents()
+    val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val hc: HeaderCarrier    = HeaderCarrier()
 
-    val fakeRequest = FakeRequest("GET", "/")
+    val fakeRequest     = FakeRequest("GET", "/")
     val fakePostRequest = FakeRequest("GET", "/WrongUrl")
-    val controller = new PenaltiesController(Helpers.stubControllerComponents(), mockPenaltiesConnector)
+    val controller      = new PenaltiesController(Helpers.stubControllerComponents(), mockPenaltiesConnector)
   }
 
   "GET /" should {
@@ -66,14 +66,13 @@ class PenaltiesControllerSpec extends AnyWordSpec with Matchers with PenaltiesHe
         .thenReturn(Future.failed(new RuntimeException("unexpected")))
 
       val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L)(fakeRequest)
-      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve penalties"
 
       verify(mockPenaltiesConnector).getPenaltyTransactionList(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }
 
     // TODO: implement auth failed scenario
-
 
   }
 

@@ -36,7 +36,6 @@ class PenaltiesConnector @Inject() (http: HttpClientV2, config: ServicesConfig)(
 
   def getPenaltyTransactionList(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[Penalties] = {
     val url: URL = url"$dataProxyPath/corporation-tax/penalty-transactions/$taxRef/$accPeriod"
-
     http
       .get(url)
       .execute[Penalties]
