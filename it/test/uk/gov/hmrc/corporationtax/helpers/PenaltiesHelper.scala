@@ -41,10 +41,8 @@ trait PenaltiesHelper {
         `type` = "F",
         postingAmount = BigDecimal(100.13)
       ),
-      PenaltyTransaction(
-        penaltyDate = LocalDate.of(2021, 3, 7),
-        `type` = "G", postingAmount = BigDecimal(27.19))
+      PenaltyTransaction(penaltyDate = LocalDate.of(2021, 3, 7), `type` = "G", postingAmount = BigDecimal(27.19))
     )
   )
-  
+
 }
