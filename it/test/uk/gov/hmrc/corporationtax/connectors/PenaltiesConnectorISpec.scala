@@ -27,7 +27,7 @@ import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.http.HeaderCarrier
 
 class PenaltiesConnectorISpec
-  extends AnyWordSpec
+    extends AnyWordSpec
     with Matchers
     with ScalaFutures
     with IntegrationPatience
