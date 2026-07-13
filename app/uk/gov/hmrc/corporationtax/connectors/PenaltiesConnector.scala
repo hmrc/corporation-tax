@@ -28,19 +28,17 @@ import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PenaltiesConnector @Inject()(http: HttpClientV2,
-                                   config: ServicesConfig)(implicit ec: ExecutionContext)
-  extends Logging {
+class PenaltiesConnector @Inject() (http: HttpClientV2, config: ServicesConfig)(implicit ec: ExecutionContext)
+    extends Logging {
 
   private val stubEnabled: Boolean = config.getBoolean("features.corporation-tax-stub-enabled")
 
-  private val dataProxyPath = {
+  private val dataProxyPath =
     if (stubEnabled) {
       config.baseUrl("corporation-tax-stub")
     } else {
       config.baseUrl("rds-datacache-proxy") + "/rds-datacache-proxy"
     }
-  }
 
   def getPenaltyTransactionList(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[Penalties] = {
     val url: URL = url"$dataProxyPath/corporation-tax/penalty-transactions/$taxRef/$accPeriod"
