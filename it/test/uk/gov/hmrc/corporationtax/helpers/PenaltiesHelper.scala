@@ -22,14 +22,29 @@ import java.time.LocalDate
 
 trait PenaltiesHelper {
 
-  val penaltiesSingleItemList = Penalties(
+  val penaltiesEmptyList: Penalties = Penalties(penaltyTransactions = List.empty)
+
+  val penaltiesSingleItemList: Penalties = Penalties(
+    List(
+      PenaltyTransaction(
+        penaltyDate = LocalDate.of(2025, 5, 1),
+        `type` = "F",
+        postingAmount = BigDecimal(100.13)
+      )
+    )
+  )
+
+  val penaltiesTwoItemList: Penalties = Penalties(
     List(
       PenaltyTransaction(
         penaltyDate = LocalDate.of(2025, 5, 1),
         `type` = "F",
         postingAmount = BigDecimal(100.13)
       ),
-      PenaltyTransaction(penaltyDate = LocalDate.of(2021, 3, 7), `type` = "G", postingAmount = BigDecimal(27.19))
+      PenaltyTransaction(
+        penaltyDate = LocalDate.of(2021, 3, 7),
+        `type` = "G", postingAmount = BigDecimal(27.19))
     )
   )
+  
 }
