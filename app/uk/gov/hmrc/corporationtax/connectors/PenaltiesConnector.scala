@@ -44,10 +44,6 @@ class PenaltiesConnector @Inject()(http: HttpClientV2,
 
   def getPenaltyTransactionList(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[Penalties] = {
     val url: URL = url"$dataProxyPath/corporation-tax/penalty-transactions/$taxRef/$accPeriod"
-
-    val s = config.baseUrl("corporation-tax-stub") + "/stamp-duty-land-tax-stub"
-    println(s"URLS-$s")
-
     http
       .get(url)
       .execute[Penalties]
