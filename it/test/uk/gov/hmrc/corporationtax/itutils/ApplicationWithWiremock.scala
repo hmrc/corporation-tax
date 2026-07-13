@@ -35,14 +35,8 @@ trait ApplicationWithWiremock
     Map[String, Any](
       "microservice.services.auth.host"                     -> WireMockConstants.stubHost,
       "microservice.services.auth.port"                     -> WireMockConstants.stubPort,
-      "microservice.services.chris.host"                    -> WireMockConstants.stubHost,
-      "microservice.services.chris.port"                    -> WireMockConstants.stubPort,
       "microservice.services.rds-datacache-proxy.host"      -> WireMockConstants.stubHost,
       "microservice.services.rds-datacache-proxy.port"      -> WireMockConstants.stubPort,
-      "microservice.services.formp-proxy.host"              -> WireMockConstants.stubHost,
-      "microservice.services.formp-proxy.port"              -> WireMockConstants.stubPort,
-      "microservice.services.stamp-duty-land-tax-stub.port" -> WireMockConstants.stubPort,
-      "microservice.services.stamp-duty-land-tax-stub.host" -> WireMockConstants.stubHost
     )
 
   override lazy val app: Application = new GuiceApplicationBuilder()
