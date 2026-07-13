@@ -123,8 +123,6 @@ class PenaltiesConnectorISpec
         connector.getPenaltyTransactionList(1L, 5L).futureValue
       }
       ex.getMessage.toLowerCase must include("error")
-//      val result = connector.getPenaltyTransactionList(1L, 5L).futureValue
-//      result.penaltyTransactions must contain allElementsOf penaltiesEmptyList.penaltyTransactions
     }
   }
 }
