@@ -27,10 +27,10 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class InterestAccuralListController @Inject()(
-  cc: ControllerComponents,
-  interestAccuralListConnector: InterestAccuralListConnector
-)(implicit ec: ExecutionContext)
-    extends BackendController(cc)
+                                               cc: ControllerComponents,
+                                               interestAccuralListConnector: InterestAccuralListConnector
+                                             )(implicit ec: ExecutionContext)
+  extends BackendController(cc)
     with Logging {
 
   def getInterestAccuralList(taxRef: Long, accPeriod: Long, interestType: String): Action[AnyContent] = Action.async { implicit request =>
