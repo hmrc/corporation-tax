@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.corporationtax.controllers
+package uk.gov.hmrc.corporationtax.models
 
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import play.api.libs.json.{Json, OFormat}
+import java.time.LocalDate
 
-import javax.inject.{Inject, Singleton}
+case class Penalties(penaltyTransactions: List[PenaltyTransaction])
 
-@Singleton()
-class MicroserviceHelloWorldController @Inject() (
-  cc: ControllerComponents
-) extends BackendController(cc):
+object Penalties {
+  implicit val format: OFormat[Penalties] = Json.format[Penalties]
+}
 
-  val hello: Action[AnyContent] =
-    Action:
-      implicit request => Ok("Hello world")
+case class PenaltyTransaction(
+  penaltyDate: LocalDate,
+  `type`: String,
+  postingAmount: BigDecimal
+)
+
+object PenaltyTransaction {
+  implicit val format: OFormat[PenaltyTransaction] = Json.format[PenaltyTransaction]
+}
