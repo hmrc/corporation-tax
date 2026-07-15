@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.corporationtax.helpers
+package uk.gov.hmrc.corporationtax.testdata
 
 import uk.gov.hmrc.corporationtax.models.{Penalties, PenaltyTransaction}
 
