@@ -21,7 +21,6 @@ lazy val it = project
   .dependsOn(microservice % "test->test")
   .settings(DefaultBuildSettings.itSettings())
   .settings(libraryDependencies ++= AppDependencies.it)
-  .settings(PlayKeys.playDefaultPort := 9000)
 
 addCommandAlias(
   "runAllChecks",
