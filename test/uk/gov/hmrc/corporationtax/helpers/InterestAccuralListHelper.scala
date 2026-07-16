@@ -23,33 +23,33 @@ import java.time.LocalDate
 trait InterestAccuralListHelper {
 
   val interestAccuralList =
-    List(
-      InterestAccural(
-          computationAmount = 1,
-          interestAccrualFromDate = LocalDate.of(2021, 3, 7),
-          interestAccrualToDate = LocalDate.of(2021, 5, 7),
-          interestRate = 2,
-          interestAmount = 10,
-          apEndDate = LocalDate.of(2021, 6, 7)
-      ),
-      InterestAccural(
+    InterestAccuralList(
+      List(InterestAccural(
         computationAmount = 1,
-        interestAccrualFromDate = LocalDate.of(2023, 3, 7),
-        interestAccrualToDate = LocalDate.of(2023, 5, 7),
+        interestAccrualFromDate = LocalDate.of(2021, 3, 7),
+        interestAccrualToDate = LocalDate.of(2021, 5, 7),
         interestRate = 2,
         interestAmount = 10,
-        apEndDate = LocalDate.of(2023, 6, 7))
-    )
+        apEndDate = LocalDate.of(2021, 6, 7)
+      ),
+        InterestAccural(
+          computationAmount = 1,
+          interestAccrualFromDate = LocalDate.of(2023, 3, 7),
+          interestAccrualToDate = LocalDate.of(2023, 5, 7),
+          interestRate = 2,
+          interestAmount = 10,
+          apEndDate = LocalDate.of(2023, 6, 7))
+      ))
 
-  val interestAccuralSingleItemList = InterestAccuralList(
-    List(
-      InterestAccural(
+  val interestAccuralSingleItemList =
+    InterestAccuralList(
+      List(InterestAccural(
         computationAmount = 1,
         interestAccrualFromDate = LocalDate.of(2021, 3, 7),
         interestAccrualToDate = LocalDate.of(2021, 5, 7),
         interestRate = 2,
         interestAmount = 10,
         apEndDate = LocalDate.of(2021, 6, 7))
-    )
-  )
+      ))
+
 }
