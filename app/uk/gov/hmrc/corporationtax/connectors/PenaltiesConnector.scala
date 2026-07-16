@@ -35,13 +35,15 @@ class PenaltiesConnector @Inject() (http: HttpClientV2, config: ServicesConfig)(
 
   private val dataProxyPath =
     if (stubEnabled) {
-      config.baseUrl("corporation-tax-stub")
+      config.baseUrl("corporation-tax-stub") + "/corporation-tax-stubs"
     } else {
       config.baseUrl("rds-datacache-proxy") + "/rds-datacache-proxy"
     }
 
   def getPenaltyTransactionList(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[Penalties] = {
     val url: URL = url"$dataProxyPath/corporation-tax/penalty-transactions/$taxRef/$accPeriod"
+
+    println(s"HERE IS URL: $url")
     http
       .get(url)
       .execute[Penalties]
