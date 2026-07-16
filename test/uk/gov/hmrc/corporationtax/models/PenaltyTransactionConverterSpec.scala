@@ -17,6 +17,7 @@
 package uk.gov.hmrc.corporationtax.models
 
 import org.scalatest.flatspec.AnyFlatSpec
+import uk.gov.hmrc.corporationtax.models.PenaltyTransaction.convertToItems
 import uk.gov.hmrc.corporationtax.models.PenaltyTransactionType.*
 
 import java.time.LocalDate
@@ -35,7 +36,7 @@ class PenaltyTransactionConverterSpec extends AnyFlatSpec {
       postingAmount = BigDecimal(100.13)
     )
     assert(
-      Penalties.convertToItems(penalty, true) == expected
+      convertToItems(penalty, true) == expected
     )
   }
 
@@ -51,7 +52,7 @@ class PenaltyTransactionConverterSpec extends AnyFlatSpec {
       postingAmount = BigDecimal(100.13)
     )
     assert(
-      Penalties.convertToItems(penalty, false) == expected
+      convertToItems(penalty, false) == expected
     )
   }
 
@@ -67,7 +68,7 @@ class PenaltyTransactionConverterSpec extends AnyFlatSpec {
       postingAmount = BigDecimal(100.13)
     )
     assert(
-      Penalties.convertToItems(penalty, true) == expected
+      convertToItems(penalty, true) == expected
     )
   }
 
@@ -79,11 +80,11 @@ class PenaltyTransactionConverterSpec extends AnyFlatSpec {
     )
     val expected = PenaltyTransactionItem(
       penaltyDate = LocalDate.of(2025, 5, 1),
-      `type` = TR,
+      `type` = TG,
       postingAmount = BigDecimal(100.13)
     )
     assert(
-      Penalties.convertToItems(penalty, true) == expected
+      convertToItems(penalty, true) == expected
     )
   }
 

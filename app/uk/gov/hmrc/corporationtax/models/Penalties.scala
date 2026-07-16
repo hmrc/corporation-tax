@@ -24,6 +24,16 @@ case class Penalties(penaltyTransactions: List[PenaltyTransaction])
 
 object Penalties {
   implicit val format: OFormat[Penalties] = Json.format[Penalties]
+}
+
+case class PenaltyTransaction(
+                               penaltyDate: LocalDate,
+                               `type`: String,
+                               postingAmount: BigDecimal
+                             )
+
+object PenaltyTransaction {
+  implicit val format: OFormat[PenaltyTransaction] = Json.format[PenaltyTransaction]
 
   def convertToItems(penalty: PenaltyTransaction, isCTPF: Boolean): PenaltyTransactionItem = {
     (penalty.`type`.toUpperCase(), isCTPF) match {
@@ -38,16 +48,6 @@ object Penalties {
     }
   }
 
-}
-
-case class PenaltyTransaction(
-                               penaltyDate: LocalDate,
-                               `type`: String,
-                               postingAmount: BigDecimal
-                             )
-
-object PenaltyTransaction {
-  implicit val format: OFormat[PenaltyTransaction] = Json.format[PenaltyTransaction]
 }
 
 enum PenaltyTransactionType:
