@@ -63,8 +63,7 @@ class TaxTransactionsConnectorISpec
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withBody(Json.stringify(Json.toJson(emptyTaxTransactions))
-              )
+              .withBody(Json.stringify(Json.toJson(emptyTaxTransactions)))
           )
       )
 
@@ -78,10 +77,9 @@ class TaxTransactionsConnectorISpec
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withBody(Json.stringify(Json.toJson(taxTransactionsSingleItemList)
-              )
-              )
-          ))
+              .withBody(Json.stringify(Json.toJson(taxTransactionsSingleItemList)))
+          )
+      )
 
       val result = connector.getTaxTransactions(1L, 5L).futureValue
 
@@ -97,10 +95,7 @@ class TaxTransactionsConnectorISpec
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withBody(Json.stringify(Json.toJson(taxTransactions)
-
-              )
-              )
+              .withBody(Json.stringify(Json.toJson(taxTransactions)))
           )
       )
 
