@@ -13,6 +13,8 @@ lazy val microservice = Project("corporation-tax", file("."))
     scalacOptions ++= Seq("-Wconf:src=routes/.*:s", "-Xfatal-warnings", "-Wconf:msg=Flag.*repeatedly:s", "-deprecation")
   )
   .settings(CodeCoverageSettings.settings: _*)
+  .settings(PlayKeys.playDefaultPort := 11202)
+
 
 lazy val it = project
   .enablePlugins(PlayScala)
