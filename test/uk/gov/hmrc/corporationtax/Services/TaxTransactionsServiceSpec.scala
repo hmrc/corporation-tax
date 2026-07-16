@@ -23,46 +23,24 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
-import uk.gov.hmrc.corporationtax.models.{TaxTransactions, TaxTransactionsItem}
+import uk.gov.hmrc.corporationtax.models.TaxTransactions
 import uk.gov.hmrc.corporationtax.connectors.TaxTransactionsConnector
 import uk.gov.hmrc.corporationtax.services.TaxTransactionsService
+import uk.gov.hmrc.corporationtax.helpers.TaxTransactionsHelper
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.LocalDate
 import scala.concurrent.Future
 
-class TaxTransactionsServiceSpec extends AnyWordSpec with Matchers with ScalaFutures with MockitoSugar {
+class TaxTransactionsServiceSpec
+    extends AnyWordSpec
+    with Matchers
+    with ScalaFutures
+    with MockitoSugar
+    with TaxTransactionsHelper {
   implicit val hc: HeaderCarrier = HeaderCarrier()
   private class Setup {
     val mockConnector: TaxTransactionsConnector = mock[TaxTransactionsConnector]
     val service                                 = new TaxTransactionsService(mockConnector)
-
-    val taxRef: Long    = 1234567L
-    val accPeriod: Long = 1L
-
-    val taxTransactions: TaxTransactions =
-      TaxTransactions(
-        List(
-          TaxTransactionsItem(
-            currentAmount = 1234.44,
-            assessmentType = "A",
-            taxDate = LocalDate.of(2026, 1, 1),
-            correctionClaimSignal = Some("1")
-          ),
-          TaxTransactionsItem(
-            currentAmount = 2345.44,
-            assessmentType = "D",
-            taxDate = LocalDate.of(2026, 2, 1),
-            correctionClaimSignal = Some("1")
-          ),
-          TaxTransactionsItem(
-            currentAmount = 6754.44,
-            assessmentType = "E",
-            taxDate = LocalDate.of(2026, 3, 1),
-            correctionClaimSignal = Some("1")
-          )
-        )
-      )
 
   }
 

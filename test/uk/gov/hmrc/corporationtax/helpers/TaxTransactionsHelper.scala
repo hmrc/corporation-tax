@@ -22,6 +22,9 @@ import java.time.LocalDate
 
 trait TaxTransactionsHelper {
 
+  val taxRef: Long    = 1234567L
+  val accPeriod: Long = 1L
+
   val emptyTaxTransactions: TaxTransactions = TaxTransactions(List.empty)
 
   val taxTransactions =
