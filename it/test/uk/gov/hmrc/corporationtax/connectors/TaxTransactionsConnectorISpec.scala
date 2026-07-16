@@ -42,14 +42,6 @@ class TaxTransactionsConnectorISpec
 
   private val connector: TaxTransactionsConnector = app.injector.instanceOf[TaxTransactionsConnector]
 
-  override lazy val app: Application = new GuiceApplicationBuilder()
-    .in(Environment.simple(mode = Mode.Dev))
-    .configure(
-      extraConfig ++ Map(
-        "features.corporation-tax-stub-enabled" -> false
-      )
-    )
-    .build()
 
   // TODO: add auth stub and relevant cases
   "getTaxTransactions" should {
