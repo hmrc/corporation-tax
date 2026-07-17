@@ -31,6 +31,7 @@ class PenaltiesService @Inject() (
     extends Logging {
 
   // TODO: to be implemented as a part of another story as dependencies not YET resolved
+  // https://jira.tools.tax.service.gov.uk/browse/DTR-6393
   private def getCTPFStatus: Future[Boolean] =
     Future.successful(true)
 
