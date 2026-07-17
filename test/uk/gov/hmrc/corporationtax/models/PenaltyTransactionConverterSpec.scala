@@ -72,7 +72,7 @@ class PenaltyTransactionConverterSpec extends AnyFlatSpec {
     )
   }
 
-  it should "convert Penalty type not F with isCPTF false to FX" in {
+  it should "convert Penalty type not F with isCPTF false to TR" in {
     val penalty  = PenaltyTransaction(
       penaltyDate = LocalDate.of(2025, 5, 1),
       `type` = "G",
@@ -80,11 +80,11 @@ class PenaltyTransactionConverterSpec extends AnyFlatSpec {
     )
     val expected = PenaltyTransactionItem(
       penaltyDate = LocalDate.of(2025, 5, 1),
-      `type` = TG,
+      `type` = TR,
       postingAmount = BigDecimal(100.13)
     )
     assert(
-      convertToItems(penalty, true) == expected
+      convertToItems(penalty, false) == expected
     )
   }
 

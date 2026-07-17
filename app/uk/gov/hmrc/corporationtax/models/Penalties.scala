@@ -71,14 +71,14 @@ enum PenaltyTransactionType:
 implicit val penaltyTransactionType: Format[PenaltyTransactionType] = new Format[PenaltyTransactionType] {
   def reads(json: JsValue): JsResult[PenaltyTransactionType] = json match {
     case JsString(s) =>
-      s.toLowerCase() match {
+      s.toUpperCase() match {
         case "FX" => JsSuccess(PenaltyTransactionType.FX)
         case "FT" => JsSuccess(PenaltyTransactionType.FT)
         case "TG" => JsSuccess(PenaltyTransactionType.TG)
         case "TR" => JsSuccess(PenaltyTransactionType.TR)
         case _    => JsError("Invalid PenaltyTransactionType string")
       }
-    case _           => JsError("Expected JsString")
+    case _           => JsError("penaltyTransactionType::Expected JsString")
   }
 
   def writes(penaltyType: PenaltyTransactionType): JsValue = JsString(penaltyType.toString.toUpperCase())
