@@ -18,34 +18,44 @@ package uk.gov.hmrc.corporationtax.services
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar.mock
+import org.mockito.Mockito.verify
 import uk.gov.hmrc.corporationtax.connectors.PenaltiesConnector
+import uk.gov.hmrc.http.HeaderCarrier
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatest.concurrent.ScalaFutures
+import play.api.test.Helpers
 import uk.gov.hmrc.corporationtax.helpers.PenaltiesHelper
+import uk.gov.hmrc.corporationtax.models.PenaltyItems
 
-// TODO: implement ~ServiceSpec
-class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelper {
+import scala.concurrent.{ExecutionContext, Future}
+
+class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelper with ScalaFutures {
 
   private trait Fixture {
     val mockPenaltiesConnector: PenaltiesConnector = mock[PenaltiesConnector]
 
-    // val cc = Helpers.stubControllerComponents()
+    val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
     implicit val hc: HeaderCarrier    = HeaderCarrier()
 
-    // val fakeRequest = FakeRequest("GET", "/")
-    // val fakePostRequest = FakeRequest("GET", "/WrongUrl")
-    // val controller = new PenaltiesController(Helpers.stubControllerComponents(), mockPenaltiesService)
+    val service = new PenaltiesService(mockPenaltiesConnector)
   }
 
-  "getTaxTransactions returns list of Tax Transactions retrieved from connector" in new Fixture {
+  "getPenaltyTransactionList returns list of Penalties from connector" in new Fixture {
 
-    when(mockConnector.getTaxTransactions(any[Long], any[Long])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(taxTransactions))
+    when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(penalties))
 
-    val result: TaxTransactions = service.getTaxTransactions(taxRef, accPeriod).futureValue
+    val result: PenaltyItems = service.getPenaltyTransactionList(1L, 1L).futureValue
 
-    result mustBe taxTransactions
+    result shouldBe penaltyItems
 
-    verify(mockConnector).getTaxTransactions(taxRef, accPeriod)(hc)
+    verify(mockPenaltiesConnector).getPenaltyTransactionList(1L, 1L)(hc)
   }
+
+  // TODO: extend testing to cover CTPF scenarios
 
 }

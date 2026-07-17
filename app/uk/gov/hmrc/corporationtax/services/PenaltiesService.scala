@@ -30,10 +30,14 @@ class PenaltiesService @Inject() (
 )(implicit ec: ExecutionContext)
     extends Logging {
 
+  // TODO: to be implemented as a part of another story as dependencies not YET resolved
+  private def getCTPFStatus: Future[Boolean] =
+    Future.successful(true)
+
   def getPenaltyTransactionList(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[PenaltyItems] =
     for {
       penalties <- connector.getPenaltyTransactionList(taxRef, accPeriod)
-      isCTPF    <- Future.successful(true) // TODO: implement logic to resolve Council Tax Penalty Framework (CTPF)
+      isCTPF    <- getCTPFStatus
     } yield PenaltyItems(penalties.penaltyTransactions.map(p => convertToItems(p, isCTPF)))
 
 }
