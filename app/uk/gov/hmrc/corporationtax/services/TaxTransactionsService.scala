@@ -22,7 +22,9 @@ import uk.gov.hmrc.corporationtax.models.TaxTransactions
 import uk.gov.hmrc.corporationtax.utils.applyAmountTransformToList
 import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.corporationtax.models.TaxTransactionsItem
 
+import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,8 +36,30 @@ class TaxTransactionsService @Inject() (
   def getTaxTransactions(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[TaxTransactions] = {
     logger.info(s"Calling repository with taxRef: $taxRef and accPeriod: $accPeriod")
     connector.getTaxTransactions(taxRef, accPeriod).map { taxTransactions =>
-      taxTransactions.copy(taxTransactions = applyAmountTransformToList(taxTransactions.taxTransactions))
+      taxTransactions
+        .copy(taxTransactions = filterAndSortTranscations(applyAmountTransformToList(taxTransactions.taxTransactions)))
     }
 
   }
+  private val filterableAssessmentTypes: Set[String] = Set("M", "A", "S", "E", "T", "R", "J", "Z")
+
+  private def filterAndSortTranscations(transactions: List[TaxTransactionsItem]): List[TaxTransactionsItem] = {
+
+    val assessmentTypesWithZeroAmountRetained = scala.collection.mutable.Set.empty[String]
+
+    val filteredTransactions = transactions.filter { transaction =>
+      val isDuplicateFilterableZero =
+        filterableAssessmentTypes.contains(transaction.assessmentType) && transaction.currentAmount == BigDecimal(0.00)
+
+      if (!isDuplicateFilterableZero) {
+        true
+      } else if (!assessmentTypesWithZeroAmountRetained.contains(transaction.assessmentType)) {
+        assessmentTypesWithZeroAmountRetained.add(transaction.assessmentType)
+        true
+      } else { false }
+    }
+
+    filteredTransactions.sortBy(_.taxDate)(Ordering[LocalDate].reverse)
+  }
+
 }

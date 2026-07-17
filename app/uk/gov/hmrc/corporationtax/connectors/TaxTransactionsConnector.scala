@@ -33,7 +33,7 @@ class TaxTransactionsConnector @Inject() (http: HttpClientV2, config: ServicesCo
 
   private val stubEnabled: Boolean = config.getBoolean("features.corporation-tax-stub-enabled")
 
-  private val dataProxyPath =
+  private val dataProxyPath                                                                                  =
     if (stubEnabled) {
       config.baseUrl("corporation-tax-stub") + "/corporation-tax-stubs"
     } else {
