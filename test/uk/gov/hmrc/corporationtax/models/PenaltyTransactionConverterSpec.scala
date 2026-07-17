@@ -25,7 +25,7 @@ import java.time.LocalDate
 class PenaltyTransactionConverterSpec extends AnyFlatSpec {
 
   it should "convert Penalty type F with isCPTF true to FX" in {
-    val penalty = PenaltyTransaction(
+    val penalty  = PenaltyTransaction(
       penaltyDate = LocalDate.of(2025, 5, 1),
       `type` = "F",
       postingAmount = BigDecimal(100.13)
@@ -41,7 +41,7 @@ class PenaltyTransactionConverterSpec extends AnyFlatSpec {
   }
 
   it should "convert Penalty type F with isCPTF false to FT" in {
-    val penalty = PenaltyTransaction(
+    val penalty  = PenaltyTransaction(
       penaltyDate = LocalDate.of(2025, 5, 1),
       `type` = "F",
       postingAmount = BigDecimal(100.13)
@@ -57,7 +57,7 @@ class PenaltyTransactionConverterSpec extends AnyFlatSpec {
   }
 
   it should "convert Penalty type not F with isCPTF true to TG" in {
-    val penalty = PenaltyTransaction(
+    val penalty  = PenaltyTransaction(
       penaltyDate = LocalDate.of(2025, 5, 1),
       `type` = "G",
       postingAmount = BigDecimal(100.13)
@@ -73,7 +73,7 @@ class PenaltyTransactionConverterSpec extends AnyFlatSpec {
   }
 
   it should "convert Penalty type not F with isCPTF false to FX" in {
-    val penalty = PenaltyTransaction(
+    val penalty  = PenaltyTransaction(
       penaltyDate = LocalDate.of(2025, 5, 1),
       `type` = "G",
       postingAmount = BigDecimal(100.13)
@@ -87,6 +87,5 @@ class PenaltyTransactionConverterSpec extends AnyFlatSpec {
       convertToItems(penalty, true) == expected
     )
   }
-
 
 }

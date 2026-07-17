@@ -18,16 +18,22 @@ package uk.gov.hmrc.corporationtax.services
 
 import uk.gov.hmrc.corporationtax.models.*
 import play.api.Logging
-//import uk.gov.hmrc.corporationtax.connectors.PenaltiesConnector
+import uk.gov.hmrc.corporationtax.connectors.PenaltiesConnector
 import uk.gov.hmrc.http.HeaderCarrier
-
+import PenaltyTransaction.*
 import javax.inject.Inject
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext
 
 class PenaltiesService @Inject() (
-                                        // connector: PenaltiesConnector
-                                       ) extends Logging {
+  connector: PenaltiesConnector
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
-  def getTaxTransactions(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[PenaltyItems] = ???
+  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[PenaltyItems] =
+    for {
+      penalties <- connector.getPenaltyTransactionList(taxRef, accPeriod)
+      isCTPF    <- Future.successful(true) // TODO: implement logic to resolve Council Tax Penalty Framework (CTPF)
+    } yield PenaltyItems(penalties.penaltyTransactions.map(p => convertToItems(p, isCTPF)))
 
 }

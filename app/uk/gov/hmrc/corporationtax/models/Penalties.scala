@@ -27,53 +27,68 @@ object Penalties {
 }
 
 case class PenaltyTransaction(
-                               penaltyDate: LocalDate,
-                               `type`: String,
-                               postingAmount: BigDecimal
-                             )
+  penaltyDate: LocalDate,
+  `type`: String,
+  postingAmount: BigDecimal
+)
 
 object PenaltyTransaction {
   implicit val format: OFormat[PenaltyTransaction] = Json.format[PenaltyTransaction]
 
-  def convertToItems(penalty: PenaltyTransaction, isCTPF: Boolean): PenaltyTransactionItem = {
+  def convertToItems(penalty: PenaltyTransaction, isCTPF: Boolean): PenaltyTransactionItem =
     (penalty.`type`.toUpperCase(), isCTPF) match {
-      case ("F", true) =>
-        PenaltyTransactionItem(penaltyDate = penalty.penaltyDate, `type` = PenaltyTransactionType.FX, postingAmount = penalty.postingAmount)
+      case ("F", true)  =>
+        PenaltyTransactionItem(
+          penaltyDate = penalty.penaltyDate,
+          `type` = PenaltyTransactionType.FX,
+          postingAmount = penalty.postingAmount
+        )
       case ("F", false) =>
-        PenaltyTransactionItem(penaltyDate = penalty.penaltyDate, `type` = PenaltyTransactionType.FT, postingAmount = penalty.postingAmount)
-      case (_, true) =>
-        PenaltyTransactionItem(penaltyDate = penalty.penaltyDate, `type` = PenaltyTransactionType.TG, postingAmount = penalty.postingAmount)
-      case (_, false) =>
-        PenaltyTransactionItem(penaltyDate = penalty.penaltyDate, `type` = PenaltyTransactionType.TR, postingAmount = penalty.postingAmount)
+        PenaltyTransactionItem(
+          penaltyDate = penalty.penaltyDate,
+          `type` = PenaltyTransactionType.FT,
+          postingAmount = penalty.postingAmount
+        )
+      case (_, true)    =>
+        PenaltyTransactionItem(
+          penaltyDate = penalty.penaltyDate,
+          `type` = PenaltyTransactionType.TG,
+          postingAmount = penalty.postingAmount
+        )
+      case (_, false)   =>
+        PenaltyTransactionItem(
+          penaltyDate = penalty.penaltyDate,
+          `type` = PenaltyTransactionType.TR,
+          postingAmount = penalty.postingAmount
+        )
     }
-  }
 
 }
 
 enum PenaltyTransactionType:
   case FX, FT, TG, TR
 
-
 implicit val penaltyTransactionType: Format[PenaltyTransactionType] = new Format[PenaltyTransactionType] {
   def reads(json: JsValue): JsResult[PenaltyTransactionType] = json match {
-    case JsString(s) => s.toLowerCase() match {
-      case "FX" => JsSuccess(PenaltyTransactionType.FX)
-      case "FT" => JsSuccess(PenaltyTransactionType.FT)
-      case "TG" => JsSuccess(PenaltyTransactionType.TG)
-      case "TR" => JsSuccess(PenaltyTransactionType.TR)
-      case _ => JsError("Invalid PenaltyTransactionType string")
-    }
-    case _ => JsError("Expected JsString")
+    case JsString(s) =>
+      s.toLowerCase() match {
+        case "FX" => JsSuccess(PenaltyTransactionType.FX)
+        case "FT" => JsSuccess(PenaltyTransactionType.FT)
+        case "TG" => JsSuccess(PenaltyTransactionType.TG)
+        case "TR" => JsSuccess(PenaltyTransactionType.TR)
+        case _    => JsError("Invalid PenaltyTransactionType string")
+      }
+    case _           => JsError("Expected JsString")
   }
 
   def writes(penaltyType: PenaltyTransactionType): JsValue = JsString(penaltyType.toString.toUpperCase())
 }
 
 case class PenaltyTransactionItem(
-                                   penaltyDate: LocalDate,
-                                   `type`: PenaltyTransactionType,
-                                   postingAmount: BigDecimal
-                                 )
+  penaltyDate: LocalDate,
+  `type`: PenaltyTransactionType,
+  postingAmount: BigDecimal
+)
 
 object PenaltyTransactionItem {
   implicit val format: OFormat[PenaltyTransactionItem] = Json.format[PenaltyTransactionItem]
