@@ -19,18 +19,23 @@ package uk.gov.hmrc.corporationtax.services
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.TaxTransactionsConnector
 import uk.gov.hmrc.corporationtax.models.TaxTransactions
+import uk.gov.hmrc.corporationtax.utils.applyAmountTransformToList
+import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class TaxTransactionsService @Inject() (
   connector: TaxTransactionsConnector
-) extends Logging {
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def getTaxTransactions(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[TaxTransactions] = {
     logger.info(s"Calling repository with taxRef: $taxRef and accPeriod: $accPeriod")
-    connector.getTaxTransactions(taxRef, accPeriod)
+    connector.getTaxTransactions(taxRef, accPeriod).map { taxTransactions =>
+      taxTransactions.copy(taxTransactions = applyAmountTransformToList(taxTransactions.taxTransactions))
+    }
 
   }
 }

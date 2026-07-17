@@ -28,7 +28,7 @@ import uk.gov.hmrc.corporationtax.helpers.TaxTransactionsHelper
 import uk.gov.hmrc.corporationtax.models.TaxTransactions
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class TaxTransactionsServiceSpec
     extends AnyWordSpec
@@ -36,7 +36,8 @@ class TaxTransactionsServiceSpec
     with ScalaFutures
     with MockitoSugar
     with TaxTransactionsHelper {
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val hc: HeaderCarrier    = HeaderCarrier()
+  implicit val ec: ExecutionContext = ExecutionContext.global
   private class Setup {
     val mockConnector: TaxTransactionsConnector = mock[TaxTransactionsConnector]
     val service                                 = new TaxTransactionsService(mockConnector)
@@ -50,7 +51,7 @@ class TaxTransactionsServiceSpec
 
     val result: TaxTransactions = service.getTaxTransactions(taxRef, accPeriod).futureValue
 
-    result mustBe taxTransactions
+    result mustBe taxTransactionsTransformed
 
     verify(mockConnector).getTaxTransactions(taxRef, accPeriod)(hc)
   }
