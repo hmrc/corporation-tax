@@ -16,12 +16,15 @@
 
 package uk.gov.hmrc.corporationtax.helpers
 
-import uk.gov.hmrc.corporationtax.models.{Penalties, PenaltyTransaction}
+import uk.gov.hmrc.corporationtax.models.{Penalties, PenaltyItems, PenaltyTransaction, PenaltyTransactionItem}
+import uk.gov.hmrc.corporationtax.models.PenaltyTransactionType.*
+
 
 import java.time.LocalDate
 
 trait PenaltiesHelper {
 
+  // DATA_CACHE_PROXY RESPONSES
   val penalties =
     Penalties(
       List(
@@ -40,4 +43,13 @@ trait PenaltiesHelper {
       PenaltyTransaction(penaltyDate = LocalDate.of(2021, 3, 7), `type` = "G", postingAmount = BigDecimal(27.19))
     )
   )
+
+  // AFTER BF TRANSFORMATIONS
+  val penaltyItems =
+    PenaltyItems(
+      List(
+        PenaltyTransactionItem(penaltyDate = LocalDate.of(2025, 5, 1), `type` = FX, postingAmount = BigDecimal(100.13)),
+        PenaltyTransactionItem(penaltyDate = LocalDate.of(2021, 3, 7), `type` = TG, postingAmount = BigDecimal(27.19))
+      )
+    )
 }
