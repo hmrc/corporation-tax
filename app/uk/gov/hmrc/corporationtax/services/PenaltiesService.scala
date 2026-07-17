@@ -30,8 +30,7 @@ class PenaltiesService @Inject() (
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long)
-                               (implicit hc: HeaderCarrier): Future[PenaltyItems] =
+  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[PenaltyItems] =
     for {
       penalties <- connector.getPenaltyTransactionList(taxRef, accPeriod)
       isCTPF    <- Future.successful(true) // TODO: implement logic to resolve Council Tax Penalty Framework (CTPF)

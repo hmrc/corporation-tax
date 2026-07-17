@@ -18,9 +18,34 @@ package uk.gov.hmrc.corporationtax.services
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import uk.gov.hmrc.corporationtax.connectors.PenaltiesConnector
 import uk.gov.hmrc.corporationtax.helpers.PenaltiesHelper
 
 // TODO: implement ~ServiceSpec
-class PenaltiesServiceSpec  extends AnyWordSpec with Matchers with PenaltiesHelper {
+class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelper {
+
+  private trait Fixture {
+    val mockPenaltiesConnector: PenaltiesConnector = mock[PenaltiesConnector]
+
+    // val cc = Helpers.stubControllerComponents()
+    implicit val ec: ExecutionContext = cc.executionContext
+    implicit val hc: HeaderCarrier    = HeaderCarrier()
+
+    // val fakeRequest = FakeRequest("GET", "/")
+    // val fakePostRequest = FakeRequest("GET", "/WrongUrl")
+    // val controller = new PenaltiesController(Helpers.stubControllerComponents(), mockPenaltiesService)
+  }
+
+  "getTaxTransactions returns list of Tax Transactions retrieved from connector" in new Fixture {
+
+    when(mockConnector.getTaxTransactions(any[Long], any[Long])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(taxTransactions))
+
+    val result: TaxTransactions = service.getTaxTransactions(taxRef, accPeriod).futureValue
+
+    result mustBe taxTransactions
+
+    verify(mockConnector).getTaxTransactions(taxRef, accPeriod)(hc)
+  }
 
 }

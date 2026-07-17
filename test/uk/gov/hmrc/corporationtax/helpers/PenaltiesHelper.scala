@@ -19,7 +19,6 @@ package uk.gov.hmrc.corporationtax.helpers
 import uk.gov.hmrc.corporationtax.models.{Penalties, PenaltyItems, PenaltyTransaction, PenaltyTransactionItem}
 import uk.gov.hmrc.corporationtax.models.PenaltyTransactionType.*
 
-
 import java.time.LocalDate
 
 trait PenaltiesHelper {
