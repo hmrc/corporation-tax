@@ -25,7 +25,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class PaymentsController @Inject()(
+class PaymentsController @Inject() (
   cc: ControllerComponents,
   service: PaymentsService
 )(implicit ec: ExecutionContext)
