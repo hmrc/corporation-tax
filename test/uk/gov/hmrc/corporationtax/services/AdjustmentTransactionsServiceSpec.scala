@@ -34,7 +34,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 class AdjustmentTransactionsServiceSpec
-  extends AnyWordSpec
+    extends AnyWordSpec
     with Matchers
     with ScalaFutures
     with MockitoSugar
@@ -42,11 +42,11 @@ class AdjustmentTransactionsServiceSpec
 
   private trait Setup {
     private val cc: ControllerComponents = stubControllerComponents()
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    implicit val ec: ExecutionContext = cc.executionContext
+    implicit val hc: HeaderCarrier       = HeaderCarrier()
+    implicit val ec: ExecutionContext    = cc.executionContext
 
     val mockAdjustmentTransactionsConnector: AdjustmentTransactionsConnector = mock[AdjustmentTransactionsConnector]
-    val adjustmentTransactionsService = new AdjustmentTransactionsService(mockAdjustmentTransactionsConnector)
+    val adjustmentTransactionsService                                        = new AdjustmentTransactionsService(mockAdjustmentTransactionsConnector)
   }
 
   "getAdjustmentTransactions" should {
