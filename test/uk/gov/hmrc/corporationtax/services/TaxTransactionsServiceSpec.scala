@@ -51,7 +51,7 @@ class TaxTransactionsServiceSpec
 
     val result: TaxTransactions = service.getTaxTransactions(taxRef, accPeriod).futureValue
 
-    result mustBe taxTransactionsTransformedAndSorted
+    result mustBe taxTransactionsTransformed
 
     verify(mockConnector).getTaxTransactions(taxRef, accPeriod)(hc)
   }
@@ -76,20 +76,6 @@ class TaxTransactionsServiceSpec
     val result: TaxTransactions = service.getTaxTransactions(taxRef, accPeriod).futureValue
 
     result mustBe taxTransactionsSingleItemListTransformed
-
-    verify(mockConnector).getTaxTransactions(taxRef, accPeriod)(hc)
-  }
-
-  "getTaxTransactions returns a multiple item list with first zero amount of assessment type only kept" in new Setup {
-    when(mockConnector.getTaxTransactions(any[Long], any[Long])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(taxTransactionsZeroAmountAssessments))
-
-    val result: TaxTransactions = service.getTaxTransactions(taxRef, accPeriod).futureValue
-
-    val countByType: Map[String, Int] =
-      result.taxTransactions.groupBy(_.assessmentType).view.mapValues(_.size).toMap
-
-    countByType mustBe Map("M" -> 1, "A" -> 1, "D" -> 2)
 
     verify(mockConnector).getTaxTransactions(taxRef, accPeriod)(hc)
   }

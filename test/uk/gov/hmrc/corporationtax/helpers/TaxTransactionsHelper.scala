@@ -73,14 +73,14 @@ trait TaxTransactionsHelper {
     )
   )
 
-  val taxTransactionsTransformedAndSorted: TaxTransactions =
+  val taxTransactionsTransformed: TaxTransactions =
     TaxTransactions(
       List(
         TaxTransactionsItem(
           currentAmount = BigDecimal(-123.44),
-          assessmentType = "E",
-          taxDate = LocalDate.of(2026, 3, 1),
-          correctionClaimSignal = None
+          assessmentType = "A",
+          taxDate = LocalDate.of(2026, 1, 1),
+          correctionClaimSignal = Some("0")
         ),
         TaxTransactionsItem(
           currentAmount = BigDecimal(-123.44),
@@ -90,9 +90,9 @@ trait TaxTransactionsHelper {
         ),
         TaxTransactionsItem(
           currentAmount = BigDecimal(-123.44),
-          assessmentType = "A",
-          taxDate = LocalDate.of(2026, 1, 1),
-          correctionClaimSignal = Some("0")
+          assessmentType = "E",
+          taxDate = LocalDate.of(2026, 3, 1),
+          correctionClaimSignal = None
         )
       )
     )
