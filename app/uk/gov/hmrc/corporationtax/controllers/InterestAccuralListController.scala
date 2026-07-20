@@ -26,23 +26,24 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class InterestAccuralListController @Inject()(
-                                               cc: ControllerComponents,
-                                               interestAccuralListConnector: InterestAccuralListConnector
-                                             )(implicit ec: ExecutionContext)
-  extends BackendController(cc)
+class InterestAccuralListController @Inject() (
+  cc: ControllerComponents,
+  interestAccuralListConnector: InterestAccuralListConnector
+)(implicit ec: ExecutionContext)
+    extends BackendController(cc)
     with Logging {
 
-  def getInterestAccuralList(taxRef: Long, accPeriod: Long, interestType: String): Action[AnyContent] = Action.async { implicit request =>
-    interestAccuralListConnector
-      .getInterestAccuralList(taxRef, accPeriod, interestType)
-      .map { interestAccuralList =>
-        Ok(Json.toJson(interestAccuralList))
-      }
-      .recover { case ex: Exception =>
-        logger.error("Error while retrieving interest accural list", ex)
-        InternalServerError(Json.obj("error" -> "Failed to retrieve interest accural list"))
-      }
+  def getInterestAccuralList(taxRef: Long, accPeriod: Long, interestType: String): Action[AnyContent] = Action.async {
+    implicit request =>
+      interestAccuralListConnector
+        .getInterestAccuralList(taxRef, accPeriod, interestType)
+        .map { interestAccuralList =>
+          Ok(Json.toJson(interestAccuralList))
+        }
+        .recover { case ex: Exception =>
+          logger.error("Error while retrieving interest accural list", ex)
+          InternalServerError(Json.obj("error" -> "Failed to retrieve interest accural list"))
+        }
   }
 
 }

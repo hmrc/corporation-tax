@@ -28,7 +28,7 @@ import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class InterestAccuralListConnector @Inject()(http: HttpClientV2, config: ServicesConfig)(implicit ec: ExecutionContext)
+class InterestAccuralListConnector @Inject() (http: HttpClientV2, config: ServicesConfig)(implicit ec: ExecutionContext)
     extends Logging {
 
   private val stubEnabled: Boolean = config.getBoolean("features.corporation-tax-stub-enabled")
@@ -40,13 +40,17 @@ class InterestAccuralListConnector @Inject()(http: HttpClientV2, config: Service
       config.baseUrl("rds-datacache-proxy") + "/rds-datacache-proxy"
     }
 
-  def getInterestAccuralList(taxRef: Long, accPeriod: Long, interestType: String)(implicit hc: HeaderCarrier): Future[InterestAccuralList] = {
+  def getInterestAccuralList(taxRef: Long, accPeriod: Long, interestType: String)(implicit
+    hc: HeaderCarrier
+  ): Future[InterestAccuralList] = {
     val url: URL = url"$dataProxyPath/corporation-tax/interest-accural-list/$taxRef/$accPeriod/$interestType"
     http
       .get(url)
       .execute[InterestAccuralList]
       .recover { case e: Throwable =>
-        logger.error(s"[InterestAccuralListConnector][getInterestAccuralList]: $taxRef :: $accPeriod :: $interestType - ${e.getMessage}")
+        logger.error(
+          s"[InterestAccuralListConnector][getInterestAccuralList]: $taxRef :: $accPeriod :: $interestType - ${e.getMessage}"
+        )
         throw new RuntimeException(e.getMessage)
       }
   }

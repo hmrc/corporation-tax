@@ -43,7 +43,8 @@ class InterestAccuralListControllerSpec extends AnyWordSpec with Matchers with I
 
     val fakeRequest     = FakeRequest("GET", "/")
     val fakePostRequest = FakeRequest("GET", "/WrongUrl")
-    val controller      = new InterestAccuralListController(Helpers.stubControllerComponents(), mockInterestAccuralListConnector)
+    val controller      =
+      new InterestAccuralListController(Helpers.stubControllerComponents(), mockInterestAccuralListConnector)
   }
 
   "GET /" should {
@@ -57,7 +58,9 @@ class InterestAccuralListControllerSpec extends AnyWordSpec with Matchers with I
 
       contentAsJson(result) shouldBe Json.toJson(interestAccuralList)
 
-      verify(mockInterestAccuralListConnector).getInterestAccuralList(eqTo(1L), eqTo(2L), eqTo("IDE"))(any[HeaderCarrier])
+      verify(mockInterestAccuralListConnector).getInterestAccuralList(eqTo(1L), eqTo(2L), eqTo("IDE"))(
+        any[HeaderCarrier]
+      )
     }
 
     "return 500: INTERNAL_SERVER_ERROR" in new Fixture {
@@ -68,7 +71,9 @@ class InterestAccuralListControllerSpec extends AnyWordSpec with Matchers with I
       status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve interest accural list"
 
-      verify(mockInterestAccuralListConnector).getInterestAccuralList(eqTo(1L), eqTo(2L), eqTo("IDE"))(any[HeaderCarrier])
+      verify(mockInterestAccuralListConnector).getInterestAccuralList(eqTo(1L), eqTo(2L), eqTo("IDE"))(
+        any[HeaderCarrier]
+      )
     }
 
   }
