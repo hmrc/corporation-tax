@@ -33,37 +33,44 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class InterestChargeServiceSpec extends AnyWordSpec with Matchers with ScalaFutures with MockitoSugar with InterestChargesHelper {
-  
+class InterestChargeServiceSpec
+    extends AnyWordSpec
+    with Matchers
+    with ScalaFutures
+    with MockitoSugar
+    with InterestChargesHelper {
+
   private trait BaseSetup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
     private val cc: ControllerComponents = stubControllerComponents()
-    implicit val ec: ExecutionContext = cc.executionContext
+    implicit val ec: ExecutionContext    = cc.executionContext
 
     val mockRds: InterestChargesSummaryRdsProxyConnector = mock[InterestChargesSummaryRdsProxyConnector]
-    val service = new InterestChargeService(mockRds)
-    val taxPayerReference:String = "0986542"
+    val service                                          = new InterestChargeService(mockRds)
+    val taxPayerReference: String                        = "0986542"
   }
-  
+
   "InterestChargeService.getInterestChargesSummary" should {
-    
+
     "delegate to connector and successfully return InterestCharges" in new BaseSetup {
-      when(mockRds.getInterestChargesSummary(eqTo(taxPayerReference))(any[HeaderCarrier])).thenReturn(Future.successful(interestCharges))
-      
+      when(mockRds.getInterestChargesSummary(eqTo(taxPayerReference))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(interestCharges))
+
       val result: InterestCharges = service.getInterestChargesSummary(taxPayerReference).futureValue
-      
+
       result shouldBe interestCharges
-      
+
       verify(mockRds).getInterestChargesSummary(taxPayerReference)
-      
+
       verify(mockRds, times(1)).getInterestChargesSummary(taxPayerReference)
-      
+
     }
 
     "propagate any errors or exceptions from connector" in new BaseSetup {
 
-      when(mockRds.getInterestChargesSummary(eqTo(taxPayerReference))(any[HeaderCarrier])).thenReturn(Future.failed(new RuntimeException("boom")))
+      when(mockRds.getInterestChargesSummary(eqTo(taxPayerReference))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val ex: RuntimeException = intercept[RuntimeException] {
         service.getInterestChargesSummary(taxPayerReference).futureValue
@@ -74,9 +81,7 @@ class InterestChargeServiceSpec extends AnyWordSpec with Matchers with ScalaFutu
       verify(mockRds, times(1)).getInterestChargesSummary(taxPayerReference)
 
     }
-    
+
   }
-  
-  
 
 }
