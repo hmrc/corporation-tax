@@ -35,7 +35,7 @@ class InterestAccuralListConnector @Inject() (http: HttpClientV2, config: Servic
 
   private val dataProxyPath =
     if (stubEnabled) {
-      config.baseUrl("corporation-tax-stub") + "corporation-tax-stubs"
+      config.baseUrl("corporation-tax-stub") + "/corporation-tax-stubs"
     } else {
       config.baseUrl("rds-datacache-proxy") + "/rds-datacache-proxy"
     }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.corporationtax.Services
+package uk.gov.hmrc.corporationtax.services
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
@@ -23,10 +23,9 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
-import uk.gov.hmrc.corporationtax.models.TaxTransactions
 import uk.gov.hmrc.corporationtax.connectors.TaxTransactionsConnector
-import uk.gov.hmrc.corporationtax.services.TaxTransactionsService
 import uk.gov.hmrc.corporationtax.helpers.TaxTransactionsHelper
+import uk.gov.hmrc.corporationtax.models.TaxTransactions
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
