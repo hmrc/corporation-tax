@@ -22,9 +22,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.{Application, Configuration, Environment, Mode}
 import uk.gov.hmrc.corporationtax.helpers.InterestAccuralListHelper
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.http.HeaderCarrier
@@ -51,7 +49,7 @@ class InterestAccuralListConnectorISpec
 
     "return Interest Accural empty list from BE with status code OK" in {
       stubFor(
-        get(urlPathEqualTo(url(3L, 1L, "IDE")))
+        get(urlPathEqualTo(url(2L, 5L, "IDE")))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -105,7 +103,7 @@ class InterestAccuralListConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getInterestAccuralList(1L, 5L, "IDE").futureValue
+        connector.getInterestAccuralList(99L, 5L, "IDE").futureValue
       }
 
       ex.getMessage must include("500")
