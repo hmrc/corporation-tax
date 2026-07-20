@@ -59,8 +59,6 @@ class AdjustmentTransactionsConnectorISpec
           )
       )
 
-
-      println("TEST:" + adjustmentTransactionsConnector.getAdjustmentTransactions(1L, 5L).futureValue)
       val result = adjustmentTransactionsConnector.getAdjustmentTransactions(1L, 5L).futureValue
       result.adjustmentTransactionsList must contain allElementsOf emptyAdjustmentTransactionsList.adjustmentTransactionsList
     }
