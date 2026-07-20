@@ -40,7 +40,7 @@ class InterestChargesSummaryRdsProxyConnectorISpec extends AnyWordSpec
   private val connector: InterestChargesSummaryRdsProxyConnector = app.injector.instanceOf[InterestChargesSummaryRdsProxyConnector]
 
 
-  "getPenaltyTransactionList" should {
+  "getInterestChargesSummary" should {
 
     def url(taxPayerReference:String) =
       s"/rds-datacache-proxy/corporation-tax/interest-charge-summary/$taxPayerReference"
