@@ -26,17 +26,17 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.corporationtax.connectors.PenaltiesConnector
 import uk.gov.hmrc.corporationtax.helpers.PenaltiesHelper
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 import org.mockito.ArgumentMatchers.eq as eqTo
+import uk.gov.hmrc.corporationtax.services.PenaltiesService
 
 class PenaltiesControllerSpec extends AnyWordSpec with Matchers with PenaltiesHelper {
 
   private trait Fixture {
-    val mockPenaltiesConnector: PenaltiesConnector = mock[PenaltiesConnector]
+    val mockPenaltiesService: PenaltiesService = mock[PenaltiesService]
 
     val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
@@ -44,32 +44,32 @@ class PenaltiesControllerSpec extends AnyWordSpec with Matchers with PenaltiesHe
 
     val fakeRequest     = FakeRequest("GET", "/")
     val fakePostRequest = FakeRequest("GET", "/WrongUrl")
-    val controller      = new PenaltiesController(Helpers.stubControllerComponents(), mockPenaltiesConnector)
+    val controller      = new PenaltiesController(Helpers.stubControllerComponents(), mockPenaltiesService)
   }
 
   "GET /" should {
 
     "return 200: OK" in new Fixture {
-      when(mockPenaltiesConnector.getPenaltyTransactionList(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(penalties))
+      when(mockPenaltiesService.getPenaltyTransactionList(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(penaltyItems))
 
       val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L)(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson(penalties)
+      contentAsJson(result) shouldBe Json.toJson(penaltyItems)
 
-      verify(mockPenaltiesConnector).getPenaltyTransactionList(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
+      verify(mockPenaltiesService).getPenaltyTransactionList(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }
 
     "return 500: INTERNAL_SERVER_ERROR" in new Fixture {
-      when(mockPenaltiesConnector.getPenaltyTransactionList(any(), any())(any[HeaderCarrier]))
+      when(mockPenaltiesService.getPenaltyTransactionList(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("unexpected")))
 
       val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L)(fakeRequest)
       status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve penalties"
 
-      verify(mockPenaltiesConnector).getPenaltyTransactionList(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
+      verify(mockPenaltiesService).getPenaltyTransactionList(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }
 
     // TODO: implement auth failed scenario
