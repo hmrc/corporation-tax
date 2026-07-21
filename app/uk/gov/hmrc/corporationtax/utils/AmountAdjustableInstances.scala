@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.corporationtax.utils
 
-import uk.gov.hmrc.corporationtax.models.TaxTransactionsItem
+import uk.gov.hmrc.corporationtax.models.{PaymentTransaction, TaxTransactionsItem}
 
 object AmountAdjustableInstances {
   implicit val taxTransactionsItemAmountAdjustable: AmountAdjustable[TaxTransactionsItem] =
@@ -25,6 +25,15 @@ object AmountAdjustableInstances {
         : List[(TaxTransactionsItem => Option[BigDecimal], (TaxTransactionsItem, BigDecimal) => TaxTransactionsItem)] =
         List(
           (item => Some(item.currentAmount), (item, newValue) => item.copy(currentAmount = newValue))
+        )
+    }
+
+  implicit val paymentTransactionAmountAdjustable: AmountAdjustable[PaymentTransaction] =
+    new AmountAdjustable[PaymentTransaction] {
+      def amountFields
+        : List[(PaymentTransaction => Option[BigDecimal], (PaymentTransaction, BigDecimal) => PaymentTransaction)] =
+        List(
+          (item => Some(item.amount), (item, newValue) => item.copy(amount = newValue))
         )
     }
 
