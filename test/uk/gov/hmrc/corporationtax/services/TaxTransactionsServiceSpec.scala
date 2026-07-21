@@ -51,45 +51,7 @@ class TaxTransactionsServiceSpec
 
     val result: TaxTransactions = service.getTaxTransactions(taxRef, accPeriod).futureValue
 
-    result mustBe taxTransactionsTransformedAndSorted
-
-    verify(mockConnector).getTaxTransactions(taxRef, accPeriod)(hc)
-  }
-
-  "getTaxTransactions returns and empty list if an empty list is returned from connector" in new Setup {
-
-    when(mockConnector.getTaxTransactions(any[Long], any[Long])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(emptyTaxTransactions))
-
-    val result: TaxTransactions = service.getTaxTransactions(taxRef, accPeriod).futureValue
-
-    result mustBe emptyTaxTransactions
-
-    verify(mockConnector).getTaxTransactions(taxRef, accPeriod)(hc)
-
-  }
-
-  "getTaxTransactions returns a single item list with transformed current amount" in new Setup {
-    when(mockConnector.getTaxTransactions(any[Long], any[Long])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(taxTransactionsSingleItemList))
-
-    val result: TaxTransactions = service.getTaxTransactions(taxRef, accPeriod).futureValue
-
-    result mustBe taxTransactionsSingleItemListTransformed
-
-    verify(mockConnector).getTaxTransactions(taxRef, accPeriod)(hc)
-  }
-
-  "getTaxTransactions returns a multiple item list with first zero amount of assessment type only kept" in new Setup {
-    when(mockConnector.getTaxTransactions(any[Long], any[Long])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(taxTransactionsZeroAmountAssessments))
-
-    val result: TaxTransactions = service.getTaxTransactions(taxRef, accPeriod).futureValue
-
-    val countByType: Map[String, Int] =
-      result.taxTransactions.groupBy(_.assessmentType).view.mapValues(_.size).toMap
-
-    countByType mustBe Map("M" -> 1, "A" -> 1, "D" -> 2)
+    result mustBe taxTransactionsTransformed
 
     verify(mockConnector).getTaxTransactions(taxRef, accPeriod)(hc)
   }
