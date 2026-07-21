@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.corporationtax.utils
 
-import uk.gov.hmrc.corporationtax.models.{InterestAccural, PaymentTransaction, TaxTransactionsItem}
+import uk.gov.hmrc.corporationtax.models.{AccountingPeriodDetails, InterestAccural,PaymentTransaction, TaxTransactionsItem}
 
 object AmountAdjustableInstances {
   implicit val taxTransactionsItemAmountAdjustable: AmountAdjustable[TaxTransactionsItem] =
@@ -45,6 +45,20 @@ object AmountAdjustableInstances {
           (item => Some(item.computationAmount), (item, newValue) => item.copy(computationAmount = newValue)),
           (item => Some(item.interestRate), (item, newValue) => item.copy(interestRate = newValue)),
           (item => Some(item.interestAmount), (item, newValue) => item.copy(interestAmount = newValue))
+        )
+    }
+
+  implicit val accountingPeriodDetailsAmountAdjustable: AmountAdjustable[AccountingPeriodDetails] =
+    new AmountAdjustable[AccountingPeriodDetails] {
+      def amountFields
+      : List[(AccountingPeriodDetails => Option[BigDecimal], (AccountingPeriodDetails, BigDecimal) => AccountingPeriodDetails)] =
+        List(
+          (item => Some(item.creditInterestAmount), (item, newValue) => item.copy(creditInterestAmount = newValue)),
+          (item => Some(item.debitInterestAmount), (item, newValue) => item.copy(debitInterestAmount = newValue)),
+          (item => Some(item.latePaymentInterestAmount), (item, newValue) => item.copy(latePaymentInterestAmount = newValue)),
+          (item => Some(item.repaymentInterestAmount), (item, newValue) => item.copy(repaymentInterestAmount = newValue)),
+          (item => Some(item.totalDerivedActualInterest), (item, newValue) => item.copy(totalDerivedActualInterest = newValue)),
+          (item => Some(item.amountDueForAp), (item, newValue) => item.copy(amountDueForAp = newValue))
         )
     }
 
