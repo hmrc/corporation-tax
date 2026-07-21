@@ -5,3 +5,4 @@ GET        /tax-transactions/:taxRef/:accPeriod                            uk.go
 GET        /interest-accural-list/:taxRef/:accPeriod/:interestType         uk.gov.hmrc.corporationtax.controllers.InterestAccuralListController.getInterestAccuralList(taxRef: Long, accPeriod: Long, interestType: String)
 GET        /interest-charge-summary/:taxPayerReference                     uk.gov.hmrc.corporationtax.controllers.InterestChargesSummaryController.getInterestChargesSummary(taxPayerReference:String)
 GET        /adjustment-transactions/:taxRef/:accPeriod                     uk.gov.hmrc.corporationtax.controllers.AdjustmentTransactionsController.getAdjustmentTransactions(taxRef: Long, accPeriod: Long)
+GET        /administrative-rule/:adminRuleKey                              uk.gov.hmrc.corporationtax.controllers.AdministrationRuleController.getAdminRule(adminRuleKey:String)
