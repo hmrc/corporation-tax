@@ -27,7 +27,7 @@ trait TaxTransactionsHelper {
 
   val emptyTaxTransactions: TaxTransactions = TaxTransactions(List.empty)
 
-  val taxTransactions =
+  val taxTransactions: TaxTransactions =
     TaxTransactions(
       List(
         TaxTransactionsItem(
@@ -38,7 +38,7 @@ trait TaxTransactionsHelper {
         ),
         TaxTransactionsItem(
           currentAmount = BigDecimal(123.44),
-          assessmentType = "D",
+          assessmentType = "A",
           taxDate = LocalDate.of(2026, 2, 1),
           correctionClaimSignal = Some("2")
         ),
@@ -51,7 +51,7 @@ trait TaxTransactionsHelper {
       )
     )
 
-  val taxTransactionsSingleItemList = TaxTransactions(
+  val taxTransactionsSingleItemList: TaxTransactions = TaxTransactions(
     List(
       TaxTransactionsItem(
         currentAmount = BigDecimal(123.44),
@@ -61,4 +61,93 @@ trait TaxTransactionsHelper {
       )
     )
   )
+
+  val taxTransactionsSingleItemListTransformed: TaxTransactions = TaxTransactions(
+    List(
+      TaxTransactionsItem(
+        currentAmount = BigDecimal(-123.44),
+        assessmentType = "E",
+        taxDate = LocalDate.of(2026, 3, 1),
+        correctionClaimSignal = None
+      )
+    )
+  )
+
+  val taxTransactionsTransformed: TaxTransactions =
+    TaxTransactions(
+      List(
+        TaxTransactionsItem(
+          currentAmount = BigDecimal(-123.44),
+          assessmentType = "A",
+          taxDate = LocalDate.of(2026, 1, 1),
+          correctionClaimSignal = Some("0")
+        ),
+        TaxTransactionsItem(
+          currentAmount = BigDecimal(-123.44),
+          assessmentType = "A",
+          taxDate = LocalDate.of(2026, 2, 1),
+          correctionClaimSignal = Some("2")
+        ),
+        TaxTransactionsItem(
+          currentAmount = BigDecimal(-123.44),
+          assessmentType = "E",
+          taxDate = LocalDate.of(2026, 3, 1),
+          correctionClaimSignal = None
+        )
+      )
+    )
+
+  val taxTransactionsZeroAmountAssessments: TaxTransactions =
+    TaxTransactions(
+      List(
+        TaxTransactionsItem(
+          currentAmount = BigDecimal(0.00),
+          assessmentType = "M",
+          taxDate = LocalDate.of(2026, 1, 1),
+          correctionClaimSignal = None
+        ),
+        TaxTransactionsItem(
+          currentAmount = BigDecimal(0.00),
+          assessmentType = "M",
+          taxDate = LocalDate.of(2026, 1, 1),
+          correctionClaimSignal = Some("2")
+        ),
+        TaxTransactionsItem(
+          currentAmount = BigDecimal(0.00),
+          assessmentType = "M",
+          taxDate = LocalDate.of(2026, 1, 1),
+          correctionClaimSignal = Some("0")
+        ),
+        TaxTransactionsItem(
+          currentAmount = BigDecimal(0.00),
+          assessmentType = "A",
+          taxDate = LocalDate.of(2026, 1, 1),
+          correctionClaimSignal = Some("0")
+        ),
+        TaxTransactionsItem(
+          currentAmount = BigDecimal(0.00),
+          assessmentType = "A",
+          taxDate = LocalDate.of(2026, 1, 1),
+          correctionClaimSignal = Some("0")
+        ),
+        TaxTransactionsItem(
+          currentAmount = BigDecimal(0.00),
+          assessmentType = "A",
+          taxDate = LocalDate.of(2026, 1, 1),
+          correctionClaimSignal = Some("0")
+        ),
+        TaxTransactionsItem(
+          currentAmount = BigDecimal(0.00),
+          assessmentType = "D",
+          taxDate = LocalDate.of(2026, 1, 1),
+          correctionClaimSignal = Some("0")
+        ),
+        TaxTransactionsItem(
+          currentAmount = BigDecimal(0.00),
+          assessmentType = "D",
+          taxDate = LocalDate.of(2026, 1, 1),
+          correctionClaimSignal = Some("0")
+        )
+      )
+    )
 }

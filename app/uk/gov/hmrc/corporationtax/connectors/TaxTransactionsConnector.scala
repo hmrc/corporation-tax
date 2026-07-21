@@ -33,13 +33,12 @@ class TaxTransactionsConnector @Inject() (http: HttpClientV2, config: ServicesCo
 
   private val stubEnabled: Boolean = config.getBoolean("features.corporation-tax-stub-enabled")
 
-  private val dataProxyPath =
+  private val dataProxyPath                                                                                  =
     if (stubEnabled) {
       config.baseUrl("corporation-tax-stub") + "/corporation-tax-stubs"
     } else {
       config.baseUrl("rds-datacache-proxy") + "/rds-datacache-proxy"
     }
-
   def getTaxTransactions(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[TaxTransactions] = {
     val url: URL = url"$dataProxyPath/corporation-tax/tax-transactions/$taxRef/$accPeriod"
     http
