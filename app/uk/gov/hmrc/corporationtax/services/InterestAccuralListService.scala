@@ -20,13 +20,16 @@ import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.InterestAccuralListConnector
 import uk.gov.hmrc.corporationtax.models.InterestAccuralList
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.corporationtax.utils.applyAmountTransformToList
+import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class InterestAccuralListService @Inject() (
   connector: InterestAccuralListConnector
-) extends Logging {
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def getInterestAccuralList(taxRef: Long, accPeriod: Long, interestType: String)(implicit
     hc: HeaderCarrier
@@ -34,7 +37,11 @@ class InterestAccuralListService @Inject() (
     logger.info(
       s"[InterestAccuralListService][getInterestAccuralList] Calling InterestAccuralListConnector: taxRef: $taxRef, accPeriod: $accPeriod, interestType: $interestType"
     )
-    connector.getInterestAccuralList(taxRef, accPeriod, interestType)
+    // connector.getInterestAccuralList(taxRef, accPeriod, interestType)
+    connector.getInterestAccuralList(taxRef, accPeriod, interestType).map { interestAccurals =>
+      interestAccurals
+        .copy(interestAccuralList = applyAmountTransformToList(interestAccurals.interestAccuralList))
+    }
   }
 
 }

@@ -55,7 +55,7 @@ class InterestAccuralListServiceSpec
 
     val result: InterestAccuralList = service.getInterestAccuralList(1L, 1L, "IDB").futureValue
 
-    result shouldBe interestAccuralList
+    result shouldBe interestAccuralListTransformed
 
     verify(mockAccuralInterestListConnector).getInterestAccuralList(1L, 1L, "IDB")(hc)
   }

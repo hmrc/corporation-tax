@@ -28,19 +28,19 @@ trait InterestAccuralListHelper {
     InterestAccuralList(
       List(
         InterestAccural(
-          computationAmount = 1,
+          computationAmount = BigDecimal(1.00),
           interestAccrualFromDate = LocalDate.of(2021, 3, 7),
           interestAccrualToDate = LocalDate.of(2021, 5, 7),
           interestRate = 2,
-          interestAmount = 10,
+          interestAmount = BigDecimal(10.00),
           apEndDate = LocalDate.of(2021, 6, 7)
         ),
         InterestAccural(
-          computationAmount = 1,
+          computationAmount = BigDecimal(1.00),
           interestAccrualFromDate = LocalDate.of(2023, 3, 7),
           interestAccrualToDate = LocalDate.of(2023, 5, 7),
           interestRate = 2,
-          interestAmount = 10,
+          interestAmount = BigDecimal(10.0),
           apEndDate = LocalDate.of(2023, 6, 7)
         )
       )
@@ -50,14 +50,49 @@ trait InterestAccuralListHelper {
     InterestAccuralList(
       List(
         InterestAccural(
-          computationAmount = 1,
+          computationAmount = BigDecimal(1.00),
           interestAccrualFromDate = LocalDate.of(2021, 3, 7),
           interestAccrualToDate = LocalDate.of(2021, 5, 7),
           interestRate = 2,
-          interestAmount = 10,
+          interestAmount = BigDecimal(10.00),
           apEndDate = LocalDate.of(2021, 6, 7)
         )
       )
     )
 
+  val interestAccuralListTransformed =
+    InterestAccuralList(
+      List(
+        InterestAccural(
+          computationAmount = BigDecimal(-1.00),
+          interestAccrualFromDate = LocalDate.of(2021, 3, 7),
+          interestAccrualToDate = LocalDate.of(2021, 5, 7),
+          interestRate = 2,
+          interestAmount = BigDecimal(-10.00),
+          apEndDate = LocalDate.of(2021, 6, 7)
+        ),
+        InterestAccural(
+          computationAmount = BigDecimal(-1.00),
+          interestAccrualFromDate = LocalDate.of(2023, 3, 7),
+          interestAccrualToDate = LocalDate.of(2023, 5, 7),
+          interestRate = 2,
+          interestAmount = BigDecimal(-10.0),
+          apEndDate = LocalDate.of(2023, 6, 7)
+        )
+      )
+    )
+
+  val interestAccuralSingleItemListTransformed =
+    InterestAccuralList(
+      List(
+        InterestAccural(
+          computationAmount = BigDecimal(-1.00),
+          interestAccrualFromDate = LocalDate.of(2021, 3, 7),
+          interestAccrualToDate = LocalDate.of(2021, 5, 7),
+          interestRate = 2,
+          interestAmount = BigDecimal(-10.00),
+          apEndDate = LocalDate.of(2021, 6, 7)
+        )
+      )
+    )
 }
