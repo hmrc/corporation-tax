@@ -32,7 +32,11 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class InterestAccuralListServiceSpec extends AnyWordSpec with Matchers with InterestAccuralListHelper with ScalaFutures {
+class InterestAccuralListServiceSpec
+    extends AnyWordSpec
+    with Matchers
+    with InterestAccuralListHelper
+    with ScalaFutures {
 
   private trait Fixture {
     val mockAccuralInterestListConnector: InterestAccuralListConnector = mock[InterestAccuralListConnector]
