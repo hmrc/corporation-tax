@@ -19,8 +19,8 @@ package uk.gov.hmrc.corporationtax.controllers
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.corporationtax.connectors.InterestAccuralListConnector
 import uk.gov.hmrc.corporationtax.models.InterestAccuralList
+import uk.gov.hmrc.corporationtax.services.InterestAccuralListService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
@@ -28,14 +28,14 @@ import scala.concurrent.ExecutionContext
 
 class InterestAccuralListController @Inject() (
   cc: ControllerComponents,
-  interestAccuralListConnector: InterestAccuralListConnector
+  service: InterestAccuralListService
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
   def getInterestAccuralList(taxRef: Long, accPeriod: Long, interestType: String): Action[AnyContent] = Action.async {
     implicit request =>
-      interestAccuralListConnector
+      service
         .getInterestAccuralList(taxRef, accPeriod, interestType)
         .map { interestAccuralList =>
           Ok(Json.toJson(interestAccuralList))

@@ -26,7 +26,7 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.corporationtax.connectors.InterestAccuralListConnector
+import uk.gov.hmrc.corporationtax.services.InterestAccuralListService
 import uk.gov.hmrc.corporationtax.helpers.InterestAccuralListHelper
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class InterestAccuralListControllerSpec extends AnyWordSpec with Matchers with InterestAccuralListHelper {
 
   private trait Fixture {
-    val mockInterestAccuralListConnector: InterestAccuralListConnector = mock[InterestAccuralListConnector]
+    val mockInterestAccuralListService: InterestAccuralListService = mock[InterestAccuralListService]
 
     val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
@@ -44,34 +44,34 @@ class InterestAccuralListControllerSpec extends AnyWordSpec with Matchers with I
     val fakeRequest     = FakeRequest("GET", "/")
     val fakePostRequest = FakeRequest("GET", "/WrongUrl")
     val controller      =
-      new InterestAccuralListController(Helpers.stubControllerComponents(), mockInterestAccuralListConnector)
+      new InterestAccuralListController(Helpers.stubControllerComponents(), mockInterestAccuralListService)
   }
 
   "GET /" should {
 
     "return 200: OK" in new Fixture {
-      when(mockInterestAccuralListConnector.getInterestAccuralList(any(), any(), any())(any[HeaderCarrier]))
+      when(mockInterestAccuralListService.getInterestAccuralList(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(interestAccuralList))
 
-      val result: Future[Result] = controller.getInterestAccuralList(1, 2, "IDE")(fakeRequest)
+      val result: Future[Result] = controller.getInterestAccuralList(1L, 2L, "IDE")(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(interestAccuralList)
 
-      verify(mockInterestAccuralListConnector).getInterestAccuralList(eqTo(1L), eqTo(2L), eqTo("IDE"))(
+      verify(mockInterestAccuralListService).getInterestAccuralList(eqTo(1L), eqTo(2L), eqTo("IDE"))(
         any[HeaderCarrier]
       )
     }
 
     "return 500: INTERNAL_SERVER_ERROR" in new Fixture {
-      when(mockInterestAccuralListConnector.getInterestAccuralList(any(), any(), any())(any[HeaderCarrier]))
+      when(mockInterestAccuralListService.getInterestAccuralList(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("unexpected")))
 
-      val result: Future[Result] = controller.getInterestAccuralList(1, 2, "IDE")(fakeRequest)
+      val result: Future[Result] = controller.getInterestAccuralList(1L, 2L, "IDE")(fakeRequest)
       status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve interest accural list"
 
-      verify(mockInterestAccuralListConnector).getInterestAccuralList(eqTo(1L), eqTo(2L), eqTo("IDE"))(
+      verify(mockInterestAccuralListService).getInterestAccuralList(eqTo(1L), eqTo(2L), eqTo("IDE"))(
         any[HeaderCarrier]
       )
     }
