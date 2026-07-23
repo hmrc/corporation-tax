@@ -50,14 +50,27 @@ object AmountAdjustableInstances {
 
   implicit val accountingPeriodDetailsAmountAdjustable: AmountAdjustable[AccountingPeriodDetails] =
     new AmountAdjustable[AccountingPeriodDetails] {
-      def amountFields
-      : List[(AccountingPeriodDetails => Option[BigDecimal], (AccountingPeriodDetails, BigDecimal) => AccountingPeriodDetails)] =
+      def amountFields: List[
+        (
+          AccountingPeriodDetails => Option[BigDecimal],
+          (AccountingPeriodDetails, BigDecimal) => AccountingPeriodDetails
+        )
+      ] =
         List(
           (item => Some(item.creditInterestAmount), (item, newValue) => item.copy(creditInterestAmount = newValue)),
           (item => Some(item.debitInterestAmount), (item, newValue) => item.copy(debitInterestAmount = newValue)),
-          (item => Some(item.latePaymentInterestAmount), (item, newValue) => item.copy(latePaymentInterestAmount = newValue)),
-          (item => Some(item.repaymentInterestAmount), (item, newValue) => item.copy(repaymentInterestAmount = newValue)),
-          (item => Some(item.totalDerivedActualInterest), (item, newValue) => item.copy(totalDerivedActualInterest = newValue)),
+          (
+            item => Some(item.latePaymentInterestAmount),
+            (item, newValue) => item.copy(latePaymentInterestAmount = newValue)
+          ),
+          (
+            item => Some(item.repaymentInterestAmount),
+            (item, newValue) => item.copy(repaymentInterestAmount = newValue)
+          ),
+          (
+            item => Some(item.totalDerivedActualInterest),
+            (item, newValue) => item.copy(totalDerivedActualInterest = newValue)
+          ),
           (item => Some(item.amountDueForAp), (item, newValue) => item.copy(amountDueForAp = newValue))
         )
     }

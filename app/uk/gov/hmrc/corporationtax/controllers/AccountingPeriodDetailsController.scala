@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class AccountingPeriodDetailsController @Inject()(
+class AccountingPeriodDetailsController @Inject() (
   cc: ControllerComponents,
   connector: AccountingPeriodDetailsConnector
 )(implicit ec: ExecutionContext)
@@ -38,11 +38,13 @@ class AccountingPeriodDetailsController @Inject()(
     connector
       .getAccountingPeriodDetails(taxRef, accPeriod)
       .map { accountingPeriodDetails =>
-        Ok(Json.toJson(applyAmountTransform(accountingPeriodDetails))) //TODO: BF 36 Boolean transformation needs adding still
+        Ok(
+          Json.toJson(applyAmountTransform(accountingPeriodDetails))
+        ) // TODO: BF 36 Boolean transformation needs adding still
       }
       .recover { case ex: Exception =>
         logger.error("Error while retrieving tax transactions", ex)
-        InternalServerError(Json.obj("error" -> "Failed to retrieve tax transactions"))
+        InternalServerError(Json.obj("error" -> "Failed to retrieve accounting period details"))
       }
   }
 
