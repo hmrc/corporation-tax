@@ -37,7 +37,6 @@ class InterestAccuralListService @Inject() (
     logger.info(
       s"[InterestAccuralListService][getInterestAccuralList] Calling InterestAccuralListConnector: taxRef: $taxRef, accPeriod: $accPeriod, interestType: $interestType"
     )
-    // connector.getInterestAccuralList(taxRef, accPeriod, interestType)
     connector.getInterestAccuralList(taxRef, accPeriod, interestType).map { interestAccurals =>
       interestAccurals
         .copy(interestAccuralList = applyAmountTransformToList(interestAccurals.interestAccuralList))
