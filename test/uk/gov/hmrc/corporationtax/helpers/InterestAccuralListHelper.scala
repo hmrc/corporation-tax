@@ -31,7 +31,7 @@ trait InterestAccuralListHelper {
           computationAmount = BigDecimal(1.00),
           interestAccrualFromDate = LocalDate.of(2021, 3, 7),
           interestAccrualToDate = LocalDate.of(2021, 5, 7),
-          interestRate = 2,
+          interestRate = BigDecimal(2),
           interestAmount = BigDecimal(10.00),
           apEndDate = LocalDate.of(2021, 6, 7)
         ),
@@ -39,7 +39,7 @@ trait InterestAccuralListHelper {
           computationAmount = BigDecimal(1.00),
           interestAccrualFromDate = LocalDate.of(2023, 3, 7),
           interestAccrualToDate = LocalDate.of(2023, 5, 7),
-          interestRate = 2,
+          interestRate = BigDecimal(2),
           interestAmount = BigDecimal(10.0),
           apEndDate = LocalDate.of(2023, 6, 7)
         )
@@ -53,7 +53,7 @@ trait InterestAccuralListHelper {
           computationAmount = BigDecimal(1.00),
           interestAccrualFromDate = LocalDate.of(2021, 3, 7),
           interestAccrualToDate = LocalDate.of(2021, 5, 7),
-          interestRate = 2,
+          interestRate = BigDecimal(2),
           interestAmount = BigDecimal(10.00),
           apEndDate = LocalDate.of(2021, 6, 7)
         )
@@ -67,7 +67,7 @@ trait InterestAccuralListHelper {
           computationAmount = BigDecimal(-1.00),
           interestAccrualFromDate = LocalDate.of(2021, 3, 7),
           interestAccrualToDate = LocalDate.of(2021, 5, 7),
-          interestRate = 2,
+          interestRate = BigDecimal(-2),
           interestAmount = BigDecimal(-10.00),
           apEndDate = LocalDate.of(2021, 6, 7)
         ),
@@ -75,7 +75,7 @@ trait InterestAccuralListHelper {
           computationAmount = BigDecimal(-1.00),
           interestAccrualFromDate = LocalDate.of(2023, 3, 7),
           interestAccrualToDate = LocalDate.of(2023, 5, 7),
-          interestRate = 2,
+          interestRate = BigDecimal(-2.00),
           interestAmount = BigDecimal(-10.0),
           apEndDate = LocalDate.of(2023, 6, 7)
         )
@@ -89,7 +89,7 @@ trait InterestAccuralListHelper {
           computationAmount = BigDecimal(-1.00),
           interestAccrualFromDate = LocalDate.of(2021, 3, 7),
           interestAccrualToDate = LocalDate.of(2021, 5, 7),
-          interestRate = 2,
+          interestRate =  BigDecimal(-2.00),
           interestAmount = BigDecimal(-10.00),
           apEndDate = LocalDate.of(2021, 6, 7)
         )
