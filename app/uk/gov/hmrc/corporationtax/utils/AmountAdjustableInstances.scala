@@ -16,7 +16,9 @@
 
 package uk.gov.hmrc.corporationtax.utils
 
-import uk.gov.hmrc.corporationtax.models.{AccountingPeriodDetails, InterestAccural,PaymentTransaction, TaxTransactionsItem}
+import uk.gov.hmrc.corporationtax.models.{
+  AccountingPeriodDetails, InterestAccural, PaymentTransaction, TaxTransactionsItem
+}
 
 object AmountAdjustableInstances {
   implicit val taxTransactionsItemAmountAdjustable: AmountAdjustable[TaxTransactionsItem] =
