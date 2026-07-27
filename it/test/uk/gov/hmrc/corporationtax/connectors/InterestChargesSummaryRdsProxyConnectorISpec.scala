@@ -42,12 +42,12 @@ class InterestChargesSummaryRdsProxyConnectorISpec extends AnyWordSpec
 
   "getInterestChargesSummary" should {
 
-    def url(taxPayerReference:String) =
+    def url(taxPayerReference:Long) =
       s"/rds-datacache-proxy/corporation-tax/interest-charge-summary/$taxPayerReference"
 
     "return InterestCharges empty list from BE with status code OK" in {
       stubFor(
-        get(urlPathEqualTo(url("1234")))
+        get(urlPathEqualTo(url(1234L)))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -61,13 +61,13 @@ class InterestChargesSummaryRdsProxyConnectorISpec extends AnyWordSpec
           )
       )
 
-      val result = connector.getInterestChargesSummary("1234").futureValue
+      val result = connector.getInterestChargesSummary(1234L).futureValue
       result.interestCharges must contain allElementsOf emptyInterestCharges.interestCharges
     }
 
     "return InterestCharges list (single item) from BE with status code OK" in {
       stubFor(
-        get(urlPathEqualTo(url("78965432")))
+        get(urlPathEqualTo(url(78965432L)))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -89,13 +89,13 @@ class InterestChargesSummaryRdsProxyConnectorISpec extends AnyWordSpec
           )
       )
 
-      val result = connector.getInterestChargesSummary("78965432").futureValue
+      val result = connector.getInterestChargesSummary(78965432L).futureValue
       result.interestCharges must contain allElementsOf interestChargesWithTSingleItem.interestCharges
     }
 
     "return InterestCharges list (two items) from BE with status code OK" in {
       stubFor(
-        get(urlPathEqualTo(url("789652")))
+        get(urlPathEqualTo(url(789652L)))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -118,13 +118,13 @@ class InterestChargesSummaryRdsProxyConnectorISpec extends AnyWordSpec
           )
       )
 
-      val result = connector.getInterestChargesSummary("789652").futureValue
+      val result = connector.getInterestChargesSummary(789652L).futureValue
       result.interestCharges must contain allElementsOf interestChargesWithTwoItems.interestCharges
     }
 
     "return INTERNAL_ERROR when service failed" in {
       stubFor(
-        get(urlPathEqualTo(url("123")))
+        get(urlPathEqualTo(url(123L)))
           .willReturn(
             aResponse()
               .withStatus(INTERNAL_SERVER_ERROR)
@@ -133,13 +133,13 @@ class InterestChargesSummaryRdsProxyConnectorISpec extends AnyWordSpec
       )
 
       val ex = intercept[Exception] {
-        connector.getInterestChargesSummary("123").futureValue
+        connector.getInterestChargesSummary(123L).futureValue
       }
       ex.getMessage.toLowerCase must include("boom")
     }
     "return 400 when BE returns BAD_REQUEST " in {
       stubFor(
-        get(urlPathEqualTo(url("123")))
+        get(urlPathEqualTo(url(123L)))
           .willReturn(
             aResponse()
               .withStatus(BAD_REQUEST)
@@ -148,14 +148,14 @@ class InterestChargesSummaryRdsProxyConnectorISpec extends AnyWordSpec
       )
 
       val ex = intercept[Exception] {
-        connector.getInterestChargesSummary("123").futureValue
+        connector.getInterestChargesSummary(123L).futureValue
       }
       ex.getMessage must include("Invalid Request")
     }
 
     "return 404 when BE returns BAD_REQUEST " in {
       stubFor(
-        get(urlPathEqualTo(url("123")))
+        get(urlPathEqualTo(url(123L)))
           .willReturn(
             aResponse()
               .withStatus(NOT_FOUND)
@@ -164,7 +164,7 @@ class InterestChargesSummaryRdsProxyConnectorISpec extends AnyWordSpec
       )
 
       val ex = intercept[Exception] {
-        connector.getInterestChargesSummary("123").futureValue
+        connector.getInterestChargesSummary(123L).futureValue
       }
       ex.getMessage must include("Not found")
     }

@@ -33,7 +33,7 @@ class InterestChargesSummaryController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def getInterestChargesSummary(taxPayerReference: String): Action[AnyContent] = Action.async { implicit request =>
+  def getInterestChargesSummary(taxPayerReference: Long): Action[AnyContent] = Action.async { implicit request =>
     service
       .getInterestChargesSummary(taxPayerReference)
       .map { interestCharges =>

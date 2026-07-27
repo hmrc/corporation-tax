@@ -3,7 +3,7 @@
 GET        /penalty-transactions/:taxRef/:accPeriod                        uk.gov.hmrc.corporationtax.controllers.PenaltiesController.getPenaltyTransactionList(taxRef: Long, accPeriod: Long)
 GET        /tax-transactions/:taxRef/:accPeriod                            uk.gov.hmrc.corporationtax.controllers.TaxTransactionsController.getTaxTransactions(taxRef: Long, accPeriod: Long)
 GET        /interest-accural-list/:taxRef/:accPeriod/:interestType         uk.gov.hmrc.corporationtax.controllers.InterestAccuralListController.getInterestAccuralList(taxRef: Long, accPeriod: Long, interestType: String)
-GET        /interest-charge-summary/:taxPayerReference                     uk.gov.hmrc.corporationtax.controllers.InterestChargesSummaryController.getInterestChargesSummary(taxPayerReference:String)
+GET        /interest-charge-summary/:taxPayerReference                     uk.gov.hmrc.corporationtax.controllers.InterestChargesSummaryController.getInterestChargesSummary(taxPayerReference:Long)
 GET        /adjustment-transactions/:taxRef/:accPeriod                     uk.gov.hmrc.corporationtax.controllers.AdjustmentTransactionsController.getAdjustmentTransactions(taxRef: Long, accPeriod: Long)
 GET        /administrative-rule/:adminRuleKey                              uk.gov.hmrc.corporationtax.controllers.AdministrationRuleController.getAdminRule(adminRuleKey:String)
 GET        /payment-transactions/:taxRef/:accPeriod                            uk.gov.hmrc.corporationtax.controllers.PaymentsController.getPayments(taxRef: Long, accPeriod: Long)

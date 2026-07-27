@@ -22,9 +22,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.{Application, Configuration, Environment, Mode}
 import uk.gov.hmrc.corporationtax.helpers.PaymentsHelper
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.http.HeaderCarrier
