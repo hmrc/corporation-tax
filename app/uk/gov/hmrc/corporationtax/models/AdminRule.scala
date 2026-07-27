@@ -20,7 +20,7 @@ import play.api.libs.json.{Json, OFormat}
 
 import java.time.LocalDate
 
-case class AdminRule(ruleNumber: Option[Long] = None, ruleDate: Option[LocalDate] = None) {}
+case class AdminRule(ruleNumber: Option[BigDecimal] = None, ruleDate: Option[LocalDate] = None) {}
 
 object AdminRule {
   implicit val format: OFormat[AdminRule] = Json.format[AdminRule]

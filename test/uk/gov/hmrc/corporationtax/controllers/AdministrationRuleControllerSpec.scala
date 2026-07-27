@@ -23,6 +23,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.http.Status
 import play.api.libs.json.Json
+import play.api.mvc.Results.BadRequest
 import play.api.mvc.{AnyContentAsEmpty, ControllerComponents, Result}
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
@@ -57,6 +58,18 @@ class AdministrationRuleControllerSpec extends AnyWordSpec with Matchers with Ad
       contentAsJson(result) shouldBe Json.toJson(example1adminRule)
 
       verify(mockService).getAdminRule(eqTo("LAST-INST-PER-M"))(any[HeaderCarrier])
+    }
+
+    "return 400: BAD_REQUEST when the adminRule is empty" in new Fixture {
+      when(mockService.getAdminRule(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(BadRequest(Json.obj("message" -> "AdminRule Key must be provided"))))
+
+      val result: Future[Result] = controller.getAdminRule("")(fakeRequest)
+
+      status(result) shouldBe Status.BAD_REQUEST
+
+      (contentAsJson(result) \ "message").as[String] shouldBe "AdminRule Key must be provided"
+
     }
 
     "returns status code BAD_GATEWAY when Upstream error is returned" in new Fixture {
