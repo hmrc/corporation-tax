@@ -48,7 +48,7 @@ class InterestChargeServiceSpec
 
     val mockRds: InterestChargesSummaryRdsProxyConnector = mock[InterestChargesSummaryRdsProxyConnector]
     val service                                          = new InterestChargeService(mockRds)
-    val taxPayerReference: String                        = "0986542"
+    val taxPayerReference: Long                          = 986542L
   }
 
   "InterestChargeService.getInterestChargesSummary" should {

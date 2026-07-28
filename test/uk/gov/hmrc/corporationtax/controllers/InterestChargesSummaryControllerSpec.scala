@@ -51,12 +51,12 @@ class InterestChargesSummaryControllerSpec extends AnyWordSpec with Matchers wit
       when(mockService.getInterestChargesSummary(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(interestCharges))
 
-      val result: Future[Result] = controller.getInterestChargesSummary("1234567")(fakeRequest)
+      val result: Future[Result] = controller.getInterestChargesSummary(1234567L)(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(interestCharges)
 
-      verify(mockService).getInterestChargesSummary(eqTo("1234567"))(any[HeaderCarrier])
+      verify(mockService).getInterestChargesSummary(eqTo(1234567L))(any[HeaderCarrier])
     }
 
     "returns status code BAD_GATEWAY when Upstream error is returned" in new Fixture {
@@ -65,7 +65,7 @@ class InterestChargesSummaryControllerSpec extends AnyWordSpec with Matchers wit
       when(mockService.getInterestChargesSummary(any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(err))
 
-      val result: Future[Result] = controller.getInterestChargesSummary("1234567")(fakeRequest)
+      val result: Future[Result] = controller.getInterestChargesSummary(1234567L)(fakeRequest)
 
       status(result) shouldBe BAD_GATEWAY
 
@@ -76,12 +76,12 @@ class InterestChargesSummaryControllerSpec extends AnyWordSpec with Matchers wit
       when(mockService.getInterestChargesSummary(any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("unexpected")))
 
-      val result: Future[Result] = controller.getInterestChargesSummary("12387")(fakeRequest)
+      val result: Future[Result] = controller.getInterestChargesSummary(12387L)(fakeRequest)
 
       status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve interestCharges"
 
-      verify(mockService).getInterestChargesSummary(eqTo("12387"))(any[HeaderCarrier])
+      verify(mockService).getInterestChargesSummary(eqTo(12387L))(any[HeaderCarrier])
     }
 
   }

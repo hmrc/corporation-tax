@@ -28,7 +28,7 @@ class InterestChargeService @Inject() (
   connector: InterestChargesSummaryRdsProxyConnector
 ) extends Logging {
 
-  def getInterestChargesSummary(taxPayerReference: String)(implicit hc: HeaderCarrier): Future[InterestCharges] = {
+  def getInterestChargesSummary(taxPayerReference: Long)(implicit hc: HeaderCarrier): Future[InterestCharges] = {
     logger.info(
       s"[InterestChargeService][getInterestChargesSummary] Calling InterestChargesSummaryRdsProxyConnector: taxPayerReference:$taxPayerReference"
     )

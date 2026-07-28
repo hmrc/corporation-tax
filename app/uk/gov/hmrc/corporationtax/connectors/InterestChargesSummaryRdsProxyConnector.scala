@@ -35,7 +35,7 @@ class InterestChargesSummaryRdsProxyConnector @Inject() (http: HttpClientV2, con
   private val rdsDataCachePath     = config.baseUrl("rds-datacache-proxy") + "/rds-datacache-proxy"
   private val stubEnabled: Boolean = config.getBoolean("features.corporation-tax-stub-enabled")
 
-  def getInterestChargesSummary(taxPayerReference: String)(implicit hc: HeaderCarrier): Future[InterestCharges] = {
+  def getInterestChargesSummary(taxPayerReference: Long)(implicit hc: HeaderCarrier): Future[InterestCharges] = {
     val url: URL =
       if (stubEnabled) url"$stubPath/corporation-tax/interest-charge-summary/$taxPayerReference"
       else url"$rdsDataCachePath/corporation-tax/interest-charge-summary/$taxPayerReference"
