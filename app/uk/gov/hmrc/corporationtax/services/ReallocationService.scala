@@ -17,32 +17,41 @@
 package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
+import uk.gov.hmrc.corporationtax.connectors.ReallocationsConnector
 import uk.gov.hmrc.corporationtax.models.{ReallocationRow, Reallocations}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.LocalDate
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class ReallocationService @Inject() extends Logging {
+class ReallocationService @Inject(
+                                   connector: ReallocationsConnector
+                                 ) (implicit ec: ExecutionContext) extends Logging {
+
+  // TODO: replace with generic functions when they are ready
+  private def amountTransform(amount: BigDecimal) : BigDecimal = {
+    // TODO: [1] - apply rounding
+    if (amount != BigDecimal(0)) {
+      -amount
+    } else {
+      amount
+    }
+  }
 
   def getByAccountingPeriod(taxRef: Long, accPeriod: Long)
                            (implicit hc: HeaderCarrier): Future[Reallocations] = {
     logger.info(s"[ReallocationService][getByAccountingPeriod] :$taxRef $accPeriod")
-
-    Future.successful {
-      Reallocations(reallocation =
-        Seq(
-            ReallocationRow(
-              amount = BigDecimal(117.01),
-              reallocationDate = LocalDate.of(2025, 5, 1),
-              sourceApEndDate = LocalDate.of(2026, 7, 1),
-            sourceTaxpayerReference = "9369369363"
-          )
+    connector
+      .getByAccountingPeriod(taxRef, accPeriod)
+      .map { reallocations =>
+        Reallocations( reallocation = 
+          reallocations
+            .reallocation.map { e =>
+              val amountTransformed : BigDecimal = amountTransform(e.amount)
+              ReallocationRow(amountTransformed, e.reallocationDate, e.sourceApEndDate, e.sourceTaxpayerReference)
+            }
         )
-      )
-    }
-
+      }
   }
 
 }
