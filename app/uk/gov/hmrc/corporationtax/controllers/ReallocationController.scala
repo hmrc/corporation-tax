@@ -26,12 +26,11 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class ReallocationController @Inject() (
-                                      cc: ControllerComponents,
-                                      service: ReallocationService
-                                    )(implicit ec: ExecutionContext)
-  extends BackendController(cc)
+  cc: ControllerComponents,
+  service: ReallocationService
+)(implicit ec: ExecutionContext)
+    extends BackendController(cc)
     with Logging {
-
 
   def getByAccountingPeriod(taxRef: Long, accPeriod: Long): Action[AnyContent] = Action.async { implicit request =>
     service

@@ -25,14 +25,13 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.test.Helpers
 import uk.gov.hmrc.corporationtax.connectors.ReallocationsConnector
-import uk.gov.hmrc.corporationtax.helpers.ReallocationDataHelpers
+import uk.gov.hmrc.corporationtax.helpers.ReallocationDataHelper
 import uk.gov.hmrc.corporationtax.models.Reallocations
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-
-class ReallocationServiceSpec extends AnyWordSpec with Matchers with ScalaFutures with ReallocationDataHelpers {
+class ReallocationServiceSpec extends AnyWordSpec with Matchers with ScalaFutures with ReallocationDataHelper {
 
   private trait Fixture {
     val mockReallocationsConnector: ReallocationsConnector = mock[ReallocationsConnector]
@@ -56,6 +55,5 @@ class ReallocationServiceSpec extends AnyWordSpec with Matchers with ScalaFuture
 
     verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
   }
-
 
 }

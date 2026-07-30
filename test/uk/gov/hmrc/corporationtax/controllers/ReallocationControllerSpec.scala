@@ -16,23 +16,24 @@
 
 package uk.gov.hmrc.corporationtax.controllers
 
-import org.mockito.ArgumentMatchers.any //, eq as eqTo}
-import org.mockito.Mockito.when // verify
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.http.Status
-//import play.api.libs.json.Json
+import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.corporationtax.helpers.ReallocationDataHelpers
+import uk.gov.hmrc.corporationtax.helpers.ReallocationDataHelper
 import uk.gov.hmrc.corporationtax.services.ReallocationService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReallocationControllerSpec extends AnyWordSpec with Matchers with ReallocationDataHelpers {
+// TODO: integrate auth scenarios
+class ReallocationControllerSpec extends AnyWordSpec with Matchers with ReallocationDataHelper {
 
   private trait Fixture {
     val mockReallocationService: ReallocationService = mock[ReallocationService]
@@ -55,23 +56,21 @@ class ReallocationControllerSpec extends AnyWordSpec with Matchers with Realloca
       val result: Future[Result] = controller.getByAccountingPeriod(1L, 2L)(fakeRequest)
       status(result) shouldBe Status.OK
 
-      //contentAsJson(result) shouldBe Json.toJson(penaltyItems)
+      contentAsJson(result) shouldBe Json.toJson(reallocationSingleItem)
 
-      //verify(mockReallocationService).getPenaltyTransactionList(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
+      verify(mockReallocationService).getByAccountingPeriod(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }
 
-//    "return 500: INTERNAL_SERVER_ERROR" in new Fixture {
-//      when(mockPenaltiesService.getPenaltyTransactionList(any(), any())(any[HeaderCarrier]))
-//        .thenReturn(Future.failed(new RuntimeException("unexpected")))
-//
-//      val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L)(fakeRequest)
-//      status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
-//      (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve penalties"
-//
-//      verify(mockPenaltiesService).getPenaltyTransactionList(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
-//    }
+    "return 500: INTERNAL_SERVER_ERROR" in new Fixture {
+      when(mockReallocationService.getByAccountingPeriod(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("unexpected")))
 
-    // TODO: implement auth failed scenario
+      val result: Future[Result] = controller.getByAccountingPeriod(1L, 2L)(fakeRequest)
+      status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
+      (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve Reallocation"
+
+      verify(mockReallocationService).getByAccountingPeriod(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
+    }
 
   }
 

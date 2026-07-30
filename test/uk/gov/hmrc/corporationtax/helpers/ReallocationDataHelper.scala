@@ -20,7 +20,7 @@ import uk.gov.hmrc.corporationtax.models.{ReallocationRow, Reallocations}
 
 import java.time.LocalDate
 
-trait ReallocationDataHelpers {
+trait ReallocationDataHelper {
 
   val reallocationSingleItem = Reallocations(reallocation =
     Seq(
@@ -32,7 +32,7 @@ trait ReallocationDataHelpers {
       )
     )
   )
-  
+
   val reallocationsTwoItems = Reallocations(
     Seq(
       ReallocationRow(
@@ -67,4 +67,5 @@ trait ReallocationDataHelpers {
       )
     )
   )
+
 }
