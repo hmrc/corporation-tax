@@ -26,13 +26,13 @@ import play.api.http.Status
 import play.api.mvc.Result
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.corporationtax.helpers.ReallocationDataHelper
+import uk.gov.hmrc.corporationtax.helpers.ReallocationDataHelpers
 import uk.gov.hmrc.corporationtax.services.ReallocationService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReallocationControllerSpec extends AnyWordSpec with Matchers with ReallocationDataHelper {
+class ReallocationControllerSpec extends AnyWordSpec with Matchers with ReallocationDataHelpers {
 
   private trait Fixture {
     val mockReallocationService: ReallocationService = mock[ReallocationService]

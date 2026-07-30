@@ -22,6 +22,17 @@ import java.time.LocalDate
 
 trait ReallocationDataHelpers {
 
+  val reallocationSingleItem = Reallocations(reallocation =
+    Seq(
+      ReallocationRow(
+        amount = BigDecimal(117.01),
+        reallocationDate = LocalDate.of(2025, 5, 1),
+        sourceApEndDate = LocalDate.of(2026, 7, 1),
+        sourceTaxpayerReference = "9369369363"
+      )
+    )
+  )
+  
   val reallocationsTwoItems = Reallocations(
     Seq(
       ReallocationRow(
@@ -39,6 +50,7 @@ trait ReallocationDataHelpers {
     )
   )
 
+  // Expected results :: negate amount
   val reallocationsExpected = Reallocations(
     Seq(
       ReallocationRow(
