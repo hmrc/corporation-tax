@@ -36,9 +36,9 @@ class ReallocationServiceSpec extends AnyWordSpec with Matchers with ScalaFuture
   private trait Fixture {
     val mockReallocationsConnector: ReallocationsConnector = mock[ReallocationsConnector]
 
-    val cc                            = Helpers.stubControllerComponents()
+    val cc = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
-    implicit val hc: HeaderCarrier    = HeaderCarrier()
+    implicit val hc: HeaderCarrier = HeaderCarrier()
 
     val service = new ReallocationService(mockReallocationsConnector)
 
@@ -52,6 +52,19 @@ class ReallocationServiceSpec extends AnyWordSpec with Matchers with ScalaFuture
     val result: Reallocations = service.getByAccountingPeriod(1L, 1L).futureValue
 
     result shouldBe reallocationsExpected
+
+    verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
+  }
+
+  "getByAccountingPeriod returns failure from connector" in new Fixture {
+
+    val error = new RuntimeException("Simulate error")
+    when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+      .thenReturn(Future.failed(error))
+
+    val result: Throwable = service.getByAccountingPeriod(1L, 1L).failed.futureValue
+
+    result shouldBe error
 
     verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
   }
