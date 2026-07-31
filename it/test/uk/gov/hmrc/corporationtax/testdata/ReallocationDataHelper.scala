@@ -22,10 +22,10 @@ import java.time.LocalDate
 
 trait ReallocationDataHelper {
 
-  val reallocationEmpty = Reallocations(reallocation = Seq.empty)
+  val reallocationEmpty = Reallocations(reallocation = List.empty)
 
   val reallocationSingleItem = Reallocations(reallocation =
-    Seq(
+    List(
       ReallocationRow(
         amount = BigDecimal(117.01),
         reallocationDate = LocalDate.of(2025, 5, 1),
@@ -36,7 +36,7 @@ trait ReallocationDataHelper {
   )
 
   val reallocationsTwoItems = Reallocations(
-    Seq(
+    List(
       ReallocationRow(
         amount = BigDecimal(117.01),
         reallocationDate = LocalDate.of(2025, 5, 1),
@@ -54,7 +54,7 @@ trait ReallocationDataHelper {
 
   // Expected results :: negate amount
   val reallocationsExpected = Reallocations(
-    Seq(
+    List(
       ReallocationRow(
         amount = BigDecimal(-117.01),
         reallocationDate = LocalDate.of(2025, 5, 1),
