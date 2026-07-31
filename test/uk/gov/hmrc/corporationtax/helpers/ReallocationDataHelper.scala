@@ -22,6 +22,8 @@ import java.time.LocalDate
 
 trait ReallocationDataHelper {
 
+  val reallocationEmptyList = Reallocations(reallocation = Seq.empty)
+
   val reallocationSingleItem = Reallocations(reallocation =
     Seq(
       ReallocationRow(
