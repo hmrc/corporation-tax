@@ -22,10 +22,10 @@ import java.time.LocalDate
 
 trait ReallocationDataHelper {
 
-  val reallocationEmptyList = Reallocations(reallocation = Seq.empty)
+  val reallocationEmptyList = Reallocations(reallocation = List.empty)
 
   val reallocationSingleItem = Reallocations(reallocation =
-    Seq(
+    List(
       ReallocationRow(
         amount = BigDecimal(117.01),
         reallocationDate = LocalDate.of(2025, 5, 1),
@@ -36,15 +36,15 @@ trait ReallocationDataHelper {
   )
 
   val reallocationsTwoItems = Reallocations(
-    Seq(
+    List(
       ReallocationRow(
-        amount = BigDecimal(117.01),
+        amount = BigDecimal(117.01678),
         reallocationDate = LocalDate.of(2025, 5, 1),
         sourceApEndDate = LocalDate.of(2026, 7, 1),
         sourceTaxpayerReference = "9369369363"
       ),
       ReallocationRow(
-        amount = BigDecimal(-29.01),
+        amount = BigDecimal(-29.01567),
         reallocationDate = LocalDate.of(2025, 5, 1),
         sourceApEndDate = LocalDate.of(2026, 7, 1),
         sourceTaxpayerReference = "9369369363"
@@ -52,17 +52,17 @@ trait ReallocationDataHelper {
     )
   )
 
-  // Expected results :: negate amount
+  // Expected results :: negate amount and rounding applied
   val reallocationsExpected = Reallocations(
-    Seq(
+    List(
       ReallocationRow(
-        amount = BigDecimal(-117.01),
+        amount = BigDecimal(-117.02),
         reallocationDate = LocalDate.of(2025, 5, 1),
         sourceApEndDate = LocalDate.of(2026, 7, 1),
         sourceTaxpayerReference = "9369369363"
       ),
       ReallocationRow(
-        amount = BigDecimal(29.01),
+        amount = BigDecimal(29.02),
         reallocationDate = LocalDate.of(2025, 5, 1),
         sourceApEndDate = LocalDate.of(2026, 7, 1),
         sourceTaxpayerReference = "9369369363"

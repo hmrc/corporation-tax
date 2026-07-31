@@ -20,7 +20,7 @@ import play.api.libs.json.{Json, OFormat}
 
 import java.time.LocalDate
 
-case class Reallocations(reallocation: Seq[ReallocationRow])
+case class Reallocations(reallocation: List[ReallocationRow])
 case class ReallocationRow(
   amount: BigDecimal,
   reallocationDate: LocalDate,
