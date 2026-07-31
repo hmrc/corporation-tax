@@ -21,21 +21,62 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.Tables.Table
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.concurrent.ScalaFutures
+import play.api.i18n.{DefaultMessagesApi, Lang, Messages}
 
 class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutures {
 
+//  private val parametersTable = Table(
+//    ("A"),
+//    ("D"),
+//    ("E"),
+//    ("F"),
+//    ("J"),
+//    ("M"),
+//    ("R"),
+//    ("S"),
+//    ("T"),
+//    ("Z")
+//  )
+
   private val parametersTable = Table(
-    ("A"),
-    ("D"),
-    ("E"),
-    ("F"),
-    ("J"),
-    ("M"),
-    ("R"),
-    ("S"),
-    ("T"),
-    ("Z")
+    ("A", "Amended assessment", "Amended assessment (claim)"),
+    ("D", "Discovery assessment", "Discovery assessment (claim)"),
+    ("E", "HMRC determination", "HMRC determination (claim)"),
+    ("F", "Further assessment", "Further assessment (claim)"),
+    ("J", "HMRC amended self assessment", "HMRC amended self assessment (claim)"),
+    ("M", "Main assessment", "Main assessment (claim)"),
+    ("R", "HMRC amended self assessment", "HMRC amended self assessment (claim)"),
+    ("S", "Self assessment", "Self assessment (claim)"),
+    ("T", "Taxpayer amended self assessment", "Taxpayer amended self assessment"),
+    ("Z", "Return charge", "Return charge (claim)")
   )
+
+  implicit val messages: Messages = new DefaultMessagesApi(
+    Map(
+      "en" -> Map(
+        "taxDescription.assessment.a.standard" -> "Amended assessment",
+        "taxDescription.assessment.a.claim" -> "Amended assessment (claim)",
+        "taxDescription.assessment.d.standard" -> "Discovery assessment",
+        "taxDescription.assessment.d.claim" -> "Discovery assessment (claim)",
+        "taxDescription.assessment.e.standard" -> "HMRC determination",
+        "taxDescription.assessment.e.claim" -> "HMRC determination (claim)",
+        "taxDescription.assessment.f.standard" -> "Further assessment",
+        "taxDescription.assessment.f.claim" -> "Further assessment (claim)",
+        "taxDescription.assessment.j.standard" -> "HMRC amended self assessment",
+        "taxDescription.assessment.j.claim" -> "HMRC amended self assessment (claim)",
+        "taxDescription.assessment.m.standard" -> "Main assessment",
+        "taxDescription.assessment.m.claim" -> "Main assessment (claim)",
+        "taxDescription.assessment.r.standard" -> "HMRC amended self assessment",
+        "taxDescription.assessment.r.claim" -> "HMRC amended self assessment (claim)",
+        "taxDescription.assessment.s.standard" -> "Self assessment",
+        "taxDescription.assessment.s.claim" -> "Self assessment (claim)",
+        "taxDescription.assessment.t.standard" -> "Taxpayer amended self assessment",
+        "taxDescription.assessment.t.claim" -> "Taxpayer amended self assessment (claim)",
+        "taxDescription.assessment.z.standard" -> "Return charge",
+        "taxDescription.assessment.z.claim" -> "Return charge (claim)",
+      )
+    )
+  ).preferred(Seq(Lang("en")))
 
   private val taxDescriptionHelper = new TaxDescriptionHelper();
 
@@ -48,7 +89,11 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
 
           val expectedResult = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
 
-          result mustBe expectedResult
+          println(s"Correction Claim Null")
+          println(s"Actual: $result")
+          println(s"Expected: $expectedResult")
+
+          result mustBe "dummy"
         }
 
         "when Correction Claim Indicator is 0" in {
