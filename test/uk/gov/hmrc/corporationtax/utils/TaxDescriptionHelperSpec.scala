@@ -58,7 +58,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is null" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, null).futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -67,7 +67,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 0" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "0").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -76,7 +76,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 2" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "2").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -89,7 +89,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is null" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, null).futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -98,7 +98,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 0" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "0").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -107,7 +107,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 2" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "2").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -120,7 +120,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is null" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, null).futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -129,7 +129,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 0" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "0").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -138,7 +138,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 2" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "2").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -151,7 +151,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is null" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, null).futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -160,7 +160,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 0" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "0").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -169,7 +169,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 2" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "2").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -182,7 +182,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is null" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, null).futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -191,7 +191,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 0" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "0").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -200,7 +200,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 2" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "2").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -213,7 +213,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is null" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, null).futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -222,7 +222,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 0" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "0").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -231,7 +231,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 2" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "2").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -244,7 +244,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is null" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, null).futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -253,7 +253,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 0" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "0").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -262,7 +262,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 2" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "2").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -275,7 +275,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is null" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, null).futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -284,7 +284,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 0" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "0").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -293,7 +293,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 2" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "2").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -306,7 +306,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is null" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, null).futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -315,7 +315,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 0" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "0").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -324,7 +324,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 2" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "2").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -337,7 +337,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is null" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, null).futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -346,7 +346,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 0" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "0").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.standard"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
@@ -355,7 +355,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     "when Correction Claim Indicator is 2" in {
       val result: String = taxDescriptionHelper.getTaxDescription(assessmentType, "2").futureValue
 
-      val messageName = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
+      val messageName    = s"taxDescription.assessment.${assessmentType.toLowerCase()}.claim"
       val expectedResult = messages(messageName)
 
       result mustBe expectedResult
