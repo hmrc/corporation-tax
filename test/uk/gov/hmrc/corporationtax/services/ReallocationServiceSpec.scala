@@ -36,9 +36,9 @@ class ReallocationServiceSpec extends AnyWordSpec with Matchers with ScalaFuture
   private trait Fixture {
     val mockReallocationsConnector: ReallocationsConnector = mock[ReallocationsConnector]
 
-    val cc = Helpers.stubControllerComponents()
+    val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val hc: HeaderCarrier    = HeaderCarrier()
 
     val service = new ReallocationService(mockReallocationsConnector)
 
