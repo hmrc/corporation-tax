@@ -51,6 +51,8 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
 
     // Move under data helper:
     val adminRule: AdminRule = AdminRule(ruleNumber = Some(111), ruleDate = Some(LocalDate.of(2025, 1, 1)))
+    val adminRuleSecond: AdminRule = AdminRule(ruleNumber = Some(111), ruleDate = Some(LocalDate.of(2026, 1, 1)))
+
     val accountPeriodDetails = AccountingPeriodDetails(
       isApBalanced = true,
       lpiCalcFlag = true,
@@ -65,7 +67,7 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
     )
   }
 
-  "getPenaltyTransactionList returns list of Penalties from connector" in new Fixture {
+  "getPenaltyTransactionList returns list of Penalties from connector: isCTPF is true" in new Fixture {
     when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
       .thenReturn(Future.successful(penalties))
     when(mockAdminRuleRdsProxyConnector.getAdminRule(any[String])(any[HeaderCarrier]))
@@ -82,6 +84,22 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
     verify(mockAccountingPeriodDetailsConnector).getAccountingPeriodDetails(1L, 1L)(hc)
   }
 
-  // TODO: extend testing to cover CTPF scenarios
+
+  "getPenaltyTransactionList returns list of Penalties from connector: isCTPF is false" in new Fixture {
+    when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(penalties))
+    when(mockAdminRuleRdsProxyConnector.getAdminRule(any[String])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(adminRuleSecond))
+    when(mockAccountingPeriodDetailsConnector.getAccountingPeriodDetails(any[Long], any[Long])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(accountPeriodDetails))
+
+    val result: PenaltyItems = service.getPenaltyTransactionList(1L, 1L).futureValue
+
+    result shouldBe penaltyItemsSecond
+
+    verify(mockPenaltiesConnector).getPenaltyTransactionList(1L, 1L)(hc)
+    verify(mockAdminRuleRdsProxyConnector).getAdminRule("START-OF-CTSA")(hc)
+    verify(mockAccountingPeriodDetailsConnector).getAccountingPeriodDetails(1L, 1L)(hc)
+  }
 
 }
