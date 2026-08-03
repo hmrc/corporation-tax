@@ -40,9 +40,7 @@ class PenaltiesService @Inject() (
 
   // https://jira.tools.tax.service.gov.uk/browse/DTR-7236
   private def getCTPFStatus(accountingPeriod: LocalDate, adminRuleDate: LocalDate): Boolean = {
-    val res = accountingPeriod.toEpochDay < adminRuleDate.toEpochDay
-    println(s"DATA_REST: $res :: $accountingPeriod :: $adminRuleDate")
-    res
+    accountingPeriod.toEpochDay < adminRuleDate.toEpochDay
   }
 
   def getCTPFStatusAsync(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[Boolean] =
