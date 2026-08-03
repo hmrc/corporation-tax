@@ -18,7 +18,9 @@ package uk.gov.hmrc.corporationtax.services
 
 import uk.gov.hmrc.corporationtax.models.*
 import play.api.Logging
-import uk.gov.hmrc.corporationtax.connectors.{AccountingPeriodDetailsConnector, AdminRuleRdsProxyConnector, PenaltiesConnector}
+import uk.gov.hmrc.corporationtax.connectors.{
+  AccountingPeriodDetailsConnector, AdminRuleRdsProxyConnector, PenaltiesConnector
+}
 import uk.gov.hmrc.http.HeaderCarrier
 import PenaltyTransaction.*
 
@@ -28,10 +30,9 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
 
 class PenaltiesService @Inject() (
-                                   penaltiesConnector: PenaltiesConnector,
-                                   adminRuleRdsProxyConnector: AdminRuleRdsProxyConnector,
-                                   accountingPeriodDetailsConnector: AccountingPeriodDetailsConnector
-
+  penaltiesConnector: PenaltiesConnector,
+  adminRuleRdsProxyConnector: AdminRuleRdsProxyConnector,
+  accountingPeriodDetailsConnector: AccountingPeriodDetailsConnector
 )(implicit ec: ExecutionContext)
     extends Logging {
 
@@ -40,26 +41,21 @@ class PenaltiesService @Inject() (
   // https://jira.tools.tax.service.gov.uk/browse/DTR-7236
   private def getCTPFStatus(accountingPeriod: LocalDate, adminRuleDate: LocalDate): Boolean = {
     val res = accountingPeriod.toEpochDay < adminRuleDate.toEpochDay
-    println(s"DATA_REST: ${res} :: ${accountingPeriod} :: ${adminRuleDate}")
+    println(s"DATA_REST: $res :: $accountingPeriod :: $adminRuleDate")
     res
   }
 
-  def getCTPFStatusAsync(taxRef: Long, accPeriod: Long)
-                           (implicit hc: HeaderCarrier): Future[Boolean] = {
+  def getCTPFStatusAsync(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[Boolean] =
     for {
-      adminRulesResult <- adminRuleRdsProxyConnector.getAdminRule(adminRuleKey)
+      adminRulesResult        <- adminRuleRdsProxyConnector.getAdminRule(adminRuleKey)
       accountingPeriodDetails <- accountingPeriodDetailsConnector.getAccountingPeriodDetails(taxRef, accPeriod)
-    } yield {
-      (adminRulesResult.ruleDate, accountingPeriodDetails.accPeriodEndDate) match {
-        case (Some(adminRuleDate), Some(accountingPeriodDate)) =>
-          getCTPFStatus(adminRuleDate, accountingPeriodDate)
-        case (_, _) => true
-      }
+    } yield (adminRulesResult.ruleDate, accountingPeriodDetails.accPeriodEndDate) match {
+      case (Some(adminRuleDate), Some(accountingPeriodDate)) =>
+        getCTPFStatus(adminRuleDate, accountingPeriodDate)
+      case (_, _)                                            => true
     }
-  }
 
-  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long)
-                                    (implicit hc: HeaderCarrier): Future[PenaltyItems] =
+  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[PenaltyItems] =
     for {
       penalties <- penaltiesConnector.getPenaltyTransactionList(taxRef, accPeriod)
       isCTPF    <- getCTPFStatusAsync(taxRef = taxRef, accPeriod = accPeriod)

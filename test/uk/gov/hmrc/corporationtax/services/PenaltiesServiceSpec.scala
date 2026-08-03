@@ -21,7 +21,9 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
 import org.mockito.Mockito.verify
-import uk.gov.hmrc.corporationtax.connectors.{AccountingPeriodDetailsConnector, AdminRuleRdsProxyConnector, PenaltiesConnector}
+import uk.gov.hmrc.corporationtax.connectors.{
+  AccountingPeriodDetailsConnector, AdminRuleRdsProxyConnector, PenaltiesConnector
+}
 import uk.gov.hmrc.http.HeaderCarrier
 import org.mockito.ArgumentMatchers.any; //, eq as eqTo}
 import org.mockito.Mockito.when
@@ -36,31 +38,31 @@ import scala.concurrent.{ExecutionContext, Future}
 class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelper with ScalaFutures {
 
   private trait Fixture {
-    val mockPenaltiesConnector: PenaltiesConnector = mock[PenaltiesConnector]
-    val mockAdminRuleRdsProxyConnector: AdminRuleRdsProxyConnector = mock[AdminRuleRdsProxyConnector]
+    val mockPenaltiesConnector: PenaltiesConnector                             = mock[PenaltiesConnector]
+    val mockAdminRuleRdsProxyConnector: AdminRuleRdsProxyConnector             = mock[AdminRuleRdsProxyConnector]
     val mockAccountingPeriodDetailsConnector: AccountingPeriodDetailsConnector = mock[AccountingPeriodDetailsConnector]
-
 
     val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
     implicit val hc: HeaderCarrier    = HeaderCarrier()
 
-    val service = new PenaltiesService(mockPenaltiesConnector, mockAdminRuleRdsProxyConnector, mockAccountingPeriodDetailsConnector)
+    val service =
+      new PenaltiesService(mockPenaltiesConnector, mockAdminRuleRdsProxyConnector, mockAccountingPeriodDetailsConnector)
 
     // Move under data helper:
-    val adminRule :AdminRule = AdminRule(ruleNumber = Some(111), ruleDate = Some(LocalDate.of(2025, 1, 1)))
+    val adminRule: AdminRule = AdminRule(ruleNumber = Some(111), ruleDate = Some(LocalDate.of(2025, 1, 1)))
     val accountPeriodDetails = AccountingPeriodDetails(
-        isApBalanced = true,
-        lpiCalcFlag = true,
-        crDbCalcFlag = true,
-        creditInterestAmount = -123.24,
-        debitInterestAmount = -5930.02,
-        latePaymentInterestAmount = -3231.24,
-        repaymentInterestAmount = -1.23,
-        totalDerivedActualInterest = -2324.12,
-        amountDueForAp = -12.23,
-        accPeriodEndDate = Some(LocalDate.of(2025, 2, 1))
-      )
+      isApBalanced = true,
+      lpiCalcFlag = true,
+      crDbCalcFlag = true,
+      creditInterestAmount = -123.24,
+      debitInterestAmount = -5930.02,
+      latePaymentInterestAmount = -3231.24,
+      repaymentInterestAmount = -1.23,
+      totalDerivedActualInterest = -2324.12,
+      amountDueForAp = -12.23,
+      accPeriodEndDate = Some(LocalDate.of(2025, 2, 1))
+    )
   }
 
   "getPenaltyTransactionList returns list of Penalties from connector" in new Fixture {
