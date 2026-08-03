@@ -50,7 +50,7 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
       new PenaltiesService(mockPenaltiesConnector, mockAdminRuleRdsProxyConnector, mockAccountingPeriodDetailsConnector)
 
     // Move under data helper:
-    val adminRule: AdminRule = AdminRule(ruleNumber = Some(111), ruleDate = Some(LocalDate.of(2025, 1, 1)))
+    val adminRule: AdminRule       = AdminRule(ruleNumber = Some(111), ruleDate = Some(LocalDate.of(2025, 1, 1)))
     val adminRuleSecond: AdminRule = AdminRule(ruleNumber = Some(111), ruleDate = Some(LocalDate.of(2026, 1, 1)))
 
     val accountPeriodDetails = AccountingPeriodDetails(
@@ -83,7 +83,6 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
     verify(mockAdminRuleRdsProxyConnector).getAdminRule("START-OF-CTSA")(hc)
     verify(mockAccountingPeriodDetailsConnector).getAccountingPeriodDetails(1L, 1L)(hc)
   }
-
 
   "getPenaltyTransactionList returns list of Penalties from connector: isCTPF is false" in new Fixture {
     when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
