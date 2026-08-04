@@ -25,7 +25,7 @@ import uk.gov.hmrc.corporationtax.connectors.{
   AccountingPeriodDetailsConnector, AdminRuleRdsProxyConnector, PenaltiesConnector
 }
 import uk.gov.hmrc.http.HeaderCarrier
-import org.mockito.ArgumentMatchers.any; //, eq as eqTo}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers
