@@ -47,7 +47,7 @@ class PenaltiesService @Inject() (
       accountingPeriodDetails <- accountingPeriodDetailsConnector.getAccountingPeriodDetails(taxRef, accPeriod)
     } yield (adminRulesResult.ruleDate, accountingPeriodDetails.accPeriodEndDate) match {
       case (Some(adminRuleDate), Some(accountingPeriodDate)) =>
-        getCTPFStatus(adminRuleDate, accountingPeriodDate)
+        getCTPFStatus(accountingPeriodDate, adminRuleDate)
       case (_, _)                                            => true
     }
 

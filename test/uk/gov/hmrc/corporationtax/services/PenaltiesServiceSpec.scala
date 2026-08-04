@@ -71,7 +71,7 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
     when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
       .thenReturn(Future.successful(penalties))
     when(mockAdminRuleRdsProxyConnector.getAdminRule(any[String])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(adminRule))
+      .thenReturn(Future.successful(adminRuleSecond))
     when(mockAccountingPeriodDetailsConnector.getAccountingPeriodDetails(any[Long], any[Long])(any[HeaderCarrier]))
       .thenReturn(Future.successful(accountPeriodDetails))
 
@@ -88,7 +88,7 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
     when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
       .thenReturn(Future.successful(penalties))
     when(mockAdminRuleRdsProxyConnector.getAdminRule(any[String])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(adminRuleSecond))
+      .thenReturn(Future.successful(adminRule))
     when(mockAccountingPeriodDetailsConnector.getAccountingPeriodDetails(any[Long], any[Long])(any[HeaderCarrier]))
       .thenReturn(Future.successful(accountPeriodDetails))
 
