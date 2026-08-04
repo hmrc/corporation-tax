@@ -50,8 +50,8 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
       new PenaltiesService(mockPenaltiesConnector, mockAdminRuleRdsProxyConnector, mockAccountingPeriodDetailsConnector)
 
     // Move under data helper:
-    val adminRule: AdminRule       = AdminRule(ruleNumber = Some(111), ruleDate = Some(LocalDate.of(2025, 1, 1)))
-    val adminRuleSecond: AdminRule = AdminRule(ruleNumber = Some(111), ruleDate = Some(LocalDate.of(2026, 1, 1)))
+    val adminRule: AdminRule                 = AdminRule(ruleNumber = Some(111), ruleDate = Some(LocalDate.of(2025, 1, 1)))
+    val adminRuleSecond: AdminRule           = AdminRule(ruleNumber = Some(111), ruleDate = Some(LocalDate.of(2026, 1, 1)))
     val adminRuleWithRuleDateNone: AdminRule = AdminRule(ruleNumber = Some(111), ruleDate = None)
 
     val accountPeriodDetails = AccountingPeriodDetails(
