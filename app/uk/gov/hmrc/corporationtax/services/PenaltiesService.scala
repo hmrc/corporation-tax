@@ -38,7 +38,6 @@ class PenaltiesService @Inject() (
 
   private val adminRuleKey: String = "START-OF-CTSA"
 
-  // https://jira.tools.tax.service.gov.uk/browse/DTR-7236
   private def getCTPFStatus(accountingPeriod: LocalDate, adminRuleDate: LocalDate): Boolean =
     accountingPeriod.toEpochDay < adminRuleDate.toEpochDay
 
