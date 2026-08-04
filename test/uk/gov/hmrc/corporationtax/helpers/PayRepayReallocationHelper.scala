@@ -16,36 +16,18 @@
 
 package uk.gov.hmrc.corporationtax.helpers
 
-import uk.gov.hmrc.corporationtax.models.{PayRepayReallocations, PayRepayReallocationsList}
+import uk.gov.hmrc.corporationtax.models.PayRepayReallocations
 
 
 trait PayRepayReallocationHelper {
 
-  val emptyPayRepayReallocationList: PayRepayReallocationsList =
-    PayRepayReallocationsList(List.empty)
+  val emptyPayRepayReallocation: PayRepayReallocations =
+    PayRepayReallocations(Some(0), Some(0))
 
-  val payRepayReallocationListWithOneItem: PayRepayReallocationsList =
-    PayRepayReallocationsList(
-      List(
-        PayRepayReallocations(
-          totalAmountReoRfrRto = Some(BigDecimal(10)),
-          totalAmountPayments = Some(BigDecimal(20))
-        )
-      )
-    )
-
-  val payRepayReallocationListWithMultipleItems: PayRepayReallocationsList =
-    PayRepayReallocationsList(
-      List(
-        PayRepayReallocations(
-          totalAmountReoRfrRto = Some(BigDecimal(30)),
-          totalAmountPayments = Some(BigDecimal(40))
-        ),
-        PayRepayReallocations(
-          totalAmountReoRfrRto = Some(BigDecimal(50)),
-          totalAmountPayments = Some(BigDecimal(60))
-        )
-      )
+  val payRepayReallocation: PayRepayReallocations =
+    PayRepayReallocations(
+      totalAmountReoRfrRto = Some(BigDecimal(10)), 
+      totalAmountPayments = Some(BigDecimal(20))
     )
 }
 

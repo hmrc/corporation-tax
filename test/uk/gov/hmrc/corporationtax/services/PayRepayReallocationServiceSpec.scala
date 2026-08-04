@@ -28,7 +28,7 @@ import play.api.mvc.ControllerComponents
 import play.api.test.Helpers.stubControllerComponents
 import uk.gov.hmrc.corporationtax.connectors.PayRepayReallocationConnector
 import uk.gov.hmrc.corporationtax.helpers.PayRepayReallocationHelper
-import uk.gov.hmrc.corporationtax.models.PayRepayReallocationsList
+import uk.gov.hmrc.corporationtax.models.PayRepayReallocations
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -51,13 +51,13 @@ class PayRepayReallocationServiceSpec
 
   "getTotalAmounts" should {
 
-    "delegate to connector and successfully return payment repayment reallocation list" in new Setup {
+    "delegate to connector and successfully return payment repayment reallocation" in new Setup {
       when(mockConnector.getTotalAmounts(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(payRepayReallocationListWithOneItem))
+        .thenReturn(Future.successful(payRepayReallocation))
 
       val result = service.getTotalAmounts(1L, 2L).futureValue
 
-      result shouldBe payRepayReallocationListWithOneItem
+      result shouldBe payRepayReallocation
 
       verify(mockConnector).getTotalAmounts(1L, 2L)
     }

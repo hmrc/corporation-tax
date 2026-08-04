@@ -17,7 +17,7 @@
 package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
-import uk.gov.hmrc.corporationtax.models.PayRepayReallocationsList
+import uk.gov.hmrc.corporationtax.models.PayRepayReallocations
 import uk.gov.hmrc.corporationtax.connectors.PayRepayReallocationConnector
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -26,7 +26,7 @@ import scala.concurrent.Future
 
 class PayRepayReallocationService @Inject()(payRepayReallocationConnector: PayRepayReallocationConnector) extends Logging {
 
-  def getTotalAmounts(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[PayRepayReallocationsList] = {
+  def getTotalAmounts(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[PayRepayReallocations] = {
     logger.info(s"Calling repository for taxRef: $taxRef and accPeriod: $accPeriod")
 
     payRepayReallocationConnector.getTotalAmounts(taxRef, accPeriod)

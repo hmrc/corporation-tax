@@ -47,30 +47,18 @@ class PayRepayReallocationControllerSpec extends AnyWordSpec with Matchers with 
 
   "GET /total-amount-payment-repayment-reallocation" should {
 
-    "return 200 and a successful response with one item" in new Setup {
+    "return 200 and a successful response with the payment repayment reallocation" in new Setup {
       when(mockService.getTotalAmounts(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(payRepayReallocationListWithOneItem))
+        .thenReturn(Future.successful(payRepayReallocation))
 
       val result: Future[Result] = controller.getTotalAmounts(1L, 2L)(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson(payRepayReallocationListWithOneItem)
+      contentAsJson(result) shouldBe Json.toJson(payRepayReallocation)
 
       verify(mockService).getTotalAmounts(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }
-
-    "return 200 and a successful response with multiple items" in new Setup {
-      when(mockService.getTotalAmounts(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(payRepayReallocationListWithMultipleItems))
-
-      val result: Future[Result] = controller.getTotalAmounts(2L, 3L)(fakeRequest)
-      status(result) shouldBe Status.OK
-
-      contentAsJson(result) shouldBe Json.toJson(payRepayReallocationListWithMultipleItems)
-
-      verify(mockService).getTotalAmounts(eqTo(2L), eqTo(3L))(any[HeaderCarrier])
-    }
-
+    
     "return 500 INTERNAL_SERVER_ERROR" in new Setup {
       when(mockService.getTotalAmounts(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("error")))
@@ -78,7 +66,7 @@ class PayRepayReallocationControllerSpec extends AnyWordSpec with Matchers with 
       val result: Future[Result] = controller.getTotalAmounts(3L, 4L)(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
 
-      (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve the payment repayment reallocation list"
+      (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve the payment repayment reallocation"
 
       verify(mockService).getTotalAmounts(eqTo(3L), eqTo(4L))(any[HeaderCarrier])
     }

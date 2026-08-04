@@ -18,7 +18,7 @@ package uk.gov.hmrc.corporationtax.connectors
 
 import play.api.Logging
 import uk.gov.hmrc.*
-import uk.gov.hmrc.corporationtax.models.PayRepayReallocationsList
+import uk.gov.hmrc.corporationtax.models.PayRepayReallocations
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
@@ -43,12 +43,12 @@ class PayRepayReallocationConnector @Inject()(http: HttpClientV2, config: Servic
 
   def getTotalAmounts(taxRef: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
-  ): Future[PayRepayReallocationsList] = {
+  ): Future[PayRepayReallocations] = {
     val url: URL = url"$proxyPath/corporation-tax/total-amount-payment-repayment-reallocation/$taxRef/$accPeriod"
 
     http
       .get(url)
-      .execute[PayRepayReallocationsList]
+      .execute[PayRepayReallocations]
       .recover { case ex: Throwable =>
         logger.error(
           s"[PayRepayReallocationConnector][getTotalAmounts]: $taxRef :: $accPeriod - ${ex.getMessage}"
