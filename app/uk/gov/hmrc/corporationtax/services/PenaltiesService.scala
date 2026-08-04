@@ -41,7 +41,7 @@ class PenaltiesService @Inject() (
   private def getCTPFStatus(accountingPeriod: LocalDate, adminRuleDate: LocalDate): Boolean =
     accountingPeriod.toEpochDay < adminRuleDate.toEpochDay
 
-  def getCTPFStatusAsync(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[Boolean] =
+  private def getCTPFStatusAsync(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[Boolean] =
     for {
       adminRulesResult        <- adminRuleRdsProxyConnector.getAdminRule(adminRuleKey)
       accountingPeriodDetails <- accountingPeriodDetailsConnector.getAccountingPeriodDetails(taxRef, accPeriod)
