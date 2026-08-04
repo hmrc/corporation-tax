@@ -18,6 +18,8 @@ package uk.gov.hmrc.corporationtax.models
 
 import play.api.libs.json.{Json, OFormat}
 
+import java.time.LocalDate
+
 case class AccountingPeriodDetails(
   isApBalanced: Boolean,
   lpiCalcFlag: Boolean,
@@ -27,7 +29,8 @@ case class AccountingPeriodDetails(
   latePaymentInterestAmount: BigDecimal,
   repaymentInterestAmount: BigDecimal,
   totalDerivedActualInterest: BigDecimal,
-  amountDueForAp: BigDecimal
+  amountDueForAp: BigDecimal,
+  accPeriodEndDate: Option[LocalDate]
 )
 object AccountingPeriodDetails {
   implicit val format: OFormat[AccountingPeriodDetails] = Json.format[AccountingPeriodDetails]

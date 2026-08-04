@@ -16,7 +16,6 @@ lazy val microservice = Project("corporation-tax", file("."))
   .settings(CodeCoverageSettings.settings: _*)
   .settings(PlayKeys.playDefaultPort := 11202)
 
-
 lazy val it = project
   .enablePlugins(PlayScala)
   .dependsOn(microservice % "test->test")
