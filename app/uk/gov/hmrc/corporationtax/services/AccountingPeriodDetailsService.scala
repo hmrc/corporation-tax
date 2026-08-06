@@ -21,6 +21,7 @@ import uk.gov.hmrc.corporationtax.connectors.AccountingPeriodDetailsConnector
 import uk.gov.hmrc.corporationtax.models.{APBalancedResponse, AccountingPeriodDetails}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,13 +30,27 @@ class AccountingPeriodDetailsService @Inject()(
                                                 connector: AccountingPeriodDetailsConnector)
                                               (implicit ec: ExecutionContext){
 
-  private def converson(entity: APBalancedResponse) : AccountingPeriodDetails = ???
+  private def prepareResponse(entity: APBalancedResponse) : AccountingPeriodDetails = {
+    // Apply conversions :: Boolean && Amount
+    AccountingPeriodDetails(
+      isApBalanced = false,
+      lpiCalcFlag = false,
+      crDbCalcFlag = false,
+      creditInterestAmount = BigDecimal(1.1),
+      debitInterestAmount = BigDecimal(1.1),
+      latePaymentInterestAmount = BigDecimal(1.1),
+      repaymentInterestAmount = BigDecimal(1.1),
+      totalDerivedActualInterest = BigDecimal(1.1),
+      amountDueForAp = BigDecimal(1.1),
+      accPeriodEndDate = Some(LocalDate.now())
+    )
+  }
 
   def getAccountingDetails(taxRef: Long, accPeriod: Long)
                           (implicit hc: HeaderCarrier): Future[AccountingPeriodDetails] = {
     logger.info(s"Calling connector for taxRef: $taxRef and accPeriod: $accPeriod")
     connector
       .getAccountingPeriodDetails(taxRef, accPeriod)
-      .map(x => converson(x) )
+      .map(x => prepareResponse(x) )
   }
 }
