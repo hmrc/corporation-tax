@@ -53,23 +53,23 @@ class ReallocationFromAccPeriodDetailsControllerSpec
 
     "return 200: OK" in new Fixture {
       when(mockService.getReallocationFromAccPeriod(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(reallocationFromAccPeriodWithThreeElements))
+        .thenReturn(Future.successful(transformed3DecimalPlacesAmountReallocationFromAccPeriod))
 
       val result: Future[Result] = controller.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson(reallocationFromAccPeriodWithThreeElements)
+      contentAsJson(result) shouldBe Json.toJson(transformed3DecimalPlacesAmountReallocationFromAccPeriod)
 
       verify(mockService).getReallocationFromAccPeriod(any(), any())(any[HeaderCarrier])
     }
     "return 200: OK for empty response " in new Fixture {
       when(mockService.getReallocationFromAccPeriod(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(emptyListReallocationFromAccPeriod))
+        .thenReturn(Future.successful(emptyTransformedListReallocationFromAccPeriod))
 
       val result: Future[Result] = controller.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson(emptyListReallocationFromAccPeriod)
+      contentAsJson(result) shouldBe Json.toJson(emptyTransformedListReallocationFromAccPeriod)
 
       verify(mockService).getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier])
     }

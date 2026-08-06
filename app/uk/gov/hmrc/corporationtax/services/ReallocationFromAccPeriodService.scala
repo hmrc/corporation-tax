@@ -18,9 +18,11 @@ package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.ReallocationFromAccPeriodRdsProxyConnector
-import uk.gov.hmrc.corporationtax.models.ReallocationFromAccPeriod
+import uk.gov.hmrc.corporationtax.models.TransformedReallocationFromAccPeriod
 import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
-import uk.gov.hmrc.corporationtax.utils.applyAmountTransformToList
+import uk.gov.hmrc.corporationtax.utils.DomainModelTransformationInstances.*
+import uk.gov.hmrc.corporationtax.utils.TransformToDomainModel.transform
+import uk.gov.hmrc.corporationtax.utils.{TransformToDomainModel, applyAmountTransformToList}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -33,13 +35,14 @@ class ReallocationFromAccPeriodService @Inject() (
 
   def getReallocationFromAccPeriod(taxPayerReference: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
-  ): Future[ReallocationFromAccPeriod] = {
+  ): Future[TransformedReallocationFromAccPeriod] = {
     logger.info(
       s"[ReallocationFromAccService][getReallocationFromAccPeriod] Calling ReallocationFromAccPeriodRdsProxyConnector: taxPayerReference:$taxPayerReference, accPeriod: $accPeriod"
     )
     connector.getReallocationFromAccPeriod(taxPayerReference, accPeriod).map { reallocationFromAccPeriod =>
-      reallocationFromAccPeriod
+      val reallocationFromAccAfterAmountTransformation = reallocationFromAccPeriod
         .copy(reallocation = applyAmountTransformToList(reallocationFromAccPeriod.reallocation))
+      transform(reallocationFromAccAfterAmountTransformation)
     }
 
   }

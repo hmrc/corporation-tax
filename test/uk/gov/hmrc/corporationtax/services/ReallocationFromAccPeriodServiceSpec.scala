@@ -28,7 +28,7 @@ import play.api.mvc.ControllerComponents
 import play.api.test.Helpers.stubControllerComponents
 import uk.gov.hmrc.corporationtax.connectors.ReallocationFromAccPeriodRdsProxyConnector
 import uk.gov.hmrc.corporationtax.helpers.ReallocationFromAccPeriodHelper
-import uk.gov.hmrc.corporationtax.models.ReallocationFromAccPeriod
+import uk.gov.hmrc.corporationtax.models.TransformedReallocationFromAccPeriod
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -54,11 +54,11 @@ class ReallocationFromAccPeriodServiceSpec
 
   "ReallocationFromAccPeriodService.getReallocationFromAccPeriod" should {
 
-    "delegate to connector and successfully return ReallocationFromAccPeriod with amount = None transformed to 0.00" in new BaseSetup {
+    "delegate to connector and successfully return TransformedReallocationFromAccPeriod by transforming ReallocationFromAccPeriod with amount = None transformed to 0.00" in new BaseSetup {
       when(mockRds.getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
         .thenReturn(Future.successful(reallocationFromAccPeriodWithNullAmount))
 
-      val result: ReallocationFromAccPeriod =
+      val result: TransformedReallocationFromAccPeriod =
         service.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod).futureValue
 
       result shouldBe transformedNullAmountReallocationFromAccPeriod
@@ -68,11 +68,11 @@ class ReallocationFromAccPeriodServiceSpec
       verify(mockRds, times(1)).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
 
     }
-    "delegate to connector and successfully return ReallocationFromAccPeriod with non-zero amount field negated and rounded up to 2 decimal places" in new BaseSetup {
+    "delegate to connector and successfully return TransformedReallocationFromAccPeriod by transforming ReallocationFromAccPeriod with non-zero amount field negated and rounded up to 2 decimal places" in new BaseSetup {
       when(mockRds.getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
         .thenReturn(Future.successful(reallocationFromAccPeriodWithAmount3DecimalPlaces))
 
-      val result: ReallocationFromAccPeriod =
+      val result: TransformedReallocationFromAccPeriod =
         service.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod).futureValue
 
       result shouldBe transformed3DecimalPlacesAmountReallocationFromAccPeriod
@@ -82,14 +82,43 @@ class ReallocationFromAccPeriodServiceSpec
       verify(mockRds, times(1)).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
 
     }
-    "delegate to connector and successfully return ReallocationFromAccPeriod with zero amount unchanged" in new BaseSetup {
+    "delegate to connector and successfully return TransformedReallocationFromAccPeriod by transforming ReallocationFromAccPeriod with zero amount unchanged" in new BaseSetup {
       when(mockRds.getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
         .thenReturn(Future.successful(reallocationFromAccPeriodWithZeroAmount))
 
-      val result: ReallocationFromAccPeriod =
+      val result: TransformedReallocationFromAccPeriod =
         service.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod).futureValue
 
-      result shouldBe reallocationFromAccPeriodWithZeroAmount
+      result shouldBe transformedReallocationFromAccPeriodWithZeroAmount
+
+      verify(mockRds).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
+
+      verify(mockRds, times(1)).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
+
+    }
+    "delegate to connector and successfully return TransformedReallocationFromAccPeriod by transforming ReallocationFromAccPeriod with destinationApEndDate = None to empty string " in new BaseSetup {
+      when(mockRds.getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(reallocationFromAccPeriodWithZeroAmount))
+
+      val result: TransformedReallocationFromAccPeriod =
+        service.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod).futureValue
+
+      result shouldBe transformedReallocationFromAccPeriodWithZeroAmount
+
+      verify(mockRds).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
+
+      verify(mockRds, times(1)).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
+
+    }
+
+    "delegate to connector and successfully return empty TransformedReallocationFromAccPeriod when ReallocationFromAccPeriod is empty" in new BaseSetup {
+      when(mockRds.getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(emptyListReallocationFromAccPeriod))
+
+      val result: TransformedReallocationFromAccPeriod =
+        service.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod).futureValue
+
+      result shouldBe emptyTransformedListReallocationFromAccPeriod
 
       verify(mockRds).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
 
