@@ -19,13 +19,13 @@ package uk.gov.hmrc.corporationtax.services
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.ReallocationFromAccPeriodRdsProxyConnector
 import uk.gov.hmrc.corporationtax.models.ReallocationFromAccPeriod
-import uk.gov.hmrc.corporationtax.utils.applyAmountTransformToList
 import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
+import uk.gov.hmrc.corporationtax.utils.applyAmountTransformToList
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class ReallocationFromAccPeriodService @Inject() (
   connector: ReallocationFromAccPeriodRdsProxyConnector
@@ -38,7 +38,8 @@ class ReallocationFromAccPeriodService @Inject() (
       s"[ReallocationFromAccService][getReallocationFromAccPeriod] Calling ReallocationFromAccPeriodRdsProxyConnector: taxPayerReference:$taxPayerReference, accPeriod: $accPeriod"
     )
     connector.getReallocationFromAccPeriod(taxPayerReference, accPeriod).map { reallocationFromAccPeriod =>
-      reallocationFromAccPeriod.copy(reallocation = applyAmountTransformToList(reallocationFromAccPeriod.reallocation))
+      reallocationFromAccPeriod
+        .copy(reallocation = applyAmountTransformToList(reallocationFromAccPeriod.reallocation))
     }
 
   }

@@ -28,15 +28,15 @@ trait ReallocationFromAccPeriodHelper {
     List(
       ReallocationFromAccDetails(
         Some(BigDecimal(12390)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       ),
       ReallocationFromAccDetails(
         Some(BigDecimal(12345)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       )
     )
   )
@@ -44,15 +44,15 @@ trait ReallocationFromAccPeriodHelper {
     List(
       ReallocationFromAccDetails(
         Some(BigDecimal(0.00)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       ),
       ReallocationFromAccDetails(
         Some(BigDecimal(0.00)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       )
     )
   )
@@ -61,21 +61,21 @@ trait ReallocationFromAccPeriodHelper {
     List(
       ReallocationFromAccDetails(
         Some(BigDecimal(12390.00)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       ),
       ReallocationFromAccDetails(
         Some(BigDecimal(180007.00)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       ),
       ReallocationFromAccDetails(
         Some(BigDecimal(89075.00)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       )
     )
   )
@@ -84,15 +84,15 @@ trait ReallocationFromAccPeriodHelper {
     List(
       ReallocationFromAccDetails(
         None,
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       ),
       ReallocationFromAccDetails(
         None,
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       )
     )
   )
@@ -100,15 +100,15 @@ trait ReallocationFromAccPeriodHelper {
     List(
       ReallocationFromAccDetails(
         Some(0.00),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       ),
       ReallocationFromAccDetails(
         Some(0.00),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       )
     )
   )
@@ -117,21 +117,21 @@ trait ReallocationFromAccPeriodHelper {
     List(
       ReallocationFromAccDetails(
         Some(BigDecimal(12390.986)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       ),
       ReallocationFromAccDetails(
         Some(BigDecimal(180007.8654)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       ),
       ReallocationFromAccDetails(
         Some(BigDecimal(89075.3654)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       )
     )
   )
@@ -139,21 +139,21 @@ trait ReallocationFromAccPeriodHelper {
     List(
       ReallocationFromAccDetails(
         Some(BigDecimal(-12390.99)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       ),
       ReallocationFromAccDetails(
         Some(BigDecimal(-180007.87)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       ),
       ReallocationFromAccDetails(
         Some(BigDecimal(-89075.37)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       )
     )
   )

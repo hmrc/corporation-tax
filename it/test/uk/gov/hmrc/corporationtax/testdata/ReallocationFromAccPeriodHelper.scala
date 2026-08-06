@@ -28,9 +28,9 @@ trait ReallocationFromAccPeriodHelper {
     List(
       ReallocationFromAccDetails(
         Some(BigDecimal(12390.670)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       )
     )
   )
@@ -39,21 +39,21 @@ trait ReallocationFromAccPeriodHelper {
     List(
       ReallocationFromAccDetails(
         Some(BigDecimal(12390.00)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       ),
       ReallocationFromAccDetails(
         Some(BigDecimal(180007.00)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       ),
       ReallocationFromAccDetails(
         Some(BigDecimal(89075.00)),
-        Some(LocalDate.of(2026, 12, 27)),
+        LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
-        Some("18969779586")
+        "18969779586"
       )
     )
   )
