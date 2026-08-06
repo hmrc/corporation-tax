@@ -19,24 +19,23 @@ package uk.gov.hmrc.corporationtax.controllers
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.corporationtax.connectors.AccountingPeriodDetailsConnector
 import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
 import uk.gov.hmrc.corporationtax.utils.applyAmountTransform
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-
+import uk.gov.hmrc.corporationtax.services.AccountingPeriodDetailsService
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class AccountingPeriodDetailsController @Inject() (
   cc: ControllerComponents,
-  connector: AccountingPeriodDetailsConnector
+  service : AccountingPeriodDetailsService
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
   def getAccountingPeriodDetails(taxRef: Long, accPeriod: Long): Action[AnyContent] = Action.async { implicit request =>
-    connector
-      .getAccountingPeriodDetails(taxRef, accPeriod)
+    service
+      .getAccountingDetails(taxRef, accPeriod)
       .map { accountingPeriodDetails =>
         Ok(
           Json.toJson(applyAmountTransform(accountingPeriodDetails))

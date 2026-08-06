@@ -16,23 +16,20 @@
 
 package uk.gov.hmrc.corporationtax.services
 
-import uk.gov.hmrc.corporationtax.models.*
 import play.api.Logging
-import uk.gov.hmrc.corporationtax.connectors.{
-  AccountingPeriodDetailsConnector, AdminRuleRdsProxyConnector, PenaltiesConnector
-}
+import uk.gov.hmrc.corporationtax.connectors.{AdminRuleRdsProxyConnector, PenaltiesConnector}
+import uk.gov.hmrc.corporationtax.models.*
+import uk.gov.hmrc.corporationtax.models.PenaltyTransaction.*
 import uk.gov.hmrc.http.HeaderCarrier
-import PenaltyTransaction.*
 
 import java.time.LocalDate
 import javax.inject.Inject
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class PenaltiesService @Inject() (
   penaltiesConnector: PenaltiesConnector,
   adminRuleRdsProxyConnector: AdminRuleRdsProxyConnector,
-  accountingPeriodDetailsConnector: AccountingPeriodDetailsConnector
+  accPeriodDetailsService: AccountingPeriodDetailsService
 )(implicit ec: ExecutionContext)
     extends Logging {
 
@@ -44,7 +41,7 @@ class PenaltiesService @Inject() (
   private def getCTPFStatusAsync(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[Boolean] =
     for {
       adminRulesResult        <- adminRuleRdsProxyConnector.getAdminRule(adminRuleKey)
-      accountingPeriodDetails <- accountingPeriodDetailsConnector.getAccountingPeriodDetails(taxRef, accPeriod)
+      accountingPeriodDetails <- accPeriodDetailsService.getAccountingDetails(taxRef, accPeriod)
     } yield (adminRulesResult.ruleDate, accountingPeriodDetails.accPeriodEndDate) match {
       case (Some(adminRuleDate), Some(accountingPeriodDate)) =>
         getCTPFStatus(accountingPeriodDate, adminRuleDate)

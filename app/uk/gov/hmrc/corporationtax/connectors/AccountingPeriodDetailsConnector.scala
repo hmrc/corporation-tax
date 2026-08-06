@@ -18,7 +18,7 @@ package uk.gov.hmrc.corporationtax.connectors
 
 import play.api.Logging
 import uk.gov.hmrc.*
-import uk.gov.hmrc.corporationtax.models.AccountingPeriodDetails
+import uk.gov.hmrc.corporationtax.models.APBalancedResponse
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
@@ -42,11 +42,11 @@ class AccountingPeriodDetailsConnector @Inject() (http: HttpClientV2, config: Se
     }
   def getAccountingPeriodDetails(taxRef: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
-  ): Future[AccountingPeriodDetails] = {
+  ): Future[APBalancedResponse] = {
     val url: URL = url"$dataProxyPath/corporation-tax/accounting-period-details/$taxRef/$accPeriod"
     http
       .get(url)
-      .execute[AccountingPeriodDetails]
+      .execute[APBalancedResponse]
       .recover { case e: Throwable =>
         logger.error(s"[AccountingPeriodDetails][getAccountingPeriodDetails]: $taxRef :: $accPeriod - ${e.getMessage}")
         throw new RuntimeException(e.getMessage)
