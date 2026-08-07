@@ -16,42 +16,47 @@
 
 package uk.gov.hmrc.corporationtax.services
 
+import uk.gov.hmrc.corporationtax.models.*
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.{AdminRuleRdsProxyConnector, PenaltiesConnector}
-import uk.gov.hmrc.corporationtax.models.*
-import uk.gov.hmrc.corporationtax.models.PenaltyTransaction.*
 import uk.gov.hmrc.http.HeaderCarrier
+import PenaltyTransaction.*
 
 import java.time.LocalDate
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext
 
 class PenaltiesService @Inject() (
   penaltiesConnector: PenaltiesConnector,
-  adminRuleRdsProxyConnector: AdminRuleRdsProxyConnector,
-  accPeriodDetailsService: AccountingPeriodDetailsService
+  adminRuleRdsProxyConnector: AdminRuleRdsProxyConnector
 )(implicit ec: ExecutionContext)
     extends Logging {
 
   private val adminRuleKey: String = "START-OF-CTSA"
 
-  private def getCTPFStatus(accountingPeriod: LocalDate, adminRuleDate: LocalDate): Boolean =
-    accountingPeriod.toEpochDay < adminRuleDate.toEpochDay
+  private def getCTPFStatus(accountingPeriodEndDate: LocalDate, adminRuleDate: LocalDate): Boolean =
+    accountingPeriodEndDate.toEpochDay < adminRuleDate.toEpochDay
 
-  private def getCTPFStatusAsync(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[Boolean] =
+  private def getCTPFStatusAsync(
+    accountingPeriodEndDateMaybe: Option[LocalDate]
+  )(implicit hc: HeaderCarrier): Future[Boolean] =
     for {
-      adminRulesResult        <- adminRuleRdsProxyConnector.getAdminRule(adminRuleKey)
-      accountingPeriodDetails <- accPeriodDetailsService.getAccountingDetails(taxRef, accPeriod)
-    } yield (adminRulesResult.ruleDate, accountingPeriodDetails.accPeriodEndDate) match {
-      case (Some(adminRuleDate), Some(accountingPeriodDate)) =>
-        getCTPFStatus(accountingPeriodDate, adminRuleDate)
-      case (_, _)                                            => true
+      adminRulesResult <- adminRuleRdsProxyConnector.getAdminRule(adminRuleKey)
+    } yield (adminRulesResult.ruleDate, accountingPeriodEndDateMaybe) match {
+      case (Some(adminRuleDate), Some(accountingPeriodEndDate)) =>
+        getCTPFStatus(accountingPeriodEndDate, adminRuleDate)
+      case (_, _)                                               => true
     }
 
-  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[PenaltyItems] =
+  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long, accountingPeriodEndDateMaybe: Option[LocalDate])(implicit
+    hc: HeaderCarrier
+  ): Future[PenaltyItems] = {
+    logger.info(s"[PenaltiesService][getPenaltyTransactionList] $taxRef / $accPeriod / $accountingPeriodEndDateMaybe")
     for {
       penalties <- penaltiesConnector.getPenaltyTransactionList(taxRef, accPeriod)
-      isCTPF    <- getCTPFStatusAsync(taxRef = taxRef, accPeriod = accPeriod)
+      isCTPF    <- getCTPFStatusAsync(accountingPeriodEndDateMaybe)
     } yield PenaltyItems(penalties.penaltyTransactions.map(p => convertToItems(p, isCTPF)))
+  }
 
 }

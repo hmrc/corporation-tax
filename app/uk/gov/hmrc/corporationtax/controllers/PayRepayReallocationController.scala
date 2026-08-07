@@ -18,38 +18,31 @@ package uk.gov.hmrc.corporationtax.controllers
 
 import play.api.Logging
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.corporationtax.services.PenaltiesService
+import play.api.mvc.Results.InternalServerError
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
+import uk.gov.hmrc.corporationtax.models.NonNullPayRepayReallocations
+import uk.gov.hmrc.corporationtax.services.PayRepayReallocationService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
-import scala.util.Try
 
-// TODO: apply auth when its ready
-
-class PenaltiesController @Inject() (
-  cc: ControllerComponents,
-  service: PenaltiesService
+class PayRepayReallocationController @Inject() (
+  payRepayReallocationService: PayRepayReallocationService,
+  cc: ControllerComponents
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def getPenaltyTransactionList(
-    taxRef: Long,
-    accPeriod: Long,
-    accountingPeriodEndDateMaybe: String
-  ): Action[AnyContent] = Action.async { implicit request =>
-    service
-      .getPenaltyTransactionList(taxRef, accPeriod, Try(LocalDate.parse(accountingPeriodEndDateMaybe)).toOption)
-      .map { penalties =>
-        Ok(Json.toJson(penalties))
+  def getTotalAmounts(taxRef: Long, accPeriod: Long): Action[AnyContent] = Action.async { implicit request =>
+    payRepayReallocationService
+      .getTotalAmounts(taxRef, accPeriod)
+      .map { payRepayReallocations =>
+        Ok(Json.toJson(payRepayReallocations))
       }
       .recover { case ex: Exception =>
-        logger.error("Error while retrieving penalties", ex)
-        InternalServerError(Json.obj("error" -> "Failed to retrieve penalties"))
+        logger.error("Error while retrieving the payment repayment allocations", ex)
+        InternalServerError(Json.obj("error" -> "Failed to retrieve the payment repayment reallocation"))
       }
   }
-
 }

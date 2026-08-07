@@ -33,6 +33,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import org.mockito.ArgumentMatchers.eq as eqTo
 import uk.gov.hmrc.corporationtax.services.PenaltiesService
 
+import java.time.LocalDate
+
 class PenaltiesControllerSpec extends AnyWordSpec with Matchers with PenaltiesHelper {
 
   private trait Fixture {
@@ -50,26 +52,27 @@ class PenaltiesControllerSpec extends AnyWordSpec with Matchers with PenaltiesHe
   "GET /" should {
 
     "return 200: OK" in new Fixture {
-      when(mockPenaltiesService.getPenaltyTransactionList(any(), any())(any[HeaderCarrier]))
+      when(mockPenaltiesService.getPenaltyTransactionList(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(penaltyItems))
 
-      val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L)(fakeRequest)
+      val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L, "2025-02-01")(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(penaltyItems)
 
-      verify(mockPenaltiesService).getPenaltyTransactionList(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
+      verify(mockPenaltiesService)
+        .getPenaltyTransactionList(eqTo(1L), eqTo(2L), eqTo(Some(LocalDate.of(2025, 2, 1))))(any[HeaderCarrier])
     }
 
     "return 500: INTERNAL_SERVER_ERROR" in new Fixture {
-      when(mockPenaltiesService.getPenaltyTransactionList(any(), any())(any[HeaderCarrier]))
+      when(mockPenaltiesService.getPenaltyTransactionList(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("unexpected")))
 
-      val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L)(fakeRequest)
+      val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L, "2025-02-01")(fakeRequest)
       status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve penalties"
 
-      verify(mockPenaltiesService).getPenaltyTransactionList(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
+      verify(mockPenaltiesService).getPenaltyTransactionList(eqTo(1L), eqTo(2L), any())(any[HeaderCarrier])
     }
 
     // TODO: implement auth failed scenario

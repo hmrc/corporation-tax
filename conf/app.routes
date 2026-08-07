@@ -1,6 +1,6 @@
 # microservice specific routes
 
-GET        /penalty-transactions/:taxRef/:accPeriod                        uk.gov.hmrc.corporationtax.controllers.PenaltiesController.getPenaltyTransactionList(taxRef: Long, accPeriod: Long)
+GET        /penalty-transactions/:taxRef/:accPeriod/:accPeriodEndDate      uk.gov.hmrc.corporationtax.controllers.PenaltiesController.getPenaltyTransactionList(taxRef: Long, accPeriod: Long, accPeriodEndDate)
 GET        /tax-transactions/:taxRef/:accPeriod                            uk.gov.hmrc.corporationtax.controllers.TaxTransactionsController.getTaxTransactions(taxRef: Long, accPeriod: Long)
 GET        /interest-accural-list/:taxRef/:accPeriod/:interestType         uk.gov.hmrc.corporationtax.controllers.InterestAccuralListController.getInterestAccuralList(taxRef: Long, accPeriod: Long, interestType: String)
 GET        /interest-charge-summary/:taxPayerReference                     uk.gov.hmrc.corporationtax.controllers.InterestChargesSummaryController.getInterestChargesSummary(taxPayerReference:Long)
@@ -10,3 +10,6 @@ GET        /payment-transactions/:taxRef/:accPeriod                            u
 GET        /accounting-period-details/:taxRef/:accPeriod                            uk.gov.hmrc.corporationtax.controllers.AccountingPeriodDetailsController.getAccountingPeriodDetails(taxRef: Long, accPeriod: Long)
 
 GET        /reallocation-to-accounting-period/:taxRef/:accPeriod           uk.gov.hmrc.corporationtax.controllers.ReallocationController.getByAccountingPeriod(taxRef: Long, accPeriod: Long)
+
+GET        /reallocation-from-accounting-period/:taxRef/:accPeriod                            uk.gov.hmrc.corporationtax.controllers.ReallocationFromAccPeriodController.getReallocationFromAccPeriod(taxRef: Long, accPeriod: Long)
+GET        /total-amount-payment-repayment-reallocation/:taxRef/:accPeriod      uk.gov.hmrc.corporationtax.controllers.PayRepayReallocationController.getTotalAmounts(taxRef: Long, accPeriod: Long)

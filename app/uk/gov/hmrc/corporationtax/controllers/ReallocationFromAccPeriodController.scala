@@ -19,37 +19,34 @@ package uk.gov.hmrc.corporationtax.controllers
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.corporationtax.services.PenaltiesService
+import uk.gov.hmrc.corporationtax.services.ReallocationFromAccPeriodService
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
-import scala.util.Try
 
-// TODO: apply auth when its ready
-
-class PenaltiesController @Inject() (
+class ReallocationFromAccPeriodController @Inject() (
   cc: ControllerComponents,
-  service: PenaltiesService
+  service: ReallocationFromAccPeriodService
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def getPenaltyTransactionList(
-    taxRef: Long,
-    accPeriod: Long,
-    accountingPeriodEndDateMaybe: String
-  ): Action[AnyContent] = Action.async { implicit request =>
-    service
-      .getPenaltyTransactionList(taxRef, accPeriod, Try(LocalDate.parse(accountingPeriodEndDateMaybe)).toOption)
-      .map { penalties =>
-        Ok(Json.toJson(penalties))
-      }
-      .recover { case ex: Exception =>
-        logger.error("Error while retrieving penalties", ex)
-        InternalServerError(Json.obj("error" -> "Failed to retrieve penalties"))
-      }
+  def getReallocationFromAccPeriod(taxPayerReference: Long, accPeriod: Long): Action[AnyContent] = Action.async {
+    implicit request =>
+      service
+        .getReallocationFromAccPeriod(taxPayerReference, accPeriod)
+        .map { reallocationFromAccPeriod =>
+          Ok(Json.toJson(reallocationFromAccPeriod))
+        }
+        .recover {
+          case u: UpstreamErrorResponse =>
+            Status(u.statusCode)(Json.obj("message" -> u.message))
+          case t: Throwable             =>
+            logger.error("Error while retrieving reallocationFromAccPeriod", t)
+            InternalServerError(Json.obj("error" -> "Failed to retrieve reallocationFromAccPeriod"))
+        }
   }
 
 }
