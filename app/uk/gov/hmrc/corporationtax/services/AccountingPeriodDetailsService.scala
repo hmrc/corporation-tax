@@ -22,7 +22,6 @@ import uk.gov.hmrc.corporationtax.models.{APBalancedResponse, AccountingPeriodDe
 import uk.gov.hmrc.corporationtax.utils.AmountTransformation
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
