@@ -1,6 +1,6 @@
 # microservice specific routes
 
-GET        /penalty-transactions/:taxRef/:accPeriod                        uk.gov.hmrc.corporationtax.controllers.PenaltiesController.getPenaltyTransactionList(taxRef: Long, accPeriod: Long)
+GET        /penalty-transactions/:taxRef/:accPeriod/:accPeriodEndDate      uk.gov.hmrc.corporationtax.controllers.PenaltiesController.getPenaltyTransactionList(taxRef: Long, accPeriod: Long, accPeriodEndDate)
 GET        /tax-transactions/:taxRef/:accPeriod                            uk.gov.hmrc.corporationtax.controllers.TaxTransactionsController.getTaxTransactions(taxRef: Long, accPeriod: Long)
 GET        /interest-accural-list/:taxRef/:accPeriod/:interestType         uk.gov.hmrc.corporationtax.controllers.InterestAccuralListController.getInterestAccuralList(taxRef: Long, accPeriod: Long, interestType: String)
 GET        /interest-charge-summary/:taxPayerReference                     uk.gov.hmrc.corporationtax.controllers.InterestChargesSummaryController.getInterestChargesSummary(taxPayerReference:Long)

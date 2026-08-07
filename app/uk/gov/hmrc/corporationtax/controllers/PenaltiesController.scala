@@ -22,8 +22,10 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.corporationtax.services.PenaltiesService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
+import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
+import scala.util.Try
 
 // TODO: apply auth when its ready
 
@@ -34,9 +36,13 @@ class PenaltiesController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long): Action[AnyContent] = Action.async { implicit request =>
+  def getPenaltyTransactionList(
+    taxRef: Long,
+    accPeriod: Long,
+    accountingPeriodEndDateMaybe: String
+  ): Action[AnyContent] = Action.async { implicit request =>
     service
-      .getPenaltyTransactionList(taxRef, accPeriod)
+      .getPenaltyTransactionList(taxRef, accPeriod, Try(LocalDate.parse(accountingPeriodEndDateMaybe)).toOption)
       .map { penalties =>
         Ok(Json.toJson(penalties))
       }
