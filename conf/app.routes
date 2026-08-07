@@ -7,4 +7,6 @@ GET        /interest-charge-summary/:taxPayerReference                     uk.go
 GET        /adjustment-transactions/:taxRef/:accPeriod                     uk.gov.hmrc.corporationtax.controllers.AdjustmentTransactionsController.getAdjustmentTransactions(taxRef: Long, accPeriod: Long)
 GET        /administrative-rule/:adminRuleKey                              uk.gov.hmrc.corporationtax.controllers.AdministrationRuleController.getAdminRule(adminRuleKey:String)
 GET        /payment-transactions/:taxRef/:accPeriod                            uk.gov.hmrc.corporationtax.controllers.PaymentsController.getPayments(taxRef: Long, accPeriod: Long)
-GET        /accounting-period-details/:taxRef/:accPeriod/ uk.gov.hmrc.corporationtax.controllers.AccountingPeriodDetailsController.getAccountingPeriodDetails(taxRef: Long, accPeriod: Long)
+GET        /accounting-period-details/:taxRef/:accPeriod                            uk.gov.hmrc.corporationtax.controllers.AccountingPeriodDetailsController.getAccountingPeriodDetails(taxRef: Long, accPeriod: Long)
+
+GET        /reallocation-to-accounting-period/:taxRef/:accPeriod           uk.gov.hmrc.corporationtax.controllers.ReallocationController.getByAccountingPeriod(taxRef: Long, accPeriod: Long)

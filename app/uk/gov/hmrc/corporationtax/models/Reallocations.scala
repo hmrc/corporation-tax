@@ -20,8 +20,18 @@ import play.api.libs.json.{Json, OFormat}
 
 import java.time.LocalDate
 
-case class AdminRule(ruleNumber: Option[BigDecimal] = None, ruleDate: Option[LocalDate] = None) {}
+case class Reallocations(reallocation: List[ReallocationRow])
+case class ReallocationRow(
+  amount: BigDecimal,
+  reallocationDate: LocalDate,
+  sourceApEndDate: LocalDate,
+  sourceTaxpayerReference: String
+)
 
-object AdminRule {
-  implicit val format: OFormat[AdminRule] = Json.format[AdminRule]
+object Reallocations {
+  implicit val format: OFormat[Reallocations] = Json.format[Reallocations]
+}
+
+object ReallocationRow {
+  implicit val format: OFormat[ReallocationRow] = Json.format[ReallocationRow]
 }

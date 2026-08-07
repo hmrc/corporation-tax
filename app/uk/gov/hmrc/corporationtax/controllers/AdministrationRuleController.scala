@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class AdministrationRuleController @Inject() (
   cc: ControllerComponents,
@@ -34,18 +34,24 @@ class AdministrationRuleController @Inject() (
     with Logging {
 
   def getAdminRule(adminRuleKey: String): Action[AnyContent] = Action.async { implicit request =>
-    service
-      .getAdminRule(adminRuleKey)
-      .map { adminRule =>
-        Ok(Json.toJson(adminRule))
-      }
-      .recover {
-        case u: UpstreamErrorResponse =>
-          Status(u.statusCode)(Json.obj("message" -> u.message))
-        case t: Throwable             =>
-          logger.error("Error while retrieving adminRule", t)
-          InternalServerError(Json.obj("error" -> "Failed to retrieve adminRule"))
-      }
+    logger.info(s"[GetAdministrativeRuleController][getAdministrativeRule]")
+    if (adminRuleKey.isEmpty) {
+      Future.successful(BadRequest(Json.obj("message" -> "AdminRule Key must be provided")))
+    } else {
+      service
+        .getAdminRule(adminRuleKey)
+        .map { adminRule =>
+          Ok(Json.toJson(adminRule))
+        }
+        .recover {
+          case u: UpstreamErrorResponse =>
+            logger.error("Error response from Upstream", u)
+            Status(u.statusCode)(Json.obj("message" -> u.message))
+          case t: Throwable             =>
+            logger.error("Error while retrieving adminRule", t)
+            InternalServerError(Json.obj("error" -> "Failed to retrieve adminRule"))
+        }
+    }
   }
 
 }

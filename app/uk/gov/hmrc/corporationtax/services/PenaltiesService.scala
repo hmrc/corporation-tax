@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext
 
 class PenaltiesService @Inject() (
   penaltiesConnector: PenaltiesConnector,
-  adminRuleRdsProxyConnector: AdminRuleRdsProxyConnector,
+  adminRuleRdsProxyConnector: AdminRuleRdsProxyConnector
 )(implicit ec: ExecutionContext)
     extends Logging {
 
@@ -41,18 +41,19 @@ class PenaltiesService @Inject() (
   private def getCTPFStatusAsync(accountingPeriodEndDateMaybe: Option[LocalDate])
                                 (implicit hc: HeaderCarrier): Future[Boolean] =
     for {
-      adminRulesResult        <- adminRuleRdsProxyConnector.getAdminRule(adminRuleKey)
+      adminRulesResult <- adminRuleRdsProxyConnector.getAdminRule(adminRuleKey)
     } yield (adminRulesResult.ruleDate, accountingPeriodEndDateMaybe) match {
       case (Some(adminRuleDate), Some(accountingPeriodEndDate)) =>
         getCTPFStatus(accountingPeriodEndDate, adminRuleDate)
-      case (_, _)                                            => true
+      case (_, _) => true
     }
 
-  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long,
+  def getPenaltyTransactionList(taxRef: Long,
+                                accPeriod: Long,
                                 accountingPeriodEndDateMaybe: Option[LocalDate])(implicit hc: HeaderCarrier): Future[PenaltyItems] =
     for {
       penalties <- penaltiesConnector.getPenaltyTransactionList(taxRef, accPeriod)
-      isCTPF    <- getCTPFStatusAsync(accountingPeriodEndDateMaybe )
+      isCTPF    <-  getCTPFStatusAsync(accountingPeriodEndDateMaybe )
     } yield PenaltyItems(penalties.penaltyTransactions.map(p => convertToItems(p, isCTPF)))
 
 }

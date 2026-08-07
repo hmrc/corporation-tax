@@ -22,8 +22,8 @@ import java.time.LocalDate
 
 trait AdminRuleHelper {
   val emptyAdminRule: AdminRule    = AdminRule(None, None)
-  val example1adminRule: AdminRule = AdminRule(Some(3L), Some(LocalDate.of(1997, 7, 1)))
-  val example2adminRule: AdminRule = AdminRule(Some(56L), Some(LocalDate.of(2001, 8, 12)))
-  val example3adminRule: AdminRule = AdminRule(Some(87L), None)
+  val example1adminRule: AdminRule = AdminRule(Some(BigDecimal(3)), Some(LocalDate.of(1997, 7, 1)))
+  val example2adminRule: AdminRule = AdminRule(Some(BigDecimal(56)), Some(LocalDate.of(2001, 8, 12)))
+  val example3adminRule: AdminRule = AdminRule(Some(BigDecimal(87)), None)
   val example4adminRule: AdminRule = AdminRule(None, Some(LocalDate.of(2012, 4, 8)))
 }
