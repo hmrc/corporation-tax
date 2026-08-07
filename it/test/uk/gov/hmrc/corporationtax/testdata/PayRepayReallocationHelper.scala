@@ -22,7 +22,7 @@ import uk.gov.hmrc.corporationtax.models.PayRepayReallocations
 trait PayRepayReallocationHelper {
 
   val emptyPayRepayReallocation: PayRepayReallocations =
-    PayRepayReallocations(Some(0), Some(0))
+    PayRepayReallocations(None, None)
 
   val payRepayReallocation: PayRepayReallocations =
     PayRepayReallocations(

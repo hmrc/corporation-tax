@@ -49,12 +49,24 @@ class PayRepayReallocationControllerSpec extends AnyWordSpec with Matchers with 
 
     "return 200 and a successful response with the payment repayment reallocation" in new Setup {
       when(mockService.getTotalAmounts(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(payRepayReallocation))
+        .thenReturn(Future.successful(transformedPayRepayReallocation))
 
       val result: Future[Result] = controller.getTotalAmounts(1L, 2L)(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson(payRepayReallocation)
+      contentAsJson(result) shouldBe Json.toJson(transformedPayRepayReallocation)
+
+      verify(mockService).getTotalAmounts(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
+    }
+
+    "return 200 and a successful response with an empty payment repayment reallocation" in new Setup {
+      when(mockService.getTotalAmounts(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(emptyTransformedPayRepayReallocation))
+
+      val result: Future[Result] = controller.getTotalAmounts(1L, 2L)(fakeRequest)
+      status(result) shouldBe Status.OK
+
+      contentAsJson(result) shouldBe Json.toJson(emptyTransformedPayRepayReallocation)
 
       verify(mockService).getTotalAmounts(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }

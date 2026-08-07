@@ -20,7 +20,7 @@ import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.Results.InternalServerError
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
-import uk.gov.hmrc.corporationtax.models.PayRepayReallocations
+import uk.gov.hmrc.corporationtax.models.NonNullPayRepayReallocations
 import uk.gov.hmrc.corporationtax.services.PayRepayReallocationService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 

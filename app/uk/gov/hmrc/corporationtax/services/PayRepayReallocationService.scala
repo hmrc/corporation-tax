@@ -17,8 +17,14 @@
 package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
-import uk.gov.hmrc.corporationtax.models.PayRepayReallocations
+import uk.gov.hmrc.corporationtax.models.NonNullPayRepayReallocations
 import uk.gov.hmrc.corporationtax.connectors.PayRepayReallocationConnector
+import uk.gov.hmrc.corporationtax.utils.applyAmountTransform
+import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
+import uk.gov.hmrc.corporationtax.utils.PayRepayReallocationTransformInstances.*
+import uk.gov.hmrc.corporationtax.utils.TransformToDomainModel.transform
+import uk.gov.hmrc.corporationtax.utils.TransformToDomainModel
+import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -26,9 +32,14 @@ import scala.concurrent.Future
 
 class PayRepayReallocationService @Inject()(payRepayReallocationConnector: PayRepayReallocationConnector) extends Logging {
 
-  def getTotalAmounts(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[PayRepayReallocations] = {
+  def getTotalAmounts(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[NonNullPayRepayReallocations] = {
     logger.info(s"Calling repository for taxRef: $taxRef and accPeriod: $accPeriod")
 
-    payRepayReallocationConnector.getTotalAmounts(taxRef, accPeriod)
+    payRepayReallocationConnector.getTotalAmounts(taxRef, accPeriod).map { 
+      payRepayReallocation => 
+        val amount = applyAmountTransform(payRepayReallocation)
+        transform(amount)
+    }
   }
+  
 }
