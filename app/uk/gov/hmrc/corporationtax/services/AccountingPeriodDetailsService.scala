@@ -19,6 +19,7 @@ package uk.gov.hmrc.corporationtax.services
 import play.api.i18n.Lang.logger
 import uk.gov.hmrc.corporationtax.connectors.AccountingPeriodDetailsConnector
 import uk.gov.hmrc.corporationtax.models.{APBalancedResponse, AccountingPeriodDetails}
+import uk.gov.hmrc.corporationtax.utils.AmountTransformation
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
@@ -30,19 +31,27 @@ class AccountingPeriodDetailsService @Inject()(
                                                 connector: AccountingPeriodDetailsConnector)
                                               (implicit ec: ExecutionContext){
 
-  private def prepareResponse(entity: APBalancedResponse) : AccountingPeriodDetails = {
+  private def booleanConverter(in: String): Boolean = {
+    in match {
+      case "Y" => true
+      case _ => false
+    }
+  }
+
+  private def prepareResponse(e: APBalancedResponse) : AccountingPeriodDetails = {
     // Apply conversions :: Boolean && Amount
+
     AccountingPeriodDetails(
-      isApBalanced = false,
-      lpiCalcFlag = false,
-      crDbCalcFlag = false,
-      creditInterestAmount = BigDecimal(1.1),
-      debitInterestAmount = BigDecimal(1.1),
-      latePaymentInterestAmount = BigDecimal(1.1),
-      repaymentInterestAmount = BigDecimal(1.1),
-      totalDerivedActualInterest = BigDecimal(1.1),
-      amountDueForAp = BigDecimal(1.1),
-      accPeriodEndDate = Some(LocalDate.now())
+      isApBalanced = e.accountingPeriodDetails.isApBalanced.map(booleanConverter(_)).getOrElse(false),
+      lpiCalcFlag = e.accountingPeriodDetails.lpiCalcFlag.map(booleanConverter(_)).getOrElse(false),
+      crDbCalcFlag = e.accountingPeriodDetails.crDbCalcFlag.map(booleanConverter(_)).getOrElse(false),
+      creditInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
+      debitInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
+      latePaymentInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
+      repaymentInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
+      totalDerivedActualInterest = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
+      amountDueForAp = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
+      accPeriodEndDate = None
     )
   }
 
