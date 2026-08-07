@@ -28,9 +28,9 @@ object PayRepayReallocations {
 }
 
 case class NonNullPayRepayReallocations(
-                                  totalAmountReoRfrRto: BigDecimal,
-                                  totalAmountPayments: BigDecimal
-                                )
+  totalAmountReoRfrRto: BigDecimal,
+  totalAmountPayments: BigDecimal
+)
 
 object NonNullPayRepayReallocations {
   implicit val format: OFormat[NonNullPayRepayReallocations] = Json.format[NonNullPayRepayReallocations]

@@ -28,8 +28,8 @@ import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PayRepayReallocationConnector @Inject()(http: HttpClientV2, config: ServicesConfig)(implicit
-                                                                                          ec: ExecutionContext
+class PayRepayReallocationConnector @Inject() (http: HttpClientV2, config: ServicesConfig)(implicit
+  ec: ExecutionContext
 ) extends Logging {
 
   val stubEnabled: Boolean = config.getBoolean("features.corporation-tax-stub-enabled")

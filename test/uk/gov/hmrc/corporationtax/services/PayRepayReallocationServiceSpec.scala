@@ -46,7 +46,7 @@ class PayRepayReallocationServiceSpec
     implicit val ec: ExecutionContext    = cc.executionContext
 
     val mockConnector: PayRepayReallocationConnector = mock[PayRepayReallocationConnector]
-    val service = new PayRepayReallocationService(mockConnector)
+    val service                                      = new PayRepayReallocationService(mockConnector)
   }
 
   "getTotalAmounts" should {

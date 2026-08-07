@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class PayRepayReallocationController @Inject()(
+class PayRepayReallocationController @Inject() (
   payRepayReallocationService: PayRepayReallocationService,
   cc: ControllerComponents
 )(implicit ec: ExecutionContext)

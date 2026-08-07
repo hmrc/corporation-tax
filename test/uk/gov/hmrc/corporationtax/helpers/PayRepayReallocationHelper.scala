@@ -18,7 +18,6 @@ package uk.gov.hmrc.corporationtax.helpers
 
 import uk.gov.hmrc.corporationtax.models.{NonNullPayRepayReallocations, PayRepayReallocations}
 
-
 trait PayRepayReallocationHelper {
 
   val emptyTransformedPayRepayReallocation: NonNullPayRepayReallocations =
@@ -39,4 +38,3 @@ trait PayRepayReallocationHelper {
       totalAmountPayments = Some(BigDecimal(20))
     )
 }
-

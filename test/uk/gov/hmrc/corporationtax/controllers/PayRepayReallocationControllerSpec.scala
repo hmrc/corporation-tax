@@ -70,7 +70,7 @@ class PayRepayReallocationControllerSpec extends AnyWordSpec with Matchers with 
 
       verify(mockService).getTotalAmounts(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }
-    
+
     "return 500 INTERNAL_SERVER_ERROR" in new Setup {
       when(mockService.getTotalAmounts(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("error")))

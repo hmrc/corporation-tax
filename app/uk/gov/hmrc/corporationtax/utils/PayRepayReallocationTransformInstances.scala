@@ -16,15 +16,15 @@
 
 package uk.gov.hmrc.corporationtax.utils
 
-import uk.gov.hmrc.corporationtax.models.{PayRepayReallocations, NonNullPayRepayReallocations}
+import uk.gov.hmrc.corporationtax.models.{NonNullPayRepayReallocations, PayRepayReallocations}
 
 object PayRepayReallocationTransformInstances {
 
   implicit val transformPayRepayReallocation
-  : TransformToDomainModel[PayRepayReallocations, NonNullPayRepayReallocations] =
-    (payRepayReallocations: PayRepayReallocations) => 
+    : TransformToDomainModel[PayRepayReallocations, NonNullPayRepayReallocations] =
+    (payRepayReallocations: PayRepayReallocations) =>
       NonNullPayRepayReallocations(
         totalAmountReoRfrRto = payRepayReallocations.totalAmountReoRfrRto.getOrElse(BigDecimal(0)),
-        totalAmountPayments = payRepayReallocations.totalAmountPayments.getOrElse(BigDecimal(0)),
+        totalAmountPayments = payRepayReallocations.totalAmountPayments.getOrElse(BigDecimal(0))
       )
 }

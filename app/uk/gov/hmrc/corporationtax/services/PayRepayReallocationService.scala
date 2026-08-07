@@ -30,16 +30,18 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class PayRepayReallocationService @Inject()(payRepayReallocationConnector: PayRepayReallocationConnector) extends Logging {
+class PayRepayReallocationService @Inject() (payRepayReallocationConnector: PayRepayReallocationConnector)
+    extends Logging {
 
-  def getTotalAmounts(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[NonNullPayRepayReallocations] = {
+  def getTotalAmounts(taxRef: Long, accPeriod: Long)(implicit
+    hc: HeaderCarrier
+  ): Future[NonNullPayRepayReallocations] = {
     logger.info(s"Calling repository for taxRef: $taxRef and accPeriod: $accPeriod")
 
-    payRepayReallocationConnector.getTotalAmounts(taxRef, accPeriod).map { 
-      payRepayReallocation => 
-        val amount = applyAmountTransform(payRepayReallocation)
-        transform(amount)
+    payRepayReallocationConnector.getTotalAmounts(taxRef, accPeriod).map { payRepayReallocation =>
+      val amount = applyAmountTransform(payRepayReallocation)
+      transform(amount)
     }
   }
-  
+
 }
