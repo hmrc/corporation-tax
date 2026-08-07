@@ -30,7 +30,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ReallocationFromAccPeriodService @Inject() (
   connector: ReallocationFromAccPeriodRdsProxyConnector
-) extends Logging {
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def getReallocationFromAccPeriod(taxPayerReference: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier

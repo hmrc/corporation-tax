@@ -29,8 +29,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PayRepayReallocationService @Inject() (payRepayReallocationConnector: PayRepayReallocationConnector)
-    extends Logging {
+class PayRepayReallocationService @Inject() (payRepayReallocationConnector: PayRepayReallocationConnector)(implicit
+  ec: ExecutionContext
+) extends Logging {
 
   def getTotalAmounts(taxRef: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
