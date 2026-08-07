@@ -51,10 +51,12 @@ class PenaltiesService @Inject() (
 
   def getPenaltyTransactionList(taxRef: Long, accPeriod: Long, accountingPeriodEndDateMaybe: Option[LocalDate])(implicit
     hc: HeaderCarrier
-  ): Future[PenaltyItems] =
+  ): Future[PenaltyItems] = {
+    logger.info(s"[PenaltiesService][getPenaltyTransactionList] $taxRef / $accPeriod / $accountingPeriodEndDateMaybe")
     for {
       penalties <- penaltiesConnector.getPenaltyTransactionList(taxRef, accPeriod)
       isCTPF    <- getCTPFStatusAsync(accountingPeriodEndDateMaybe)
     } yield PenaltyItems(penalties.penaltyTransactions.map(p => convertToItems(p, isCTPF)))
+  }
 
 }
