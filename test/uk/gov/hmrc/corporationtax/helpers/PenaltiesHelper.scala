@@ -59,4 +59,5 @@ trait PenaltiesHelper {
         PenaltyTransactionItem(penaltyDate = LocalDate.of(2021, 3, 7), `type` = TR, postingAmount = BigDecimal(27.19))
       )
     )
+
 }
