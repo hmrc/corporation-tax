@@ -50,7 +50,6 @@ class AccountingPeriodDetailsService @Inject()(
       repaymentInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
       totalDerivedActualInterest = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
       amountDueForAp = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
-      accPeriodEndDate = None
     )
   }
 

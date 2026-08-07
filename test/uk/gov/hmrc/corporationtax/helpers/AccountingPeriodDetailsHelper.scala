@@ -18,8 +18,6 @@ package uk.gov.hmrc.corporationtax.helpers
 
 import uk.gov.hmrc.corporationtax.models.AccountingPeriodDetails
 
-import java.time.LocalDate
-
 trait AccountingPeriodDetailsHelper {
 
   val accountingPeriodDetails: AccountingPeriodDetails =
@@ -32,8 +30,7 @@ trait AccountingPeriodDetailsHelper {
       latePaymentInterestAmount = 3231.238,
       repaymentInterestAmount = 1.231,
       totalDerivedActualInterest = 2324.12,
-      amountDueForAp = 12.23,
-      accPeriodEndDate = Some(LocalDate.of(2026, 1, 1))
+      amountDueForAp = 12.23
     )
 
   val accountingPeriodDetailsTransformedAmounts: AccountingPeriodDetails =
@@ -46,8 +43,7 @@ trait AccountingPeriodDetailsHelper {
       latePaymentInterestAmount = -3231.24,
       repaymentInterestAmount = -1.23,
       totalDerivedActualInterest = -2324.12,
-      amountDueForAp = -12.23,
-      accPeriodEndDate = Some(LocalDate.of(2026, 1, 1))
+      amountDueForAp = -12.23
     )
 
 }
