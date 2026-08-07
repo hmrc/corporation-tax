@@ -24,11 +24,10 @@ import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
 import uk.gov.hmrc.corporationtax.utils.PayRepayReallocationTransformInstances.*
 import uk.gov.hmrc.corporationtax.utils.TransformToDomainModel.transform
 import uk.gov.hmrc.corporationtax.utils.TransformToDomainModel
-import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{Future, ExecutionContext}
 
 class PayRepayReallocationService @Inject() (payRepayReallocationConnector: PayRepayReallocationConnector)
     extends Logging {
