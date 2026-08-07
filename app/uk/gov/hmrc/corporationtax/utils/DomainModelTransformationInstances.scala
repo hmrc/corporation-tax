@@ -16,15 +16,13 @@
 
 package uk.gov.hmrc.corporationtax.utils
 
-import uk.gov.hmrc.corporationtax.models.{
-  ReallocationFromAccPeriod, TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod
-}
+import uk.gov.hmrc.corporationtax.models.{MiscellaneousTransfer, RdsReallocationFromAccPeriodResponse, TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod}
 
 object DomainModelTransformationInstances {
 
   implicit val toTransformedReallocationFromAccPeriod
-    : TransformToDomainModel[ReallocationFromAccPeriod, TransformedReallocationFromAccPeriod] =
-    (reallocFromAcc: ReallocationFromAccPeriod) =>
+    : TransformToDomainModel[RdsReallocationFromAccPeriodResponse, TransformedReallocationFromAccPeriod] =
+    (reallocFromAcc: RdsReallocationFromAccPeriodResponse) =>
       TransformedReallocationFromAccPeriod(
         reallocFromAcc.reallocation.map { value =>
           TransformedReallocationFromAccDetails(
@@ -33,7 +31,8 @@ object DomainModelTransformationInstances {
             destinationApEndDate = value.destinationApEndDate
               .map(_.toString)
               .getOrElse(""), // converting to string and assigning empty string if it is null
-            destinationTaxPayerReference = value.destinationTaxPayerReference
+            destinationTaxPayerReference = value.destinationTaxPayerReference,
+            transactionType = MiscellaneousTransfer
           )
         }
       )

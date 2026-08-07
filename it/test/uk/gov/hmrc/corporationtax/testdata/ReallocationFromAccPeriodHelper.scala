@@ -16,17 +16,17 @@
 
 package uk.gov.hmrc.corporationtax.testdata
 
-import uk.gov.hmrc.corporationtax.models.{ReallocationFromAccDetails, ReallocationFromAccPeriod}
+import uk.gov.hmrc.corporationtax.models.{RdsReallocationFromAccPeriodResponse, RdsReallocationFromAccDetails}
 
 import java.time.LocalDate
 
 trait ReallocationFromAccPeriodHelper {
 
-  val emptyListReallocationFromAccPeriod: ReallocationFromAccPeriod = ReallocationFromAccPeriod(List.empty)
+  val emptyListReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse = RdsReallocationFromAccPeriodResponse(List.empty)
   
-  val reallocationFromAccPeriodWithSingleElement: ReallocationFromAccPeriod = ReallocationFromAccPeriod(
+  val reallocationFromAccPeriodWithSingleElement: RdsReallocationFromAccPeriodResponse = RdsReallocationFromAccPeriodResponse(
     List(
-      ReallocationFromAccDetails(
+      RdsReallocationFromAccDetails(
         Some(BigDecimal(12390.670)),
         LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
@@ -35,21 +35,21 @@ trait ReallocationFromAccPeriodHelper {
     )
   )
   
-  val reallocationFromAccPeriodWithThreeElements: ReallocationFromAccPeriod = ReallocationFromAccPeriod(
+  val reallocationFromAccPeriodWithThreeElements: RdsReallocationFromAccPeriodResponse = RdsReallocationFromAccPeriodResponse(
     List(
-      ReallocationFromAccDetails(
+      RdsReallocationFromAccDetails(
         Some(BigDecimal(12390.00)),
         LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
         "18969779586"
       ),
-      ReallocationFromAccDetails(
+      RdsReallocationFromAccDetails(
         Some(BigDecimal(180007.00)),
         LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),
         "18969779586"
       ),
-      ReallocationFromAccDetails(
+      RdsReallocationFromAccDetails(
         Some(BigDecimal(89075.00)),
         LocalDate.of(2026, 12, 27),
         Some(LocalDate.of(2024, 2, 2)),

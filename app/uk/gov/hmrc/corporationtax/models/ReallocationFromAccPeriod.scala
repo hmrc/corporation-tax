@@ -19,22 +19,22 @@ package uk.gov.hmrc.corporationtax.models
 import play.api.libs.json.{Json, OFormat}
 import java.time.LocalDate
 
-case class ReallocationFromAccPeriod(reallocation: List[ReallocationFromAccDetails])
+case class RdsReallocationFromAccPeriodResponse(reallocation: List[RdsReallocationFromAccDetails])
 
-object ReallocationFromAccPeriod {
-  implicit val format: OFormat[ReallocationFromAccPeriod] = Json.format[ReallocationFromAccPeriod]
+object RdsReallocationFromAccPeriodResponse {
+  implicit val format: OFormat[RdsReallocationFromAccPeriodResponse] = Json.format[RdsReallocationFromAccPeriodResponse]
 }
 
-case class ReallocationFromAccDetails(
+case class RdsReallocationFromAccDetails(
   amount: Option[BigDecimal],
   reallocationDate: LocalDate,
   destinationApEndDate: Option[LocalDate],
   destinationTaxPayerReference: String
 )
 
-object ReallocationFromAccDetails {
+object RdsReallocationFromAccDetails {
 
-  implicit val format: OFormat[ReallocationFromAccDetails] = Json.format[ReallocationFromAccDetails]
+  implicit val format: OFormat[RdsReallocationFromAccDetails] = Json.format[RdsReallocationFromAccDetails]
 }
 
 case class TransformedReallocationFromAccPeriod(reallocation: List[TransformedReallocationFromAccDetails])
@@ -47,7 +47,8 @@ case class TransformedReallocationFromAccDetails(
   amount: BigDecimal,
   reallocationDate: LocalDate,
   destinationApEndDate: String,
-  destinationTaxPayerReference: String
+  destinationTaxPayerReference: String,
+  transactionType: TransactionTypesOfGetReallocationFromAcc
 )
 
 object TransformedReallocationFromAccDetails {

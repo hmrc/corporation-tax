@@ -20,6 +20,7 @@ import uk.gov.hmrc.corporationtax.models.{
   AccountingPeriodDetails, InterestAccrual, PayRepayReallocations, PaymentTransaction, ReallocationFromAccDetails,
   ReallocationRow, TaxTransactionsItem
 }
+import uk.gov.hmrc.corporationtax.models.{AccountingPeriodDetails, InterestAccural, PaymentTransaction, RdsReallocationFromAccDetails, ReallocationRow, TaxTransactionsItem}
 
 object AmountAdjustableInstances {
 
@@ -88,12 +89,12 @@ object AmountAdjustableInstances {
         )
     }
 
-  implicit val reallocationFromAccPeriod: AmountAdjustable[ReallocationFromAccDetails] =
-    new AmountAdjustable[ReallocationFromAccDetails] {
+  implicit val reallocationFromAccPeriod: AmountAdjustable[RdsReallocationFromAccDetails] =
+    new AmountAdjustable[RdsReallocationFromAccDetails] {
       def amountFields: List[
         (
-          ReallocationFromAccDetails => Option[BigDecimal],
-          (ReallocationFromAccDetails, BigDecimal) => ReallocationFromAccDetails
+          RdsReallocationFromAccDetails => Option[BigDecimal],
+          (RdsReallocationFromAccDetails, BigDecimal) => RdsReallocationFromAccDetails
         )
       ] =
         List((item => item.amount, (item, newValue) => item.copy(amount = Some(newValue))))
