@@ -38,22 +38,23 @@ class PenaltiesService @Inject() (
   private def getCTPFStatus(accountingPeriodEndDate: LocalDate, adminRuleDate: LocalDate): Boolean =
     accountingPeriodEndDate.toEpochDay < adminRuleDate.toEpochDay
 
-  private def getCTPFStatusAsync(accountingPeriodEndDateMaybe: Option[LocalDate])
-                                (implicit hc: HeaderCarrier): Future[Boolean] =
+  private def getCTPFStatusAsync(
+    accountingPeriodEndDateMaybe: Option[LocalDate]
+  )(implicit hc: HeaderCarrier): Future[Boolean] =
     for {
       adminRulesResult <- adminRuleRdsProxyConnector.getAdminRule(adminRuleKey)
     } yield (adminRulesResult.ruleDate, accountingPeriodEndDateMaybe) match {
       case (Some(adminRuleDate), Some(accountingPeriodEndDate)) =>
         getCTPFStatus(accountingPeriodEndDate, adminRuleDate)
-      case (_, _) => true
+      case (_, _)                                               => true
     }
 
-  def getPenaltyTransactionList(taxRef: Long,
-                                accPeriod: Long,
-                                accountingPeriodEndDateMaybe: Option[LocalDate])(implicit hc: HeaderCarrier): Future[PenaltyItems] =
+  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long, accountingPeriodEndDateMaybe: Option[LocalDate])(implicit
+    hc: HeaderCarrier
+  ): Future[PenaltyItems] =
     for {
       penalties <- penaltiesConnector.getPenaltyTransactionList(taxRef, accPeriod)
-      isCTPF    <-  getCTPFStatusAsync(accountingPeriodEndDateMaybe )
+      isCTPF    <- getCTPFStatusAsync(accountingPeriodEndDateMaybe)
     } yield PenaltyItems(penalties.penaltyTransactions.map(p => convertToItems(p, isCTPF)))
 
 }

@@ -21,9 +21,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
 import org.mockito.Mockito.verify
-import uk.gov.hmrc.corporationtax.connectors.{
-  AdminRuleRdsProxyConnector, PenaltiesConnector
-}
+import uk.gov.hmrc.corporationtax.connectors.{AdminRuleRdsProxyConnector, PenaltiesConnector}
 import uk.gov.hmrc.http.HeaderCarrier
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -35,12 +33,11 @@ import uk.gov.hmrc.corporationtax.models.{AdminRule, PenaltyItems}
 import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
-class PenaltiesServiceSpec extends AnyWordSpec with Matchers
-  with PenaltiesHelper with ScalaFutures {
+class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelper with ScalaFutures {
 
   private trait Fixture {
-    val mockPenaltiesConnector: PenaltiesConnector                             = mock[PenaltiesConnector]
-    val mockAdminRuleRdsProxyConnector: AdminRuleRdsProxyConnector             = mock[AdminRuleRdsProxyConnector]
+    val mockPenaltiesConnector: PenaltiesConnector                 = mock[PenaltiesConnector]
+    val mockAdminRuleRdsProxyConnector: AdminRuleRdsProxyConnector = mock[AdminRuleRdsProxyConnector]
 
     val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
@@ -97,8 +94,6 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers
     verify(mockPenaltiesConnector).getPenaltyTransactionList(1L, 1L)(hc)
     verify(mockAdminRuleRdsProxyConnector).getAdminRule("START-OF-CTSA")(hc)
   }
-
-
 
   "getPenaltyTransactionList returns list of Penalties from connector: isCTPF is true and accountPeriodDate is None" in new Fixture {
     when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))

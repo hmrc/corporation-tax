@@ -36,11 +36,13 @@ class PenaltiesController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def getPenaltyTransactionList(taxRef: Long, accPeriod: Long, 
-                                accountingPeriodEndDateMaybe: String): Action[AnyContent] = Action.async { implicit request =>
+  def getPenaltyTransactionList(
+    taxRef: Long,
+    accPeriod: Long,
+    accountingPeriodEndDateMaybe: String
+  ): Action[AnyContent] = Action.async { implicit request =>
     service
-      .getPenaltyTransactionList(taxRef, accPeriod, 
-        Try{ LocalDate.parse(accountingPeriodEndDateMaybe)}.toOption )
+      .getPenaltyTransactionList(taxRef, accPeriod, Try(LocalDate.parse(accountingPeriodEndDateMaybe)).toOption)
       .map { penalties =>
         Ok(Json.toJson(penalties))
       }

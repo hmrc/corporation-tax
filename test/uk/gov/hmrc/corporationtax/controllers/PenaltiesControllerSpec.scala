@@ -60,7 +60,8 @@ class PenaltiesControllerSpec extends AnyWordSpec with Matchers with PenaltiesHe
 
       contentAsJson(result) shouldBe Json.toJson(penaltyItems)
 
-      verify(mockPenaltiesService).getPenaltyTransactionList(eqTo(1L), eqTo(2L), eqTo(Some(LocalDate.of(2025, 2, 1)) ))(any[HeaderCarrier])
+      verify(mockPenaltiesService)
+        .getPenaltyTransactionList(eqTo(1L), eqTo(2L), eqTo(Some(LocalDate.of(2025, 2, 1))))(any[HeaderCarrier])
     }
 
     "return 500: INTERNAL_SERVER_ERROR" in new Fixture {
