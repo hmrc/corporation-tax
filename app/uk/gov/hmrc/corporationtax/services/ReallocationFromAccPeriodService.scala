@@ -26,7 +26,7 @@ import uk.gov.hmrc.corporationtax.utils.{TransformToDomainModel, applyAmountTran
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 class ReallocationFromAccPeriodService @Inject() (
   connector: ReallocationFromAccPeriodRdsProxyConnector
