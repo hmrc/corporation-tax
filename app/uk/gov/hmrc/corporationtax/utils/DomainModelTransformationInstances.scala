@@ -16,25 +16,42 @@
 
 package uk.gov.hmrc.corporationtax.utils
 
-import uk.gov.hmrc.corporationtax.models.{MiscellaneousTransfer, RdsReallocationFromAccPeriodResponse, TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod}
+import uk.gov.hmrc.corporationtax.models.BusinessConstants.destinationTaxRefOASTransfer
+import uk.gov.hmrc.corporationtax.models.{
+  MiscellaneousTransfer, RdsReallocationFromAccPeriodResponse, ReallocationTo, TransactionTypesOfGetReallocationFromAcc,
+  TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod
+}
 
 object DomainModelTransformationInstances {
 
   implicit val toTransformedReallocationFromAccPeriod
-    : TransformToDomainModel[RdsReallocationFromAccPeriodResponse, TransformedReallocationFromAccPeriod] =
-    (reallocFromAcc: RdsReallocationFromAccPeriodResponse) =>
+    : TransformToDomainModel[(RdsReallocationFromAccPeriodResponse, Long), TransformedReallocationFromAccPeriod] =
+    (reallocFromAcc: RdsReallocationFromAccPeriodResponse, taxPayerReference: Long) =>
       TransformedReallocationFromAccPeriod(
         reallocFromAcc.reallocation.map { value =>
+          // Determine TransactionType for each Reallocation(BF-F31)
+          val transactionType: TransactionTypesOfGetReallocationFromAcc =
+            determineTransactionType(value.destinationTaxPayerReference, taxPayerReference)
           TransformedReallocationFromAccDetails(
             amount = value.amount.getOrElse(BigDecimal(0.00)),
             reallocationDate = value.reallocationDate,
             destinationApEndDate = value.destinationApEndDate
               .map(_.toString)
-              .getOrElse(""), // converting to string and assigning empty string if it is null
+              .getOrElse(""), // converting to string and assigning empty string if it's null
             destinationTaxPayerReference = value.destinationTaxPayerReference,
-            transactionType = MiscellaneousTransfer
+            transactionType = transactionType
           )
         }
       )
 
+  // Determine TransactionType for each ReallocationFromAccPeriod(BF-F31)
+  private def determineTransactionType(
+    destinationTaxPayerRef: String,
+    requestedTaxPayerRef: Long
+  ): TransactionTypesOfGetReallocationFromAcc = {
+    val taxRef: String = requestedTaxPayerRef.toString
+    if ((destinationTaxPayerRef == destinationTaxRefOASTransfer) || (destinationTaxPayerRef != taxRef))
+      MiscellaneousTransfer
+    else ReallocationTo
+  }
 }

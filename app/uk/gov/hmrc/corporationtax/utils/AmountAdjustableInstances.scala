@@ -17,10 +17,9 @@
 package uk.gov.hmrc.corporationtax.utils
 
 import uk.gov.hmrc.corporationtax.models.{
-  AccountingPeriodDetails, InterestAccrual, PayRepayReallocations, PaymentTransaction, ReallocationFromAccDetails,
+  AccountingPeriodDetails, InterestAccrual, PayRepayReallocations, PaymentTransaction, RdsReallocationFromAccDetails,
   ReallocationRow, TaxTransactionsItem
 }
-import uk.gov.hmrc.corporationtax.models.{AccountingPeriodDetails, InterestAccural, PaymentTransaction, RdsReallocationFromAccDetails, ReallocationRow, TaxTransactionsItem}
 
 object AmountAdjustableInstances {
 

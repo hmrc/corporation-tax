@@ -16,209 +16,79 @@
 
 package uk.gov.hmrc.corporationtax.helpers
 
-import uk.gov.hmrc.corporationtax.models.{MiscellaneousTransfer, RdsReallocationFromAccDetails, RdsReallocationFromAccPeriodResponse, TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod}
+import uk.gov.hmrc.corporationtax.models.{
+  RdsReallocationFromAccDetails, RdsReallocationFromAccPeriodResponse, TransactionTypesOfGetReallocationFromAcc,
+  TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod
+}
 
 import java.time.LocalDate
 
 trait ReallocationFromAccPeriodHelper {
 
-  val emptyListReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse                       = RdsReallocationFromAccPeriodResponse(List.empty)
+  val emptyString: String = ""
+
+  val emptyListReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse            = RdsReallocationFromAccPeriodResponse(
+    List.empty
+  )
   val emptyTransformedListReallocationFromAccPeriod: TransformedReallocationFromAccPeriod =
     TransformedReallocationFromAccPeriod(List.empty)
 
-  val reallocationFromAccPeriodWithTwoElements: RdsReallocationFromAccPeriodResponse                      = RdsReallocationFromAccPeriodResponse(
-    List(
-      RdsReallocationFromAccDetails(
-        Some(BigDecimal(12390)),
-        LocalDate.of(2026, 12, 27),
-        Some(LocalDate.of(2024, 2, 2)),
-        "18969779586"
-      ),
-      RdsReallocationFromAccDetails(
-        Some(BigDecimal(12345)),
-        LocalDate.of(2026, 12, 27),
-        Some(LocalDate.of(2024, 2, 2)),
-        "18969779586"
-      )
-    )
-  )
-  val reallocationFromAccPeriodWithZeroAmount: RdsReallocationFromAccPeriodResponse                       = RdsReallocationFromAccPeriodResponse(
-    List(
-      RdsReallocationFromAccDetails(
-        Some(BigDecimal(0.00)),
-        LocalDate.of(2026, 12, 27),
-        Some(LocalDate.of(2024, 2, 2)),
-        "18969779586"
-      ),
-      RdsReallocationFromAccDetails(
-        Some(BigDecimal(0.00)),
-        LocalDate.of(2026, 12, 27),
-        Some(LocalDate.of(2024, 2, 2)),
-        "18969779586"
-      )
-    )
-  )
-  val transformedReallocationFromAccPeriodWithZeroAmount: TransformedReallocationFromAccPeriod =
-    TransformedReallocationFromAccPeriod(
-      List(
-        TransformedReallocationFromAccDetails(
-          BigDecimal(0.00),
-          LocalDate.of(2026, 12, 27),
-          "2024-02-02",
-          "18969779586",
-          MiscellaneousTransfer
-        ),
-        TransformedReallocationFromAccDetails(
-          BigDecimal(0.00),
-          LocalDate.of(2026, 12, 27),
-          "2024-02-02",
-          "18969779586",
-          MiscellaneousTransfer
-        )
-      )
-    )
-
-  val reallocationFromAccPeriodWithNullDestinationApEndDateAmount: RdsReallocationFromAccPeriodResponse                 =
+  def rdsReallocationFromAccPeriodResponse(
+    amount: Option[BigDecimal] = None,
+    destinationApEndDate: Option[LocalDate] = None,
+    destinationTaxPayerReference: String
+  ): RdsReallocationFromAccPeriodResponse =
     RdsReallocationFromAccPeriodResponse(
       List(
         RdsReallocationFromAccDetails(
-          Some(BigDecimal(0.00)),
-          LocalDate.of(2026, 12, 27),
-          None,
-          "18969779586"
+          amount,
+          LocalDate.of(2026, 12, 2),
+          destinationApEndDate,
+          destinationTaxPayerReference
         ),
         RdsReallocationFromAccDetails(
-          Some(BigDecimal(0.00)),
-          LocalDate.of(2026, 12, 27),
-          None,
-          "18969779586"
-        )
-      )
-    )
-  val transformedReallocationFromAccPeriodWithNullDestinationApEndDate: TransformedReallocationFromAccPeriod =
-    TransformedReallocationFromAccPeriod(
-      List(
-        TransformedReallocationFromAccDetails(
-          BigDecimal(0.00),
-          LocalDate.of(2026, 12, 27),
-          "",
-          "18969779586",
-          MiscellaneousTransfer
+          amount,
+          LocalDate.of(2026, 12, 2),
+          destinationApEndDate,
+          destinationTaxPayerReference
         ),
-        TransformedReallocationFromAccDetails(
-          BigDecimal(0.00),
-          LocalDate.of(2026, 12, 27),
-          "",
-          "18969779586",
-          MiscellaneousTransfer
+        RdsReallocationFromAccDetails(
+          amount,
+          LocalDate.of(2026, 12, 2),
+          destinationApEndDate,
+          destinationTaxPayerReference
         )
       )
     )
 
-  val reallocationFromAccPeriodWithThreeElements: RdsReallocationFromAccPeriodResponse = RdsReallocationFromAccPeriodResponse(
-    List(
-      RdsReallocationFromAccDetails(
-        Some(BigDecimal(12390.00)),
-        LocalDate.of(2026, 12, 27),
-        Some(LocalDate.of(2024, 2, 2)),
-        "18969779586"
-      ),
-      RdsReallocationFromAccDetails(
-        Some(BigDecimal(180007.00)),
-        LocalDate.of(2026, 12, 27),
-        Some(LocalDate.of(2024, 2, 2)),
-        "18969779586"
-      ),
-      RdsReallocationFromAccDetails(
-        Some(BigDecimal(89075.00)),
-        LocalDate.of(2026, 12, 27),
-        Some(LocalDate.of(2024, 2, 2)),
-        "18969779586"
-      )
-    )
-  )
-
-  val reallocationFromAccPeriodWithNullAmount: RdsReallocationFromAccPeriodResponse                   = RdsReallocationFromAccPeriodResponse(
-    List(
-      RdsReallocationFromAccDetails(
-        None,
-        LocalDate.of(2026, 12, 27),
-        Some(LocalDate.of(2024, 2, 2)),
-        "18969779586"
-      ),
-      RdsReallocationFromAccDetails(
-        None,
-        LocalDate.of(2026, 12, 27),
-        Some(LocalDate.of(2024, 2, 2)),
-        "18969779586"
-      )
-    )
-  )
-  val transformedNullAmountReallocationFromAccPeriod: TransformedReallocationFromAccPeriod =
+  def transformedReallocationFromAccPeriod(
+    amount: BigDecimal,
+    destinationApEndDate: String,
+    destinationTaxPayerReference: String,
+    transactionType: TransactionTypesOfGetReallocationFromAcc
+  ): TransformedReallocationFromAccPeriod =
     TransformedReallocationFromAccPeriod(
       List(
         TransformedReallocationFromAccDetails(
-          BigDecimal(0.00),
-          LocalDate.of(2026, 12, 27),
-          "2024-02-02",
-          "18969779586",
-          MiscellaneousTransfer
+          amount,
+          LocalDate.of(2026, 12, 2),
+          destinationApEndDate,
+          destinationTaxPayerReference,
+          transactionType
         ),
         TransformedReallocationFromAccDetails(
-          BigDecimal(0.00),
-          LocalDate.of(2026, 12, 27),
-          "2024-02-02",
-          "18969779586",
-          MiscellaneousTransfer
-        )
-      )
-    )
-
-  val reallocationFromAccPeriodWithAmount3DecimalPlaces: RdsReallocationFromAccPeriodResponse                   = RdsReallocationFromAccPeriodResponse(
-    List(
-      RdsReallocationFromAccDetails(
-        Some(BigDecimal(12390.986)),
-        LocalDate.of(2026, 12, 27),
-        Some(LocalDate.of(2024, 2, 2)),
-        "18969779586"
-      ),
-      RdsReallocationFromAccDetails(
-        Some(BigDecimal(180007.8654)),
-        LocalDate.of(2026, 12, 27),
-        Some(LocalDate.of(2024, 2, 2)),
-        "18969779586"
-      ),
-      RdsReallocationFromAccDetails(
-        Some(BigDecimal(89075.3654)),
-        LocalDate.of(2026, 12, 27),
-        Some(LocalDate.of(2024, 2, 2)),
-        "18969779586"
-      )
-    )
-  )
-  val transformed3DecimalPlacesAmountReallocationFromAccPeriod: TransformedReallocationFromAccPeriod =
-    TransformedReallocationFromAccPeriod(
-      List(
-        TransformedReallocationFromAccDetails(
-          BigDecimal(-12390.99),
-          LocalDate.of(2026, 12, 27),
-          "2024-02-02",
-          "18969779586",
-          MiscellaneousTransfer
+          amount,
+          LocalDate.of(2026, 12, 2),
+          destinationApEndDate,
+          destinationTaxPayerReference,
+          transactionType
         ),
         TransformedReallocationFromAccDetails(
-          BigDecimal(-180007.87),
-          LocalDate.of(2026, 12, 27),
-          "2024-02-02",
-          "18969779586",
-          MiscellaneousTransfer
-        ),
-        TransformedReallocationFromAccDetails(
-          BigDecimal(-89075.37),
-          LocalDate.of(2026, 12, 27),
-          "2024-02-02",
-          "18969779586",
-          MiscellaneousTransfer
+          amount,
+          LocalDate.of(2026, 12, 2),
+          destinationApEndDate,
+          destinationTaxPayerReference,
+          transactionType
         )
       )
     )
