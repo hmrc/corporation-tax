@@ -37,11 +37,11 @@ class AccountingPeriodDetailsControllerSpec extends AnyWordSpec with Matchers wi
   private trait Setup {
     val mockAccountingPeriodDetailsService: AccountingPeriodDetailsService = mock[AccountingPeriodDetailsService]
 
-    val cc                            = Helpers.stubControllerComponents()
+    val cc = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
 
     val fakeRequest = FakeRequest("GET", "/accounting-period-details")
-    val controller  =
+    val controller =
       new AccountingPeriodDetailsController(Helpers.stubControllerComponents(), mockAccountingPeriodDetailsService)
   }
 
@@ -60,9 +60,9 @@ class AccountingPeriodDetailsControllerSpec extends AnyWordSpec with Matchers wi
       verify(mockAccountingPeriodDetailsService).getAccountingDetails(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }
 
-    /*
+
     "return 500 INTERNAL_SERVER_ERROR" in new Setup {
-      when(mockAccountingPeriodDetailsConnector.getAccountingPeriodDetails(any(), any())(any[HeaderCarrier]))
+      when(mockAccountingPeriodDetailsService.getAccountingDetails(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("error")))
 
       val result: Future[Result] = controller.getAccountingPeriodDetails(3L, 4L)(fakeRequest)
@@ -70,9 +70,8 @@ class AccountingPeriodDetailsControllerSpec extends AnyWordSpec with Matchers wi
 
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve accounting period details"
 
-      verify(mockAccountingPeriodDetailsConnector).getAccountingPeriodDetails(eqTo(3L), eqTo(4L))(any[HeaderCarrier])
+      verify(mockAccountingPeriodDetailsService).getAccountingDetails(eqTo(3L), eqTo(4L))(any[HeaderCarrier])
     }
 
-     */
   }
 }

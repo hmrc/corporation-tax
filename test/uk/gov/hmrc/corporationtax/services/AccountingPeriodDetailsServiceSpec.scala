@@ -57,4 +57,6 @@ class AccountingPeriodDetailsServiceSpec extends AnyWordSpec
     verify(mockAccPeriodDetailsConnector).getAccountingPeriodDetails(1L, 1L)(hc)
   }
 
+  //TODO: enhance test coverage
+
 }
