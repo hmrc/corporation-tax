@@ -16,21 +16,36 @@
 
 package uk.gov.hmrc.corporationtax.helpers
 
-import uk.gov.hmrc.corporationtax.models.AccountingPeriodDetails
+import uk.gov.hmrc.corporationtax.models.{APBalancedItem, APBalancedResponse, AccountingPeriodDetails}
 
 trait AccountingPeriodDetailsHelper {
 
+  // before transform
+  val apBalanceResponse = APBalancedResponse(
+    accountingPeriodDetails = APBalancedItem(
+      isApBalanced = Some("Y"),
+      lpiCalcFlag = Some(""),
+      crDbCalcFlag = Some("Y"),
+      creditInterestAmount = Some(BigDecimal(123.235)),
+      debitInterestAmount = Some(BigDecimal(5930.02)),
+      latePaymentInterestAmount = Some(BigDecimal(3231.238)),
+      repaymentInterestAmount = Some(BigDecimal(1.231)),
+      amountDueForAp = Some(BigDecimal(12.23))
+    )
+  )
+
+  // after transformation
   val accountingPeriodDetails: AccountingPeriodDetails =
     AccountingPeriodDetails(
       isApBalanced = true,
-      lpiCalcFlag = true,
+      lpiCalcFlag = false,
       crDbCalcFlag = true,
-      creditInterestAmount = 123.235,
-      debitInterestAmount = 5930.02,
-      latePaymentInterestAmount = 3231.238,
-      repaymentInterestAmount = 1.231,
-      totalDerivedActualInterest = 2324.12,
-      amountDueForAp = 12.23
+      creditInterestAmount = -123.24,
+      debitInterestAmount = -5930.02,
+      latePaymentInterestAmount = -3231.24,
+      repaymentInterestAmount = -1.23,
+      totalDerivedActualInterest = -9297.95,
+      amountDueForAp = -12.23
     )
 
   val accountingPeriodDetailsTransformedAmounts: AccountingPeriodDetails =

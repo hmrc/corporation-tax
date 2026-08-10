@@ -39,7 +39,7 @@ class AccountingPeriodDetailsController @Inject() (
       .map { accountingPeriodDetails =>
         Ok(
           Json.toJson(applyAmountTransform(accountingPeriodDetails))
-        ) // TODO: BF 36 Boolean transformation needs adding still
+        )
       }
       .recover { case ex: Exception =>
         logger.error("Error while retrieving tax transactions", ex)

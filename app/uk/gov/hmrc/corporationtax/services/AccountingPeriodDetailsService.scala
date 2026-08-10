@@ -21,43 +21,56 @@ import uk.gov.hmrc.corporationtax.connectors.AccountingPeriodDetailsConnector
 import uk.gov.hmrc.corporationtax.models.{APBalancedResponse, AccountingPeriodDetails}
 import uk.gov.hmrc.corporationtax.utils.AmountTransformation
 import uk.gov.hmrc.http.HeaderCarrier
-
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 
 class AccountingPeriodDetailsService @Inject()(
                                                 connector: AccountingPeriodDetailsConnector)
-                                              (implicit ec: ExecutionContext){
+                                              (implicit ec: ExecutionContext) {
 
   private def booleanConverter(in: String): Boolean = {
-    in match {
+    in.toUpperCase() match {
       case "Y" => true
       case _ => false
     }
   }
 
-  private def prepareResponse(e: APBalancedResponse) : AccountingPeriodDetails = {
-    // Apply conversions :: Boolean && Amount
+  private def calcTotalDerivedActualInterest(e: APBalancedResponse): Option[BigDecimal] = {
+      Seq(
+        e.accountingPeriodDetails.creditInterestAmount,
+        e.accountingPeriodDetails.debitInterestAmount,
+        e.accountingPeriodDetails.latePaymentInterestAmount,
+        e.accountingPeriodDetails.repaymentInterestAmount,
+        e.accountingPeriodDetails.amountDueForAp
+      ).collect{
+        case Some(amount) => amount
+      } match {
+        case xs if xs.nonEmpty => Some( xs.sum )
+        case _ => None
+      }
+  }
 
+  private def transform(e: APBalancedResponse): AccountingPeriodDetails = {
     AccountingPeriodDetails(
-      isApBalanced = e.accountingPeriodDetails.isApBalanced.map(booleanConverter(_)).getOrElse(false),
-      lpiCalcFlag = e.accountingPeriodDetails.lpiCalcFlag.map(booleanConverter(_)).getOrElse(false),
-      crDbCalcFlag = e.accountingPeriodDetails.crDbCalcFlag.map(booleanConverter(_)).getOrElse(false),
+      isApBalanced = e.accountingPeriodDetails.isApBalanced.exists(booleanConverter),
+      lpiCalcFlag = e.accountingPeriodDetails.lpiCalcFlag.exists(booleanConverter),
+      crDbCalcFlag = e.accountingPeriodDetails.crDbCalcFlag.exists(booleanConverter),
       creditInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
-      debitInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
-      latePaymentInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
-      repaymentInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
-      totalDerivedActualInterest = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
-      amountDueForAp = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
+      debitInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.debitInterestAmount),
+      latePaymentInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.latePaymentInterestAmount),
+      repaymentInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.repaymentInterestAmount),
+      totalDerivedActualInterest = AmountTransformation.apply(calcTotalDerivedActualInterest(e)),
+      amountDueForAp = AmountTransformation.apply(e.accountingPeriodDetails.amountDueForAp),
     )
   }
 
   def getAccountingDetails(taxRef: Long, accPeriod: Long)
                           (implicit hc: HeaderCarrier): Future[AccountingPeriodDetails] = {
-    logger.info(s"Calling connector for taxRef: $taxRef and accPeriod: $accPeriod")
+    logger.info(s"[AccountingPeriodDetailsService][getAccountingDetails] taxRef: $taxRef and accPeriod: $accPeriod")
     connector
       .getAccountingPeriodDetails(taxRef, accPeriod)
-      .map(x => prepareResponse(x) )
+      .map(transform)
   }
+
 }
