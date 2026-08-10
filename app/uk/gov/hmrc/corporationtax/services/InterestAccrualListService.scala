@@ -17,8 +17,8 @@
 package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
-import uk.gov.hmrc.corporationtax.connectors.InterestAccuralListConnector
-import uk.gov.hmrc.corporationtax.models.InterestAccuralList
+import uk.gov.hmrc.corporationtax.connectors.InterestAccrualListConnector
+import uk.gov.hmrc.corporationtax.models.InterestAccrualList
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.corporationtax.utils.applyAmountTransformToList
 import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
@@ -26,20 +26,20 @@ import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class InterestAccuralListService @Inject() (
-  connector: InterestAccuralListConnector
+class InterestAccrualListService @Inject() (
+  connector: InterestAccrualListConnector
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def getInterestAccuralList(taxRef: Long, accPeriod: Long, interestType: String)(implicit
+  def getInterestAccrualList(taxRef: Long, accPeriod: Long, interestType: String)(implicit
     hc: HeaderCarrier
-  ): Future[InterestAccuralList] = {
+  ): Future[InterestAccrualList] = {
     logger.info(
-      s"[InterestAccuralListService][getInterestAccuralList] Calling InterestAccuralListConnector: taxRef: $taxRef, accPeriod: $accPeriod, interestType: $interestType"
+      s"[InterestAccrualListService][getInterestAccrualList] Calling InterestAccrualListConnector: taxRef: $taxRef, accPeriod: $accPeriod, interestType: $interestType"
     )
-    connector.getInterestAccuralList(taxRef, accPeriod, interestType).map { interestAccurals =>
-      interestAccurals
-        .copy(interestAccuralList = applyAmountTransformToList(interestAccurals.interestAccuralList))
+    connector.getInterestAccrualList(taxRef, accPeriod, interestType).map { interestAccruals =>
+      interestAccruals
+        .copy(interestAccrualList = applyAmountTransformToList(interestAccruals.interestAccrualList))
     }
   }
 

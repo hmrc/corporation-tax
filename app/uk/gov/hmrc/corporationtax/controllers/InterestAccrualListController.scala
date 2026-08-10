@@ -19,30 +19,30 @@ package uk.gov.hmrc.corporationtax.controllers
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.corporationtax.models.InterestAccuralList
-import uk.gov.hmrc.corporationtax.services.InterestAccuralListService
+import uk.gov.hmrc.corporationtax.models.InterestAccrualList
+import uk.gov.hmrc.corporationtax.services.InterestAccrualListService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class InterestAccuralListController @Inject() (
+class InterestAccrualListController @Inject() (
   cc: ControllerComponents,
-  service: InterestAccuralListService
+  service: InterestAccrualListService
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def getInterestAccuralList(taxRef: Long, accPeriod: Long, interestType: String): Action[AnyContent] = Action.async {
+  def getInterestAccrualList(taxRef: Long, accPeriod: Long, interestType: String): Action[AnyContent] = Action.async {
     implicit request =>
       service
-        .getInterestAccuralList(taxRef, accPeriod, interestType)
-        .map { interestAccuralList =>
-          Ok(Json.toJson(interestAccuralList))
+        .getInterestAccrualList(taxRef, accPeriod, interestType)
+        .map { interestAccrualList =>
+          Ok(Json.toJson(interestAccrualList))
         }
         .recover { case ex: Exception =>
-          logger.error("Error while retrieving interest accural list", ex)
-          InternalServerError(Json.obj("error" -> "Failed to retrieve interest accural list"))
+          logger.error("Error while retrieving interest Accrual list", ex)
+          InternalServerError(Json.obj("error" -> "Failed to retrieve interest Accrual list"))
         }
   }
 

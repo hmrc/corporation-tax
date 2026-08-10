@@ -20,13 +20,13 @@ import play.api.libs.json.{Format, Json}
 
 import java.time.LocalDate
 
-case class InterestAccuralList(interestAccuralList: List[InterestAccural])
+case class InterestAccrualList(interestAccrualList: List[InterestAccrual])
 
-object InterestAccuralList {
-  implicit val format: Format[InterestAccuralList] = Json.format[InterestAccuralList]
+object InterestAccrualList {
+  implicit val format: Format[InterestAccrualList] = Json.format[InterestAccrualList]
 }
 
-case class InterestAccural(
+case class InterestAccrual(
   computationAmount: BigDecimal,
   interestAccrualFromDate: LocalDate,
   interestAccrualToDate: LocalDate,
@@ -35,6 +35,6 @@ case class InterestAccural(
   apEndDate: LocalDate
 )
 
-object InterestAccural {
-  implicit val format: Format[InterestAccural] = Json.format[InterestAccural]
+object InterestAccrual {
+  implicit val format: Format[InterestAccrual] = Json.format[InterestAccrual]
 }

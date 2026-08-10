@@ -16,18 +16,18 @@
 
 package uk.gov.hmrc.corporationtax.helpers
 
-import uk.gov.hmrc.corporationtax.models.{InterestAccural, InterestAccuralList}
+import uk.gov.hmrc.corporationtax.models.{InterestAccrual, InterestAccrualList}
 
 import java.time.LocalDate
 
-trait InterestAccuralListHelper {
+trait InterestAccrualListHelper {
 
-  val emptyInterestAccuralList: InterestAccuralList = InterestAccuralList(List.empty)
+  val emptyInterestAccrualList: InterestAccrualList = InterestAccrualList(List.empty)
 
-  val interestAccuralList =
-    InterestAccuralList(
+  val interestAccrualList =
+    InterestAccrualList(
       List(
-        InterestAccural(
+        InterestAccrual(
           computationAmount = BigDecimal(1.00),
           interestAccrualFromDate = LocalDate.of(2021, 3, 7),
           interestAccrualToDate = LocalDate.of(2021, 5, 7),
@@ -35,7 +35,7 @@ trait InterestAccuralListHelper {
           interestAmount = BigDecimal(10.00),
           apEndDate = LocalDate.of(2021, 6, 7)
         ),
-        InterestAccural(
+        InterestAccrual(
           computationAmount = BigDecimal(1.00),
           interestAccrualFromDate = LocalDate.of(2023, 3, 7),
           interestAccrualToDate = LocalDate.of(2023, 5, 7),
@@ -46,10 +46,10 @@ trait InterestAccuralListHelper {
       )
     )
 
-  val interestAccuralSingleItemList =
-    InterestAccuralList(
+  val interestAccrualSingleItemList =
+    InterestAccrualList(
       List(
-        InterestAccural(
+        InterestAccrual(
           computationAmount = BigDecimal(1.00),
           interestAccrualFromDate = LocalDate.of(2021, 3, 7),
           interestAccrualToDate = LocalDate.of(2021, 5, 7),
@@ -60,10 +60,10 @@ trait InterestAccuralListHelper {
       )
     )
 
-  val interestAccuralListTransformed =
-    InterestAccuralList(
+  val interestAccrualListTransformed =
+    InterestAccrualList(
       List(
-        InterestAccural(
+        InterestAccrual(
           computationAmount = BigDecimal(-1.00),
           interestAccrualFromDate = LocalDate.of(2021, 3, 7),
           interestAccrualToDate = LocalDate.of(2021, 5, 7),
@@ -71,7 +71,7 @@ trait InterestAccuralListHelper {
           interestAmount = BigDecimal(-10.00),
           apEndDate = LocalDate.of(2021, 6, 7)
         ),
-        InterestAccural(
+        InterestAccrual(
           computationAmount = BigDecimal(-1.00),
           interestAccrualFromDate = LocalDate.of(2023, 3, 7),
           interestAccrualToDate = LocalDate.of(2023, 5, 7),
@@ -82,10 +82,10 @@ trait InterestAccuralListHelper {
       )
     )
 
-  val interestAccuralSingleItemListTransformed =
-    InterestAccuralList(
+  val interestAccrualSingleItemListTransformed =
+    InterestAccrualList(
       List(
-        InterestAccural(
+        InterestAccrual(
           computationAmount = BigDecimal(-1.00),
           interestAccrualFromDate = LocalDate.of(2021, 3, 7),
           interestAccrualToDate = LocalDate.of(2021, 5, 7),

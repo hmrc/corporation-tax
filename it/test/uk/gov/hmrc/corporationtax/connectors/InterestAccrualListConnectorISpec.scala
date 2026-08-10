@@ -23,42 +23,42 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
 import play.api.libs.json.Json
-import uk.gov.hmrc.corporationtax.helpers.InterestAccuralListHelper
+import uk.gov.hmrc.corporationtax.helpers.InterestAccrualListHelper
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.http.HeaderCarrier
 
-class InterestAccuralListConnectorISpec
+class InterestAccrualListConnectorISpec
     extends AnyWordSpec
     with Matchers
     with ScalaFutures
     with IntegrationPatience
     with ApplicationWithWiremock
     with BeforeAndAfterEach
-    with InterestAccuralListHelper {
+    with InterestAccrualListHelper {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  private val connector: InterestAccuralListConnector = app.injector.instanceOf[InterestAccuralListConnector]
+  private val connector: InterestAccrualListConnector = app.injector.instanceOf[InterestAccrualListConnector]
 
 
   // TODO: add auth stub and relevant cases
-  "getInterestAccuralList" should {
+  "getInterestAccrualList" should {
 
     def url(taxRef: Long, accPeriod: Long, interestType: String) =
-      s"/rds-datacache-proxy/corporation-tax/interest-accural-list/$taxRef/$accPeriod/$interestType"
+      s"/rds-datacache-proxy/corporation-tax/interest-accrual-list/$taxRef/$accPeriod/$interestType"
 
-    "return Interest Accural empty list from BE with status code OK" in {
+    "return Interest Accrual empty list from BE with status code OK" in {
       stubFor(
         get(urlPathEqualTo(url(2L, 5L, "IDE")))
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withBody(Json.stringify(Json.toJson(emptyInterestAccuralList)))
+              .withBody(Json.stringify(Json.toJson(emptyInterestAccrualList)))
           )
       )
 
-      val result = connector.getInterestAccuralList(2L, 5L, "IDE").futureValue
-      result.interestAccuralList must contain allElementsOf emptyInterestAccuralList.interestAccuralList
+      val result = connector.getInterestAccrualList(2L, 5L, "IDE").futureValue
+      result.interestAccrualList must contain allElementsOf emptyInterestAccrualList.interestAccrualList
     }
 
     "return Tax Transactions list (single item) from BE with status code OK" in {
@@ -67,16 +67,16 @@ class InterestAccuralListConnectorISpec
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withBody(Json.stringify(Json.toJson(interestAccuralSingleItemList)))
+              .withBody(Json.stringify(Json.toJson(interestAccrualSingleItemList)))
           )
       )
 
-      val result = connector.getInterestAccuralList(1L, 5L, "IDE").futureValue
+      val result = connector.getInterestAccrualList(1L, 5L, "IDE").futureValue
 
       verify(
         getRequestedFor(urlPathEqualTo(url(1L, 5L, "IDE")))
       )
-      result.interestAccuralList must contain allElementsOf interestAccuralSingleItemList.interestAccuralList
+      result.interestAccrualList must contain allElementsOf interestAccrualSingleItemList.interestAccrualList
     }
 
     "return Penalties list (two items) from BE with status code OK" in {
@@ -85,12 +85,12 @@ class InterestAccuralListConnectorISpec
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withBody(Json.stringify(Json.toJson(interestAccuralList)))
+              .withBody(Json.stringify(Json.toJson(interestAccrualList)))
           )
       )
 
-      val result = connector.getInterestAccuralList(1L, 5L, "IDE").futureValue
-      result.interestAccuralList must contain allElementsOf interestAccuralList.interestAccuralList
+      val result = connector.getInterestAccrualList(1L, 5L, "IDE").futureValue
+      result.interestAccrualList must contain allElementsOf interestAccrualList.interestAccrualList
     }
 
     "return failure when downstream returns INTERNAL_SERVER_ERROR" in {
@@ -103,7 +103,7 @@ class InterestAccuralListConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getInterestAccuralList(99L, 5L, "IDE").futureValue
+        connector.getInterestAccrualList(99L, 5L, "IDE").futureValue
       }
 
       ex.getMessage must include("500")
