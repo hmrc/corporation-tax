@@ -27,7 +27,7 @@ import scala.concurrent.ExecutionContext
 
 class AccountingPeriodDetailsController @Inject() (
   cc: ControllerComponents,
-  service : AccountingPeriodDetailsService
+  service: AccountingPeriodDetailsService
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {

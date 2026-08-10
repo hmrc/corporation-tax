@@ -17,7 +17,7 @@
 package uk.gov.hmrc.corporationtax.services
 
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{when, verify}
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -31,11 +31,14 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AccountingPeriodDetailsServiceSpec extends AnyWordSpec
-  with Matchers with AccountingPeriodDetailsHelper with ScalaFutures {
+class AccountingPeriodDetailsServiceSpec
+    extends AnyWordSpec
+    with Matchers
+    with AccountingPeriodDetailsHelper
+    with ScalaFutures {
 
   private trait Fixture {
-    val mockAccPeriodDetailsConnector: AccountingPeriodDetailsConnector                 = mock[AccountingPeriodDetailsConnector]
+    val mockAccPeriodDetailsConnector: AccountingPeriodDetailsConnector = mock[AccountingPeriodDetailsConnector]
 
     val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext

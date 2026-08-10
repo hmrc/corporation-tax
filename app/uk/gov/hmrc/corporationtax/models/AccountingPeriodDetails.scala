@@ -19,15 +19,16 @@ package uk.gov.hmrc.corporationtax.models
 import play.api.libs.json.{Json, OFormat}
 
 // RDS_CACHE_PROXY Response:
-case class APBalancedItem(isApBalanced: Option[String],
-                          lpiCalcFlag: Option[String],
-                          crDbCalcFlag: Option[String],
-                          creditInterestAmount: Option[BigDecimal],
-                          debitInterestAmount: Option[BigDecimal],
-                          latePaymentInterestAmount: Option[BigDecimal],
-                          repaymentInterestAmount: Option[BigDecimal],
-                          amountDueForAp: Option[BigDecimal]
-                         )
+case class APBalancedItem(
+  isApBalanced: Option[String],
+  lpiCalcFlag: Option[String],
+  crDbCalcFlag: Option[String],
+  creditInterestAmount: Option[BigDecimal],
+  debitInterestAmount: Option[BigDecimal],
+  latePaymentInterestAmount: Option[BigDecimal],
+  repaymentInterestAmount: Option[BigDecimal],
+  amountDueForAp: Option[BigDecimal]
+)
 
 object APBalancedItem {
   implicit val format: OFormat[APBalancedItem] = Json.format[APBalancedItem]

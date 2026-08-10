@@ -24,34 +24,31 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
+class AccountingPeriodDetailsService @Inject() (connector: AccountingPeriodDetailsConnector)(implicit
+  ec: ExecutionContext
+) {
 
-class AccountingPeriodDetailsService @Inject()(
-                                                connector: AccountingPeriodDetailsConnector)
-                                              (implicit ec: ExecutionContext) {
-
-  private def booleanConverter(in: String): Boolean = {
+  private def booleanConverter(in: String): Boolean =
     in.toUpperCase() match {
       case "Y" => true
-      case _ => false
+      case _   => false
     }
-  }
 
-  private def calcTotalDerivedActualInterest(e: APBalancedResponse): Option[BigDecimal] = {
-      Seq(
-        e.accountingPeriodDetails.creditInterestAmount,
-        e.accountingPeriodDetails.debitInterestAmount,
-        e.accountingPeriodDetails.latePaymentInterestAmount,
-        e.accountingPeriodDetails.repaymentInterestAmount,
-        e.accountingPeriodDetails.amountDueForAp
-      ).collect{
-        case Some(amount) => amount
-      } match {
-        case xs if xs.nonEmpty => Some( xs.sum )
-        case _ => None
-      }
-  }
+  private def calcTotalDerivedActualInterest(e: APBalancedResponse): Option[BigDecimal] =
+    Seq(
+      e.accountingPeriodDetails.creditInterestAmount,
+      e.accountingPeriodDetails.debitInterestAmount,
+      e.accountingPeriodDetails.latePaymentInterestAmount,
+      e.accountingPeriodDetails.repaymentInterestAmount,
+      e.accountingPeriodDetails.amountDueForAp
+    ).collect { case Some(amount) =>
+      amount
+    } match {
+      case xs if xs.nonEmpty => Some(xs.sum)
+      case _                 => None
+    }
 
-  private def transform(e: APBalancedResponse): AccountingPeriodDetails = {
+  private def transform(e: APBalancedResponse): AccountingPeriodDetails =
     AccountingPeriodDetails(
       isApBalanced = e.accountingPeriodDetails.isApBalanced.exists(booleanConverter),
       lpiCalcFlag = e.accountingPeriodDetails.lpiCalcFlag.exists(booleanConverter),
@@ -61,12 +58,12 @@ class AccountingPeriodDetailsService @Inject()(
       latePaymentInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.latePaymentInterestAmount),
       repaymentInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.repaymentInterestAmount),
       totalDerivedActualInterest = AmountTransformation.apply(calcTotalDerivedActualInterest(e)),
-      amountDueForAp = AmountTransformation.apply(e.accountingPeriodDetails.amountDueForAp),
+      amountDueForAp = AmountTransformation.apply(e.accountingPeriodDetails.amountDueForAp)
     )
-  }
 
-  def getAccountingDetails(taxRef: Long, accPeriod: Long)
-                          (implicit hc: HeaderCarrier): Future[AccountingPeriodDetails] = {
+  def getAccountingDetails(taxRef: Long, accPeriod: Long)(implicit
+    hc: HeaderCarrier
+  ): Future[AccountingPeriodDetails] = {
     logger.info(s"[AccountingPeriodDetailsService][getAccountingDetails] taxRef: $taxRef and accPeriod: $accPeriod")
     connector
       .getAccountingPeriodDetails(taxRef, accPeriod)

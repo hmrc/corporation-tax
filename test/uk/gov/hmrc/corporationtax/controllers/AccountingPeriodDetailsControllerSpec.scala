@@ -37,16 +37,15 @@ class AccountingPeriodDetailsControllerSpec extends AnyWordSpec with Matchers wi
   private trait Setup {
     val mockAccountingPeriodDetailsService: AccountingPeriodDetailsService = mock[AccountingPeriodDetailsService]
 
-    val cc = Helpers.stubControllerComponents()
+    val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
 
     val fakeRequest = FakeRequest("GET", "/accounting-period-details")
-    val controller =
+    val controller  =
       new AccountingPeriodDetailsController(Helpers.stubControllerComponents(), mockAccountingPeriodDetailsService)
   }
 
   "GET /accounting-period-details" should {
-
 
     "return 200 and a successful response with one item transformed amounts" in new Setup {
       when(mockAccountingPeriodDetailsService.getAccountingDetails(any(), any())(any[HeaderCarrier]))
@@ -59,7 +58,6 @@ class AccountingPeriodDetailsControllerSpec extends AnyWordSpec with Matchers wi
 
       verify(mockAccountingPeriodDetailsService).getAccountingDetails(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }
-
 
     "return 500 INTERNAL_SERVER_ERROR" in new Setup {
       when(mockAccountingPeriodDetailsService.getAccountingDetails(any(), any())(any[HeaderCarrier]))

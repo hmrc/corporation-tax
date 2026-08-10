@@ -43,7 +43,7 @@ trait AccountingPeriodDetailsHelper {
       debitInterestAmount = None,
       latePaymentInterestAmount = None,
       repaymentInterestAmount = None,
-      amountDueForAp = None,
+      amountDueForAp = None
     )
   )
 
@@ -62,16 +62,16 @@ trait AccountingPeriodDetailsHelper {
     )
 
   val accountingPeriodDetailsEmptyRecord = AccountingPeriodDetails(
-        isApBalanced = false,
-        lpiCalcFlag = false,
-        crDbCalcFlag = false,
-        creditInterestAmount = 0.0,
-        debitInterestAmount = 0.0,
-        latePaymentInterestAmount = 0.0,
-        repaymentInterestAmount = 0.0,
-        totalDerivedActualInterest = 0.0,
-        amountDueForAp = 0.0
-      )
+    isApBalanced = false,
+    lpiCalcFlag = false,
+    crDbCalcFlag = false,
+    creditInterestAmount = 0.0,
+    debitInterestAmount = 0.0,
+    latePaymentInterestAmount = 0.0,
+    repaymentInterestAmount = 0.0,
+    totalDerivedActualInterest = 0.0,
+    amountDueForAp = 0.0
+  )
 
   val accountingPeriodDetailsTransformedAmounts: AccountingPeriodDetails =
     AccountingPeriodDetails(
