@@ -34,6 +34,19 @@ trait AccountingPeriodDetailsHelper {
     )
   )
 
+  val apBalanceEmptyResponse = APBalancedResponse(
+    accountingPeriodDetails = APBalancedItem(
+      isApBalanced = None,
+      lpiCalcFlag = None,
+      crDbCalcFlag = None,
+      creditInterestAmount = None,
+      debitInterestAmount = None,
+      latePaymentInterestAmount = None,
+      repaymentInterestAmount = None,
+      amountDueForAp = None,
+    )
+  )
+
   // after transformation
   val accountingPeriodDetails: AccountingPeriodDetails =
     AccountingPeriodDetails(
@@ -47,6 +60,18 @@ trait AccountingPeriodDetailsHelper {
       totalDerivedActualInterest = -9297.95,
       amountDueForAp = -12.23
     )
+
+  val accountingPeriodDetailsEmptyRecord = AccountingPeriodDetails(
+        isApBalanced = false,
+        lpiCalcFlag = false,
+        crDbCalcFlag = false,
+        creditInterestAmount = 0.0,
+        debitInterestAmount = 0.0,
+        latePaymentInterestAmount = 0.0,
+        repaymentInterestAmount = 0.0,
+        totalDerivedActualInterest = 0.0,
+        amountDueForAp = 0.0
+      )
 
   val accountingPeriodDetailsTransformedAmounts: AccountingPeriodDetails =
     AccountingPeriodDetails(

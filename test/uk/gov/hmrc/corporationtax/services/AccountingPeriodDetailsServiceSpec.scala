@@ -57,6 +57,15 @@ class AccountingPeriodDetailsServiceSpec extends AnyWordSpec
     verify(mockAccPeriodDetailsConnector).getAccountingPeriodDetails(1L, 1L)(hc)
   }
 
-  //TODO: enhance test coverage
+  "getAccountingDetails returns transformed empty record" in new Fixture {
+    when(mockAccPeriodDetailsConnector.getAccountingPeriodDetails(any[Long], any[Long])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(apBalanceEmptyResponse))
+
+    val result: AccountingPeriodDetails = service.getAccountingDetails(7L, 9L).futureValue
+
+    result shouldBe accountingPeriodDetailsEmptyRecord
+
+    verify(mockAccPeriodDetailsConnector).getAccountingPeriodDetails(7L, 9L)(hc)
+  }
 
 }
