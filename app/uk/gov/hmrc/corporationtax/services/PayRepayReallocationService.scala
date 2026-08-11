@@ -36,7 +36,7 @@ class PayRepayReallocationService @Inject() (payRepayReallocationConnector: PayR
   def getTotalAmounts(taxRef: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
   ): Future[NonNullPayRepayReallocations] = {
-    logger.info(s"Calling repository for taxRef: $taxRef and accPeriod: $accPeriod")
+    logger.info(s"Calling connector for taxRef: $taxRef and accPeriod: $accPeriod")
 
     payRepayReallocationConnector.getTotalAmounts(taxRef, accPeriod).map { payRepayReallocation =>
       val amount = applyAmountTransform(payRepayReallocation)
