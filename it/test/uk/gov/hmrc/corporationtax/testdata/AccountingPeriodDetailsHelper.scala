@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.corporationtax.helpers
+package uk.gov.hmrc.corporationtax.testdata
 
 import uk.gov.hmrc.corporationtax.models.{APBalancedItem, APBalancedResponse, AccountingPeriodDetails}
 
@@ -25,7 +25,7 @@ trait AccountingPeriodDetailsHelper {
     accountingPeriodDetails = APBalancedItem(
       isApBalanced = Some("Y"),
       lpiCalcFlag = Some(""),
-      crDbCalcFlag = Some(""),
+      crDbCalcFlag = Some("Y"),
       creditInterestAmount = Some(BigDecimal(123.235)),
       debitInterestAmount = Some(BigDecimal(5930.02)),
       latePaymentInterestAmount = Some(BigDecimal(3231.238)),
