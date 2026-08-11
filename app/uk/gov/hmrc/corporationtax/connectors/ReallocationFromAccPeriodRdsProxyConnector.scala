@@ -17,7 +17,7 @@
 package uk.gov.hmrc.corporationtax.connectors
 
 import play.api.Logging
-import uk.gov.hmrc.corporationtax.models.ReallocationFromAccPeriod
+import uk.gov.hmrc.corporationtax.models.RdsReallocationFromAccPeriodResponse
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -37,13 +37,13 @@ class ReallocationFromAccPeriodRdsProxyConnector @Inject() (http: HttpClientV2, 
 
   def getReallocationFromAccPeriod(taxPayerReference: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
-  ): Future[ReallocationFromAccPeriod] = {
+  ): Future[RdsReallocationFromAccPeriodResponse] = {
     val url: URL =
       if (stubEnabled) url"$stubPath/corporation-tax/reallocation-from-accounting-period/$taxPayerReference/$accPeriod"
       else url"$rdsDataCachePath/corporation-tax/reallocation-from-accounting-period/$taxPayerReference/$accPeriod"
     http
       .get(url)
-      .execute[ReallocationFromAccPeriod]
+      .execute[RdsReallocationFromAccPeriodResponse]
       .recover {
         case e: UpstreamErrorResponse =>
           logger.error(

@@ -42,7 +42,7 @@ class ReallocationFromAccPeriodService @Inject() (
     connector.getReallocationFromAccPeriod(taxPayerReference, accPeriod).map { reallocationFromAccPeriod =>
       val reallocationFromAccAfterAmountTransformation = reallocationFromAccPeriod
         .copy(reallocation = applyAmountTransformToList(reallocationFromAccPeriod.reallocation))
-      transform(reallocationFromAccAfterAmountTransformation)
+      transform(reallocationFromAccAfterAmountTransformation, taxPayerReference)
     }
 
   }

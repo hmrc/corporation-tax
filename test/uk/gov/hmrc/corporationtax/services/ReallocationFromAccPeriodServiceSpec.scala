@@ -28,9 +28,12 @@ import play.api.mvc.ControllerComponents
 import play.api.test.Helpers.stubControllerComponents
 import uk.gov.hmrc.corporationtax.connectors.ReallocationFromAccPeriodRdsProxyConnector
 import uk.gov.hmrc.corporationtax.helpers.ReallocationFromAccPeriodHelper
-import uk.gov.hmrc.corporationtax.models.TransformedReallocationFromAccPeriod
+import uk.gov.hmrc.corporationtax.models.{
+  MiscellaneousTransfer, RdsReallocationFromAccPeriodResponse, ReallocationTo, TransformedReallocationFromAccPeriod
+}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class ReallocationFromAccPeriodServiceSpec
@@ -54,63 +57,117 @@ class ReallocationFromAccPeriodServiceSpec
 
   "ReallocationFromAccPeriodService.getReallocationFromAccPeriod" should {
 
-    "delegate to connector and successfully return TransformedReallocationFromAccPeriod by transforming ReallocationFromAccPeriod with amount = None transformed to 0.00" in new BaseSetup {
+    "delegate to connector and successfully return RdsReallocationFromAccPeriodResponse with amount = None  and transform to TransformedReallocationFromAccPeriod to 0.00" in new BaseSetup {
+      val destinationTaxPayerReference: String = "7865"
+
+      val rdsReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse =
+        rdsReallocationFromAccPeriodResponse(destinationTaxPayerReference = destinationTaxPayerReference)
+
+      val transformedReallocation: TransformedReallocationFromAccPeriod = transformedReallocationFromAccPeriod(
+        BigDecimal(0.00),
+        emptyString,
+        destinationTaxPayerReference,
+        MiscellaneousTransfer
+      )
+
       when(mockRds.getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(reallocationFromAccPeriodWithNullAmount))
+        .thenReturn(Future.successful(rdsReallocationFromAccPeriod))
 
       val result: TransformedReallocationFromAccPeriod =
         service.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod).futureValue
 
-      result shouldBe transformedNullAmountReallocationFromAccPeriod
+      result shouldBe transformedReallocation
 
       verify(mockRds).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
 
       verify(mockRds, times(1)).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
 
     }
-    "delegate to connector and successfully return TransformedReallocationFromAccPeriod by transforming ReallocationFromAccPeriod with non-zero amount field negated and rounded up to 2 decimal places" in new BaseSetup {
+    "delegate to connector and successfully return RdsReallocationFromAccPeriodResponse and transform to TransformedReallocationFromAccPeriod with non-zero amount field negated and rounded up to 2 decimal places" in new BaseSetup {
+      val destinationTaxPayerReference: String = "7865"
+
+      val rdsReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse = rdsReallocationFromAccPeriodResponse(
+        amount = Some(BigDecimal(57689.8765)),
+        destinationTaxPayerReference = destinationTaxPayerReference
+      )
+
+      val transformedReallocation: TransformedReallocationFromAccPeriod = transformedReallocationFromAccPeriod(
+        BigDecimal(-57689.88),
+        emptyString,
+        destinationTaxPayerReference,
+        MiscellaneousTransfer
+      )
+
       when(mockRds.getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(reallocationFromAccPeriodWithAmount3DecimalPlaces))
+        .thenReturn(Future.successful(rdsReallocationFromAccPeriod))
 
       val result: TransformedReallocationFromAccPeriod =
         service.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod).futureValue
 
-      result shouldBe transformed3DecimalPlacesAmountReallocationFromAccPeriod
+      result shouldBe transformedReallocation
 
       verify(mockRds).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
 
       verify(mockRds, times(1)).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
 
     }
-    "delegate to connector and successfully return TransformedReallocationFromAccPeriod by transforming ReallocationFromAccPeriod with zero amount unchanged" in new BaseSetup {
+    "delegate to connector and successfully return RdsReallocationFromAccPeriodResponse and transform to TransformedReallocationFromAccPeriod with zero amount unchanged" in new BaseSetup {
+
+      val destinationTaxPayerReference: String = "7865"
+
+      val rdsReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse = rdsReallocationFromAccPeriodResponse(
+        amount = Some(BigDecimal(0)),
+        destinationApEndDate = Some(LocalDate.of(2022, 12, 6)),
+        destinationTaxPayerReference = destinationTaxPayerReference
+      )
+
+      val transformedReallocation: TransformedReallocationFromAccPeriod = transformedReallocationFromAccPeriod(
+        BigDecimal(0.0),
+        "2022-12-06",
+        destinationTaxPayerReference,
+        MiscellaneousTransfer
+      )
+
       when(mockRds.getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(reallocationFromAccPeriodWithZeroAmount))
+        .thenReturn(Future.successful(rdsReallocationFromAccPeriod))
 
       val result: TransformedReallocationFromAccPeriod =
         service.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod).futureValue
 
-      result shouldBe transformedReallocationFromAccPeriodWithZeroAmount
+      result shouldBe transformedReallocation
 
       verify(mockRds).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
 
       verify(mockRds, times(1)).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
 
     }
-    "delegate to connector and successfully return TransformedReallocationFromAccPeriod by transforming ReallocationFromAccPeriod with destinationApEndDate = None to empty string " in new BaseSetup {
+    "delegate to connector and successfully return RdsReallocationFromAccPeriodResponse with destinationApEndDate = None and then transform to TransformedReallocationFromAccPeriod with destinationApEndDate = emptyString " in new BaseSetup {
+
+      val destinationTaxPayerReference: String = "7865"
+
+      val rdsReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse =
+        rdsReallocationFromAccPeriodResponse(destinationTaxPayerReference = destinationTaxPayerReference)
+
+      val transformedReallocation: TransformedReallocationFromAccPeriod = transformedReallocationFromAccPeriod(
+        BigDecimal(0.0),
+        emptyString,
+        destinationTaxPayerReference,
+        MiscellaneousTransfer
+      )
+
       when(mockRds.getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(reallocationFromAccPeriodWithZeroAmount))
+        .thenReturn(Future.successful(rdsReallocationFromAccPeriod))
 
       val result: TransformedReallocationFromAccPeriod =
         service.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod).futureValue
 
-      result shouldBe transformedReallocationFromAccPeriodWithZeroAmount
+      result shouldBe transformedReallocation
 
       verify(mockRds).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
 
       verify(mockRds, times(1)).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
 
     }
-
     "delegate to connector and successfully return empty TransformedReallocationFromAccPeriod when ReallocationFromAccPeriod is empty" in new BaseSetup {
       when(mockRds.getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
         .thenReturn(Future.successful(emptyListReallocationFromAccPeriod))
@@ -125,7 +182,6 @@ class ReallocationFromAccPeriodServiceSpec
       verify(mockRds, times(1)).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
 
     }
-
     "propagate any errors or exceptions from connector" in new BaseSetup {
 
       when(mockRds.getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
@@ -138,6 +194,92 @@ class ReallocationFromAccPeriodServiceSpec
       ex.getMessage should include("boom")
 
       verify(mockRds, times(1)).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
+
+    }
+
+    // Business Function : F31 - Get Reallocation From Accounting Period
+    "delegate to connector and successfully return RdsReallocationFromAccPeriodResponse when destinationTaxPayerReference = OasTransfer(99) and transform to TransformedReallocationFromAccPeriod with transactionType = MiscellaneousTransfer" in new BaseSetup {
+      val destinationTaxPayerReference: String = "99"
+
+      val rdsReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse =
+        rdsReallocationFromAccPeriodResponse(destinationTaxPayerReference = destinationTaxPayerReference)
+
+      val transformedReallocation: TransformedReallocationFromAccPeriod = transformedReallocationFromAccPeriod(
+        BigDecimal(0.0),
+        emptyString,
+        destinationTaxPayerReference,
+        transactionType = MiscellaneousTransfer
+      )
+
+      when(mockRds.getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(rdsReallocationFromAccPeriod))
+
+      val result: TransformedReallocationFromAccPeriod =
+        service.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod).futureValue
+
+      result shouldBe transformedReallocation
+
+      result.reallocation.head.transactionType shouldBe MiscellaneousTransfer
+
+      verify(mockRds).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
+
+      verify(mockRds, times(1)).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
+
+    }
+    "delegate to connector and successfully return RdsReallocationFromAccPeriodResponse(destinationTaxPayerReference is different from requested taxPayerReference) and transform to TransformedReallocationFromAccPeriod with transactionType = MiscellaneousTransfer" in new BaseSetup {
+      val taxPayerReferenceNumber: Long = 1237L
+
+      val destinationTaxPayerReference: String = "98765"
+
+      val rdsReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse =
+        rdsReallocationFromAccPeriodResponse(destinationTaxPayerReference = destinationTaxPayerReference)
+
+      val transformedReallocation: TransformedReallocationFromAccPeriod = transformedReallocationFromAccPeriod(
+        BigDecimal(0.0),
+        emptyString,
+        destinationTaxPayerReference,
+        transactionType = MiscellaneousTransfer
+      )
+
+      when(mockRds.getReallocationFromAccPeriod(eqTo(taxPayerReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(rdsReallocationFromAccPeriod))
+
+      val result: TransformedReallocationFromAccPeriod =
+        service.getReallocationFromAccPeriod(taxPayerReferenceNumber, accPeriod).futureValue
+
+      result shouldBe transformedReallocation
+
+      verify(mockRds).getReallocationFromAccPeriod(taxPayerReferenceNumber, accPeriod)
+
+      verify(mockRds, times(1)).getReallocationFromAccPeriod(taxPayerReferenceNumber, accPeriod)
+
+    }
+    "delegate to connector and successfully return RdsReallocationFromAccPeriodResponse and transform to TransformedReallocationFromAccPeriod with transactionType = ReallocationTo" in new BaseSetup {
+      val taxPayerReferenceNumber: Long = 1237L
+
+      val destinationTaxPayerReference: String = "1237"
+
+      val rdsReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse =
+        rdsReallocationFromAccPeriodResponse(destinationTaxPayerReference = destinationTaxPayerReference)
+
+      val transformedReallocation: TransformedReallocationFromAccPeriod = transformedReallocationFromAccPeriod(
+        BigDecimal(0.0),
+        emptyString,
+        destinationTaxPayerReference,
+        transactionType = ReallocationTo
+      )
+
+      when(mockRds.getReallocationFromAccPeriod(eqTo(taxPayerReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(rdsReallocationFromAccPeriod))
+
+      val result: TransformedReallocationFromAccPeriod =
+        service.getReallocationFromAccPeriod(taxPayerReferenceNumber, accPeriod).futureValue
+
+      result shouldBe transformedReallocation
+
+      verify(mockRds).getReallocationFromAccPeriod(taxPayerReferenceNumber, accPeriod)
+
+      verify(mockRds, times(1)).getReallocationFromAccPeriod(taxPayerReferenceNumber, accPeriod)
 
     }
 

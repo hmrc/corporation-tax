@@ -27,6 +27,7 @@ import play.api.mvc.{AnyContentAsEmpty, ControllerComponents, Result}
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.corporationtax.helpers.ReallocationFromAccPeriodHelper
+import uk.gov.hmrc.corporationtax.models.{MiscellaneousTransfer, TransformedReallocationFromAccPeriod}
 import uk.gov.hmrc.corporationtax.services.ReallocationFromAccPeriodService
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
@@ -52,13 +53,16 @@ class ReallocationFromAccPeriodDetailsControllerSpec
   "GET /reallocationFromAccPeriod " should {
 
     "return 200: OK" in new Fixture {
+
+      val response: TransformedReallocationFromAccPeriod =
+        transformedReallocationFromAccPeriod(BigDecimal(45876.87), "2026-12-03", "99", MiscellaneousTransfer)
       when(mockService.getReallocationFromAccPeriod(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(transformed3DecimalPlacesAmountReallocationFromAccPeriod))
+        .thenReturn(Future.successful(response))
 
       val result: Future[Result] = controller.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson(transformed3DecimalPlacesAmountReallocationFromAccPeriod)
+      contentAsJson(result) shouldBe Json.toJson(response)
 
       verify(mockService).getReallocationFromAccPeriod(any(), any())(any[HeaderCarrier])
     }
