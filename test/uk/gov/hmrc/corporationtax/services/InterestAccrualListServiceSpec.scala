@@ -24,39 +24,39 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.test.Helpers
-import uk.gov.hmrc.corporationtax.connectors.InterestAccuralListConnector
-import uk.gov.hmrc.corporationtax.helpers.InterestAccuralListHelper
-import uk.gov.hmrc.corporationtax.models.InterestAccuralList
+import uk.gov.hmrc.corporationtax.connectors.InterestAccrualListConnector
+import uk.gov.hmrc.corporationtax.helpers.InterestAccrualListHelper
+import uk.gov.hmrc.corporationtax.models.InterestAccrualList
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class InterestAccuralListServiceSpec
+class InterestAccrualListServiceSpec
     extends AnyWordSpec
     with Matchers
-    with InterestAccuralListHelper
+    with InterestAccrualListHelper
     with ScalaFutures {
 
   private trait Fixture {
-    val mockAccuralInterestListConnector: InterestAccuralListConnector = mock[InterestAccuralListConnector]
+    val mockAccrualInterestListConnector: InterestAccrualListConnector = mock[InterestAccrualListConnector]
 
     val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
     implicit val hc: HeaderCarrier    = HeaderCarrier()
 
-    val service = new InterestAccuralListService(mockAccuralInterestListConnector)
+    val service = new InterestAccrualListService(mockAccrualInterestListConnector)
   }
 
-  "getInterestAccuralList returns Interest Accural List from connector" in new Fixture {
+  "getInterestAccrualList returns Interest Accrual List from connector" in new Fixture {
 
-    when(mockAccuralInterestListConnector.getInterestAccuralList(any[Long], any[Long], any[String])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(interestAccuralList))
+    when(mockAccrualInterestListConnector.getInterestAccrualList(any[Long], any[Long], any[String])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(interestAccrualList))
 
-    val result: InterestAccuralList = service.getInterestAccuralList(1L, 1L, "IDB").futureValue
+    val result: InterestAccrualList = service.getInterestAccrualList(1L, 1L, "IDB").futureValue
 
-    result shouldBe interestAccuralListTransformed
+    result shouldBe interestAccrualListTransformed
 
-    verify(mockAccuralInterestListConnector).getInterestAccuralList(1L, 1L, "IDB")(hc)
+    verify(mockAccrualInterestListConnector).getInterestAccrualList(1L, 1L, "IDB")(hc)
   }
 
   // TODO: extend testing to cover CTPF scenarios
