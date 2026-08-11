@@ -52,7 +52,7 @@ trait AccountingPeriodDetailsHelper {
     AccountingPeriodDetails(
       isApBalanced = true,
       lpiCalcFlag = false,
-      crDbCalcFlag = true,
+      crDbCalcFlag = false,
       creditInterestAmount = -123.24,
       debitInterestAmount = -5930.02,
       latePaymentInterestAmount = -3231.24,

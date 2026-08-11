@@ -49,6 +49,10 @@ class AccountingPeriodDetailsServiceSpec
 
   }
 
+  /*
+  AccountingPeriodDetails(true, false, false, -123.24, -5930.02, -3231.24, -1.23, -9297.95, -12.23) 
+  AccountingPeriodDetails(true, false, true, -123.24, -5930.02, -3231.24, -1.23, -9297.95, -12.23)
+   */
   "getAccountingDetails returns transformed record" in new Fixture {
     when(mockAccPeriodDetailsConnector.getAccountingPeriodDetails(any[Long], any[Long])(any[HeaderCarrier]))
       .thenReturn(Future.successful(apBalanceResponse))
