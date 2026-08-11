@@ -28,7 +28,7 @@ import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class InterestAccrualListConnector @Inject()(http: HttpClientV2, config: ServicesConfig)(implicit ec: ExecutionContext)
+class InterestAccrualListConnector @Inject() (http: HttpClientV2, config: ServicesConfig)(implicit ec: ExecutionContext)
     extends Logging {
 
   private val stubEnabled: Boolean = config.getBoolean("features.corporation-tax-stub-enabled")
