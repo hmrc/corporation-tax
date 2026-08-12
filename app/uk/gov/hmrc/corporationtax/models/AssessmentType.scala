@@ -22,11 +22,13 @@ case object AmendedAssessment extends AssessmentType("a", "Amended Assessment", 
 case object DiscoveryAssessment extends AssessmentType("d", "Discovery Assessment", "Discovery assessment (claim)");
 case object HMRCDetermination extends AssessmentType("e", "HMRC determination", "HMRC determination (claim)");
 case object FurtherAssessment extends AssessmentType("f", "Further assessment", "Further assessment (claim)");
-case object HMRCAmendedSelfAssessment extends AssessmentType("j", "HMRC amended self assessment", "HMRC amended self assessment (claim)");
+case object HMRCAmendedSelfAssessment
+    extends AssessmentType("j", "HMRC amended self assessment", "HMRC amended self assessment (claim)");
 case object MainAssessment extends AssessmentType("m", "Main assessment", "Main assessment (claim)");
-case object HMRCAmendedSelfAssessment2 extends AssessmentType("r", "HMRC amended self assessment", "HMRC amended self assessment (claim)");
+case object HMRCAmendedSelfAssessment2
+    extends AssessmentType("r", "HMRC amended self assessment", "HMRC amended self assessment (claim)");
 case object SelfAssessment extends AssessmentType("s", "Self assessment", "Self assessment (claim)");
-case object TaxpayerAmendedSelfAssessment extends AssessmentType("t", "Taxpayer amended self assessment", "Taxpayer amended self assessment (claim)");
+case object TaxpayerAmendedSelfAssessment
+    extends AssessmentType("t", "Taxpayer amended self assessment", "Taxpayer amended self assessment (claim)");
 case object ReturnCharge extends AssessmentType("z", "Return charge", "Return charge (claim)");
 case object NotRecognised extends AssessmentType("", "", "");
-

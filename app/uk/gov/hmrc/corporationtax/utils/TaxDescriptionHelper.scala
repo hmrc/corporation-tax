@@ -16,8 +16,12 @@
 
 package uk.gov.hmrc.corporationtax.utils
 
-import uk.gov.hmrc.corporationtax.models.{AmendedAssessment, DiscoveryAssessment, HMRCDetermination, FurtherAssessment, HMRCAmendedSelfAssessment}
-import uk.gov.hmrc.corporationtax.models.{HMRCAmendedSelfAssessment2, MainAssessment, SelfAssessment, TaxpayerAmendedSelfAssessment, ReturnCharge, NotRecognised}
+import uk.gov.hmrc.corporationtax.models.{
+  AmendedAssessment, DiscoveryAssessment, FurtherAssessment, HMRCAmendedSelfAssessment, HMRCDetermination
+}
+import uk.gov.hmrc.corporationtax.models.{
+  HMRCAmendedSelfAssessment2, MainAssessment, NotRecognised, ReturnCharge, SelfAssessment, TaxpayerAmendedSelfAssessment
+}
 
 import scala.concurrent.Future
 
@@ -26,23 +30,23 @@ class TaxDescriptionHelper {
   def getTaxDescription(assessmentType: String, correctionClaim: String): Future[String] =
     Future.successful {
       val assessment = assessmentType.toLowerCase match {
-        case AmendedAssessment.assessmentType => AmendedAssessment
-        case DiscoveryAssessment.assessmentType => DiscoveryAssessment
-        case HMRCDetermination.assessmentType => HMRCDetermination
-        case FurtherAssessment.assessmentType => FurtherAssessment
-        case HMRCAmendedSelfAssessment.assessmentType => HMRCAmendedSelfAssessment
-        case HMRCAmendedSelfAssessment2.assessmentType => HMRCAmendedSelfAssessment2
-        case MainAssessment.assessmentType => MainAssessment
-        case SelfAssessment.assessmentType => SelfAssessment
+        case AmendedAssessment.assessmentType             => AmendedAssessment
+        case DiscoveryAssessment.assessmentType           => DiscoveryAssessment
+        case HMRCDetermination.assessmentType             => HMRCDetermination
+        case FurtherAssessment.assessmentType             => FurtherAssessment
+        case HMRCAmendedSelfAssessment.assessmentType     => HMRCAmendedSelfAssessment
+        case HMRCAmendedSelfAssessment2.assessmentType    => HMRCAmendedSelfAssessment2
+        case MainAssessment.assessmentType                => MainAssessment
+        case SelfAssessment.assessmentType                => SelfAssessment
         case TaxpayerAmendedSelfAssessment.assessmentType => TaxpayerAmendedSelfAssessment
-        case ReturnCharge.assessmentType => ReturnCharge
-        case _ => NotRecognised
+        case ReturnCharge.assessmentType                  => ReturnCharge
+        case _                                            => NotRecognised
       }
 
       val taxDescription = correctionClaim match {
         case "0" => assessment.standard
         case "2" => assessment.correctionClaim
-        case _ => assessment.standard
+        case _   => assessment.standard
       }
 
       taxDescription

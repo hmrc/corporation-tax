@@ -19,8 +19,12 @@ package uk.gov.hmrc.corporationtax.utils
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.concurrent.ScalaFutures
-import uk.gov.hmrc.corporationtax.models.{AmendedAssessment, DiscoveryAssessment, HMRCDetermination, FurtherAssessment, HMRCAmendedSelfAssessment}
-import uk.gov.hmrc.corporationtax.models.{HMRCAmendedSelfAssessment2, MainAssessment, SelfAssessment, TaxpayerAmendedSelfAssessment, ReturnCharge}
+import uk.gov.hmrc.corporationtax.models.{
+  AmendedAssessment, DiscoveryAssessment, FurtherAssessment, HMRCAmendedSelfAssessment, HMRCDetermination
+}
+import uk.gov.hmrc.corporationtax.models.{
+  HMRCAmendedSelfAssessment2, MainAssessment, ReturnCharge, SelfAssessment, TaxpayerAmendedSelfAssessment
+}
 
 class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutures {
 
@@ -306,7 +310,7 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
     }
   }
 
-  s"Assessment Type is not recognised, it should return blank" should {
+  s"Assessment Type is not recognised, it should return blank"      should {
     val assessmentType = "RandomAssessmentType"
 
     "when Correction Claim Indicator is null" in {
