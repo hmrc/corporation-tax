@@ -20,4 +20,7 @@ object BusinessConstants {
 
   val destinationTaxRefOASTransfer: String = "99"
 
+  val trueFlagSet: Set[String]  = Set("Y", "1")
+  val falseFlagSet: Set[String] = Set("N", "0")
+
 }
