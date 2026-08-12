@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.corporationtax.utils
 import play.api.Logging
-import uk.gov.hmrc.corporationtax.models.BusinessConstants.*
 
 object CommonBooleanTransformation extends Logging {
 
@@ -24,9 +23,9 @@ object CommonBooleanTransformation extends Logging {
   def toBool(flag: String): Boolean =
     val flagPreProcessed: String = flag.trim.toUpperCase
     flagPreProcessed match {
-      case trueValue if trueFlagSet.contains(trueValue)    => true
-      case falseValue if falseFlagSet.contains(falseValue) => false
-      case _                                               =>
+      case "Y" | "1" => true
+      case "N" | "0" => false
+      case _         =>
         logger.warn(s"Unknown boolean value supplied <flag>: $flag")
         false
     }

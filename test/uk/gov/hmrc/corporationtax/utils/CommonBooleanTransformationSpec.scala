@@ -18,37 +18,39 @@ package uk.gov.hmrc.corporationtax.utils
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import uk.gov.hmrc.corporationtax.utils.CommonBooleanTransformation.toBool
 
 class CommonBooleanTransformationSpec extends AnyWordSpec with Matchers {
 
   "CommonBooleanTransformation.toBool" should {
+
     "return true when the input flag is Y" in {
-      CommonBooleanTransformation.toBool("Y") shouldBe true
+      toBool("Y") shouldBe true
     }
     "return true when the input flag is y" in {
-      CommonBooleanTransformation.toBool("y") shouldBe true
+      toBool("y") shouldBe true
     }
     "return true when the input flag is 1" in {
-      CommonBooleanTransformation.toBool("1") shouldBe true
+      toBool("1") shouldBe true
     }
 
     "return false when the input flag is N" in {
-      CommonBooleanTransformation.toBool("N") shouldBe false
+      toBool("N") shouldBe false
     }
     "return false when the input flag is n" in {
-      CommonBooleanTransformation.toBool("n") shouldBe false
+      toBool("n") shouldBe false
     }
 
     "return false when the input flag is 0" in {
-      CommonBooleanTransformation.toBool("0") shouldBe false
+      toBool("0") shouldBe false
     }
 
     "trim spaces and return true when input flag is 1" in {
-      CommonBooleanTransformation.toBool("  1  ") shouldBe true
+      toBool("  1  ") shouldBe true
     }
 
     "return false when the input flag is unknown" in {
-      CommonBooleanTransformation.toBool("unknown") shouldBe false
+      toBool("unknown") shouldBe false
     }
 
   }
