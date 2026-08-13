@@ -16,40 +16,43 @@
 
 package uk.gov.hmrc.corporationtax.utils
 
-import uk.gov.hmrc.corporationtax.models.{
-  AmendedAssessment, DiscoveryAssessment, FurtherAssessment, HMRCAmendedSelfAssessment, HMRCDetermination
-}
-import uk.gov.hmrc.corporationtax.models.{
-  HMRCAmendedSelfAssessment2, MainAssessment, NotRecognised, ReturnCharge, SelfAssessment, TaxpayerAmendedSelfAssessment
-}
-
-import scala.concurrent.Future
+import uk.gov.hmrc.corporationtax.models.TaxTransactionsItem
 
 class TaxDescriptionHelper {
 
-  def getTaxDescription(assessmentType: String, correctionClaim: String): Future[String] =
-    Future.successful {
-      val assessment = assessmentType.toLowerCase match {
-        case AmendedAssessment.assessmentType             => AmendedAssessment
-        case DiscoveryAssessment.assessmentType           => DiscoveryAssessment
-        case HMRCDetermination.assessmentType             => HMRCDetermination
-        case FurtherAssessment.assessmentType             => FurtherAssessment
-        case HMRCAmendedSelfAssessment.assessmentType     => HMRCAmendedSelfAssessment
-        case HMRCAmendedSelfAssessment2.assessmentType    => HMRCAmendedSelfAssessment2
-        case MainAssessment.assessmentType                => MainAssessment
-        case SelfAssessment.assessmentType                => SelfAssessment
-        case TaxpayerAmendedSelfAssessment.assessmentType => TaxpayerAmendedSelfAssessment
-        case ReturnCharge.assessmentType                  => ReturnCharge
-        case _                                            => NotRecognised
-      }
+  val selfAssessment: Map[String, String] = Map(
+    "A" -> "Amended assessment",
+    "D" -> "Discovery assessment",
+    "E" -> "HMRC determination",
+    "F" -> "Further assessment",
+    "J" -> "HMRC amended self assessment",
+    "M" -> "Main assessment assessment",
+    "R" -> "HMRC amended self assessment",
+    "S" -> "Self assessment",
+    "T" -> "Taxpayer amended self assessment",
+    "Z" -> "Return charge"
+  )
 
-      val taxDescription = correctionClaim match {
-        case "0" => assessment.standard
-        case "2" => assessment.correctionClaim
-        case _   => assessment.standard
-      }
+  val selfAssessmentClaim: Map[String, String] = Map(
+    "A" -> "Amended assessment (claim)",
+    "D" -> "Discovery assessment(claim)",
+    "E" -> "HMRC determination(claim)",
+    "F" -> "Further assessment(claim)",
+    "J" -> "HMRC amended self assessment(claim)",
+    "M" -> "Main assessment assessment(claim)",
+    "R" -> "HMRC amended self assessment(claim)",
+    "S" -> "Self assessment(claim)",
+    "T" -> "Taxpayer amended self assessment(claim)",
+    "Z" -> "Return charge(claim)"
+  )
 
-      taxDescription
-    }
+  private val claimIndicator: String = "2"
+
+  def deriveTaxDescription(taxTransaction: TaxTransactionsItem): Option[String] = {
+    val normalisedAssessmentType: String = taxTransaction.assessmentType.trim.toUpperCase
+    val isClaim                          = taxTransaction.correctionClaimSignal.contains(claimIndicator)
+    if (isClaim) selfAssessmentClaim.get(normalisedAssessmentType)
+    else selfAssessment.get(normalisedAssessmentType)
+  }
 
 }
