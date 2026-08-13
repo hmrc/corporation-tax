@@ -58,6 +58,25 @@ object DomainModelTransformationInstances {
       )
 
   // Determine TransactionType for each ReallocationFromAccPeriod(BF-F31)
+  implicit val toReallocationToAccPeriod
+    : TransformToDomainModel[(Reallocations, Long), ReallocationToAccPeriod] =
+    (reallocFromAcc: Reallocations, taxPayerReference: Long) =>
+      ReallocationToAccPeriod(
+        reallocFromAcc.reallocation.map { value =>
+          // Determine TransactionType for each Reallocation(BF-F32)
+          val transactionType: ReallocationTransactionType =
+            determineTransactionType(value.sourceTaxpayerReference, taxPayerReference)
+          ReallocationToAccPeriodRow(
+            amount = value.amount,
+            reallocationDate = value.reallocationDate,
+            sourceApEndDate = value.sourceApEndDate.toString,
+            sourceTaxpayerReference = value.sourceTaxpayerReference,
+            transactionType = transactionType
+          )
+        }
+      )
+
+  // Determine TransactionType for each ReallocationFromAccPeriod(BF-F31/BF-32)
   private def determineTransactionType(
     destinationTaxPayerRef: String,
     requestedTaxPayerRef: Long

@@ -28,6 +28,9 @@ case object MiscellaneousTransfer extends ReallocationTransactionType {
 case object ReallocationTo extends ReallocationTransactionType {
   override def value: String = "RTO"
 }
+case object ReallocationFrom extends ReallocationTransactionType {
+  override def value: String = "RFR"
+}
 
 object ReallocationTransactionType {
 
