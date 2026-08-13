@@ -15,19 +15,15 @@
  */
 
 package uk.gov.hmrc.corporationtax.utils
-import play.api.Logging
 
-object CommonBooleanTransformation extends Logging {
+object CommonBooleanTransformation {
 
   // BF-F36 Boolean Common Transformation
   def toBool(flag: String): Boolean =
     val flagPreProcessed: String = flag.trim.toUpperCase
     flagPreProcessed match {
       case "Y" | "1" => true
-      case "N" | "0" => false
-      case _         =>
-        logger.warn(s"Unknown boolean value supplied <flag>: $flag")
-        false
+      case _         => false // Return false for ("N" , "0" or any other values)
     }
 
 }
