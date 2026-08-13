@@ -75,17 +75,17 @@ trait AccountingPeriodDetailsHelper {
     )
 
   val accountingPeriodDetailsWithN: AccountingPeriodDetails =
-      AccountingPeriodDetails(
-        isApBalanced = false,
-        lpiCalcFlag = false,
-        crDbCalcFlag = false,
-        creditInterestAmount = -123.24,
-        debitInterestAmount = -5930.02,
-        latePaymentInterestAmount = -3231.24,
-        repaymentInterestAmount = -1.23,
-        totalDerivedActualInterest = -9297.95,
-        amountDueForAp = -12.23
-      )
+    AccountingPeriodDetails(
+      isApBalanced = false,
+      lpiCalcFlag = false,
+      crDbCalcFlag = false,
+      creditInterestAmount = -123.24,
+      debitInterestAmount = -5930.02,
+      latePaymentInterestAmount = -3231.24,
+      repaymentInterestAmount = -1.23,
+      totalDerivedActualInterest = -9297.95,
+      amountDueForAp = -12.23
+    )
 
   val accountingPeriodDetailsEmptyRecord = AccountingPeriodDetails(
     isApBalanced = false,
