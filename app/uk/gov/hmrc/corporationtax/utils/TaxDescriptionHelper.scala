@@ -18,7 +18,7 @@ package uk.gov.hmrc.corporationtax.utils
 
 import uk.gov.hmrc.corporationtax.models.TaxTransactionsItem
 
-class TaxDescriptionHelper {
+object TaxDescriptionHelper {
 
   val selfAssessment: Map[String, String] = Map(
     "A" -> "Amended assessment",
