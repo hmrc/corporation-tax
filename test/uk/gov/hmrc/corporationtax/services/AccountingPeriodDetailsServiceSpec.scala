@@ -71,4 +71,15 @@ class AccountingPeriodDetailsServiceSpec
     verify(mockAccPeriodDetailsConnector).getAccountingPeriodDetails(7L, 9L)(hc)
   }
 
+  "getAccountingDetails returns transformed record: with N" in new Fixture {
+    when(mockAccPeriodDetailsConnector.getAccountingPeriodDetails(any[Long], any[Long])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(apBalanceResponseWithN))
+
+    val result: AccountingPeriodDetails = service.getAccountingDetails(1L, 1L).futureValue
+
+    result shouldBe accountingPeriodDetailsWithN
+
+    verify(mockAccPeriodDetailsConnector).getAccountingPeriodDetails(1L, 1L)(hc)
+  }
+
 }
