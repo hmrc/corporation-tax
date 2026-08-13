@@ -18,35 +18,35 @@ package uk.gov.hmrc.corporationtax.models
 
 import play.api.libs.json.*
 
-sealed trait TransactionTypesOfGetReallocationToAcc {
+sealed trait ReallocationTransactionType {
   def value: String
 }
 
-case object MiscellaneousTransferGetReallocationFrom extends TransactionTypesOfGetReallocationToAcc {
+case object MiscellaneousTransfer extends ReallocationTransactionType {
   override def value: String = "MiscTFR"
 }
-case object ReallocationFrom extends TransactionTypesOfGetReallocationToAcc {
-  override def value: String = "RFR"
+case object ReallocationTo extends ReallocationTransactionType {
+  override def value: String = "RTO"
 }
 
-object TransactionTypesOfGetReallocationToAcc {
+object ReallocationTransactionType {
 
-  val values: Seq[TransactionTypesOfGetReallocationToAcc] = Seq(MiscellaneousTransferGetReallocationFrom, ReallocationFrom)
+  val values: Seq[ReallocationTransactionType] = Seq(MiscellaneousTransfer, ReallocationTo)
 
-  private def fromString(value: String): Option[TransactionTypesOfGetReallocationToAcc] =
+  private def fromString(value: String): Option[ReallocationTransactionType] =
     values.find(_.value == value)
 
-  implicit val reads: Reads[TransactionTypesOfGetReallocationToAcc] =
+  implicit val reads: Reads[ReallocationTransactionType] =
     Reads {
       case JsString(s) =>
         fromString(s) match {
           case Some(s) => JsSuccess(s)
-          case None    => JsError(s"Unknown TransactionTypesOfGetReallocationFromAcc: $s")
+          case None    => JsError(s"Unknown ReallocationTransactionType: $s")
         }
 
-      case unexpected => JsError(s"Expected JsString for TransactionTypesOfGetReallocationFromAcc, got: $unexpected")
+      case unexpected => JsError(s"Expected JsString for ReallocationTransactionType, got: $unexpected")
     }
 
-  implicit val writes: Writes[TransactionTypesOfGetReallocationToAcc] =
+  implicit val writes: Writes[ReallocationTransactionType] =
     Writes(transactionType => JsString(transactionType.value))
 }

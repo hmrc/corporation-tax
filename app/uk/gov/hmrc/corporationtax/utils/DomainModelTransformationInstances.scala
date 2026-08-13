@@ -30,7 +30,7 @@ object DomainModelTransformationInstances {
       TransformedReallocationFromAccPeriod(
         reallocFromAcc.reallocation.map { value =>
           // Determine TransactionType for each Reallocation(BF-F31)
-          val transactionType: TransactionTypesOfGetReallocationFromAcc =
+          val transactionType: ReallocationTransactionType =
             determineTransactionType(value.destinationTaxPayerReference, taxPayerReference)
           TransformedReallocationFromAccDetails(
             amount = value.amount.getOrElse(BigDecimal(0.00)),
@@ -61,7 +61,7 @@ object DomainModelTransformationInstances {
   private def determineTransactionType(
     destinationTaxPayerRef: String,
     requestedTaxPayerRef: Long
-  ): TransactionTypesOfGetReallocationFromAcc = {
+  ): ReallocationTransactionType = {
     val taxRef: String = requestedTaxPayerRef.toString
     if ((destinationTaxPayerRef == destinationTaxRefOASTransfer) || (destinationTaxPayerRef != taxRef))
       MiscellaneousTransfer

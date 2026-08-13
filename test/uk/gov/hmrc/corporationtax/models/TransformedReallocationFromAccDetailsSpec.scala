@@ -197,35 +197,35 @@ class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matcher
       json.validate[TransformedReallocationFromAccDetails] shouldBe a[JsError]
     }
   }
-  "TransactionTypesOfGetReallocationFromAcc" should {
+  "ReallocationTransactionType" should {
 
     "write MiscellaneousTransfer as MiscTFR" in {
-      Json.toJson[TransactionTypesOfGetReallocationFromAcc](MiscellaneousTransfer) shouldBe JsString("MiscTFR")
+      Json.toJson[ReallocationTransactionType](MiscellaneousTransfer) shouldBe JsString("MiscTFR")
     }
 
     "write ReallocationTo as RTO " in {
-      Json.toJson[TransactionTypesOfGetReallocationFromAcc](ReallocationTo) shouldBe JsString("RTO")
+      Json.toJson[ReallocationTransactionType](ReallocationTo) shouldBe JsString("RTO")
     }
 
     "read MiscTFR as MiscellaneousTransfer" in {
-      JsString("MiscTFR").validate[TransactionTypesOfGetReallocationFromAcc] shouldBe JsSuccess(MiscellaneousTransfer)
+      JsString("MiscTFR").validate[ReallocationTransactionType] shouldBe JsSuccess(MiscellaneousTransfer)
     }
 
     "read RTO as ReallocationTo" in {
-      JsString("RTO").validate[TransactionTypesOfGetReallocationFromAcc] shouldBe JsSuccess(ReallocationTo)
+      JsString("RTO").validate[ReallocationTransactionType] shouldBe JsSuccess(ReallocationTo)
     }
 
     "fail to read an unknown string value" in {
-      val result = JsString("unknown").validate[TransactionTypesOfGetReallocationFromAcc]
+      val result = JsString("unknown").validate[ReallocationTransactionType]
 
       result                                                 shouldBe a[JsError]
       result.asInstanceOf[JsError].errors.head._2.head.message should include(
-        "Unknown TransactionTypesOfGetReallocationFromAcc"
+        "Unknown ReallocationTransactionType"
       )
     }
 
     "fail to read a non-string JSON value" in {
-      val result = JsNumber(16).validate[TransactionTypesOfGetReallocationFromAcc]
+      val result = JsNumber(16).validate[ReallocationTransactionType]
 
       result                                                 shouldBe a[JsError]
       result.asInstanceOf[JsError].errors.head._2.head.message should include("Expected JsString")

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.corporationtax.helpers
 
 import uk.gov.hmrc.corporationtax.models.{
-  RdsReallocationFromAccDetails, RdsReallocationFromAccPeriodResponse, TransactionTypesOfGetReallocationFromAcc,
+  RdsReallocationFromAccDetails, RdsReallocationFromAccPeriodResponse, ReallocationTransactionType,
   TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod
 }
 
@@ -65,7 +65,7 @@ trait ReallocationFromAccPeriodHelper {
     amount: BigDecimal,
     destinationApEndDate: String,
     destinationTaxPayerReference: String,
-    transactionType: TransactionTypesOfGetReallocationFromAcc
+    transactionType: ReallocationTransactionType
   ): TransformedReallocationFromAccPeriod =
     TransformedReallocationFromAccPeriod(
       List(
