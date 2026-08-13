@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.corporationtax.helpers
+package uk.gov.hmrc.corporationtax.testdata
 
 import uk.gov.hmrc.corporationtax.models.{APBalancedItem, APBalancedResponse, AccountingPeriodDetails}
 
@@ -25,20 +25,7 @@ trait AccountingPeriodDetailsHelper {
     accountingPeriodDetails = APBalancedItem(
       isApBalanced = Some("Y"),
       lpiCalcFlag = Some(""),
-      crDbCalcFlag = Some(""),
-      creditInterestAmount = Some(BigDecimal(123.235)),
-      debitInterestAmount = Some(BigDecimal(5930.02)),
-      latePaymentInterestAmount = Some(BigDecimal(3231.238)),
-      repaymentInterestAmount = Some(BigDecimal(1.231)),
-      amountDueForAp = Some(BigDecimal(12.23))
-    )
-  )
-
-  val apBalanceResponseWithN = APBalancedResponse(
-    accountingPeriodDetails = APBalancedItem(
-      isApBalanced = Some("N"),
-      lpiCalcFlag = Some(""),
-      crDbCalcFlag = Some(""),
+      crDbCalcFlag = Some("Y"),
       creditInterestAmount = Some(BigDecimal(123.235)),
       debitInterestAmount = Some(BigDecimal(5930.02)),
       latePaymentInterestAmount = Some(BigDecimal(3231.238)),
@@ -65,20 +52,7 @@ trait AccountingPeriodDetailsHelper {
     AccountingPeriodDetails(
       isApBalanced = true,
       lpiCalcFlag = false,
-      crDbCalcFlag = false,
-      creditInterestAmount = -123.24,
-      debitInterestAmount = -5930.02,
-      latePaymentInterestAmount = -3231.24,
-      repaymentInterestAmount = -1.23,
-      totalDerivedActualInterest = -9297.95,
-      amountDueForAp = -12.23
-    )
-
-  val accountingPeriodDetailsWithN: AccountingPeriodDetails =
-    AccountingPeriodDetails(
-      isApBalanced = false,
-      lpiCalcFlag = false,
-      crDbCalcFlag = false,
+      crDbCalcFlag = true,
       creditInterestAmount = -123.24,
       debitInterestAmount = -5930.02,
       latePaymentInterestAmount = -3231.24,

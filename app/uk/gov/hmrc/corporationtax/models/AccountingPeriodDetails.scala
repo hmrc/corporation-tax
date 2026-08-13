@@ -18,8 +18,29 @@ package uk.gov.hmrc.corporationtax.models
 
 import play.api.libs.json.{Json, OFormat}
 
-import java.time.LocalDate
+// RDS_CACHE_PROXY Response:
+case class APBalancedItem(
+  isApBalanced: Option[String],
+  lpiCalcFlag: Option[String],
+  crDbCalcFlag: Option[String],
+  creditInterestAmount: Option[BigDecimal],
+  debitInterestAmount: Option[BigDecimal],
+  latePaymentInterestAmount: Option[BigDecimal],
+  repaymentInterestAmount: Option[BigDecimal],
+  amountDueForAp: Option[BigDecimal]
+)
 
+object APBalancedItem {
+  implicit val format: OFormat[APBalancedItem] = Json.format[APBalancedItem]
+}
+
+case class APBalancedResponse(accountingPeriodDetails: APBalancedItem)
+
+object APBalancedResponse {
+  implicit val format: OFormat[APBalancedResponse] = Json.format[APBalancedResponse]
+}
+
+// External contract
 case class AccountingPeriodDetails(
   isApBalanced: Boolean,
   lpiCalcFlag: Boolean,
@@ -29,8 +50,7 @@ case class AccountingPeriodDetails(
   latePaymentInterestAmount: BigDecimal,
   repaymentInterestAmount: BigDecimal,
   totalDerivedActualInterest: BigDecimal,
-  amountDueForAp: BigDecimal,
-  accPeriodEndDate: Option[LocalDate]
+  amountDueForAp: BigDecimal
 )
 object AccountingPeriodDetails {
   implicit val format: OFormat[AccountingPeriodDetails] = Json.format[AccountingPeriodDetails]
