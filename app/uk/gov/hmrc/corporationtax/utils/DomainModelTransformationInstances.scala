@@ -48,10 +48,11 @@ object DomainModelTransformationInstances {
     (repayments: Repayments) =>
       Repayments(
         repayments.repayments.map { value =>
-          if (value.amount > Some(0)) {
-            value.copy(repaymentType = "CRT") // Cancelled Repayment
-          } else {
-            value
+          value.amount match {
+            case Some(amount) if value.amount > Some(BigDecimal(0)) =>
+              value.copy(repaymentType = "CRT") // Cancelled Repayment
+            case _ =>
+              value
           }
         }
       )
