@@ -24,7 +24,7 @@ case class Reallocations(reallocation: List[ReallocationRow])
 case class ReallocationRow(
   amount: BigDecimal,
   reallocationDate: LocalDate,
-  sourceApEndDate: LocalDate,
+  sourceApEndDate: Option[LocalDate],
   sourceTaxpayerReference: String
 )
 
@@ -38,19 +38,18 @@ object ReallocationRow {
 
 case class ReallocationToAccPeriod(reallocation: List[ReallocationToAccPeriodRow])
 
-object ReallocationsToAccPeriod {
+object ReallocationToAccPeriod {
   implicit val format: OFormat[ReallocationToAccPeriod] = Json.format[ReallocationToAccPeriod]
 }
 
-
 case class ReallocationToAccPeriodRow(
-                                       amount: BigDecimal,
-                                       reallocationDate: LocalDate,
-                                       sourceApEndDate: String,
-                                       sourceTaxpayerReference: String,
-                                       transactionType: ReallocationTransactionType
-                                     )
+  amount: BigDecimal,
+  reallocationDate: LocalDate,
+  sourceApEndDate: String,
+  sourceTaxpayerReference: String,
+  transactionType: ReallocationTransactionType
+)
 
-object TransformedReallocationRow {
+object ReallocationToAccPeriodRow {
   implicit val format: OFormat[ReallocationToAccPeriodRow] = Json.format[ReallocationToAccPeriodRow]
 }

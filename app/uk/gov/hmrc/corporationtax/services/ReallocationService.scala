@@ -18,7 +18,7 @@ package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.ReallocationsConnector
-import uk.gov.hmrc.corporationtax.models.{ReallocationToAccPeriod, Reallocations}
+import uk.gov.hmrc.corporationtax.models.ReallocationToAccPeriod
 import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
 import uk.gov.hmrc.corporationtax.utils.DomainModelTransformationInstances.*
 import uk.gov.hmrc.corporationtax.utils.TransformToDomainModel.transform
@@ -33,12 +33,15 @@ class ReallocationService @Inject (
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def getByAccountingPeriod(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[ReallocationToAccPeriod] = {
+  def getByAccountingPeriod(taxRef: Long, accPeriod: Long)(implicit
+    hc: HeaderCarrier
+  ): Future[ReallocationToAccPeriod] = {
     logger.info(s"[ReallocationService][getByAccountingPeriod] :$taxRef $accPeriod")
     connector
       .getByAccountingPeriod(taxRef, accPeriod)
       .map { reallocations =>
-        val reallocationWithAmountTransformed = reallocations.copy(reallocation = applyAmountTransformToList(reallocations.reallocation))
+        val reallocationWithAmountTransformed =
+          reallocations.copy(reallocation = applyAmountTransformToList(reallocations.reallocation))
         transform(reallocationWithAmountTransformed, taxRef)
       }
   }

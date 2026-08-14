@@ -24,7 +24,7 @@ import java.time.LocalDate
 
 class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matchers {
 
-  "TransformedReallocationFromAccDetails"    should {
+  "TransformedReallocationFromAccDetails" should {
     "serialize to JSON correctly" in {
       val details = TransformedReallocationFromAccPeriod(
         reallocation = List(
@@ -197,7 +197,7 @@ class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matcher
       json.validate[TransformedReallocationFromAccDetails] shouldBe a[JsError]
     }
   }
-  "ReallocationTransactionType" should {
+  "ReallocationTransactionType"           should {
 
     "write MiscellaneousTransfer as MiscTFR" in {
       Json.toJson[ReallocationTransactionType](MiscellaneousTransfer) shouldBe JsString("MiscTFR")

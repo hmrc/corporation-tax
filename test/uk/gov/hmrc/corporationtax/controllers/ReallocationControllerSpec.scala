@@ -51,24 +51,24 @@ class ReallocationControllerSpec extends AnyWordSpec with Matchers with Realloca
 
     "return 200: OK - return list with a single item" in new Fixture {
       when(mockReallocationService.getByAccountingPeriod(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(reallocationSingleItem))
+        .thenReturn(Future.successful(reallocationToAccPeriodSingleItem))
 
       val result: Future[Result] = controller.getByAccountingPeriod(1L, 2L)(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson(reallocationSingleItem)
+      contentAsJson(result) shouldBe Json.toJson(reallocationToAccPeriodSingleItem)
 
       verify(mockReallocationService).getByAccountingPeriod(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }
 
     "return 200: OK - return an empty list" in new Fixture {
       when(mockReallocationService.getByAccountingPeriod(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(reallocationEmptyList))
+        .thenReturn(Future.successful(reallocationToAccPeriodEmptyList))
 
       val result: Future[Result] = controller.getByAccountingPeriod(1L, 2L)(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson(reallocationEmptyList)
+      contentAsJson(result) shouldBe Json.toJson(reallocationToAccPeriodEmptyList)
 
       verify(mockReallocationService).getByAccountingPeriod(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }

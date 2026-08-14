@@ -26,7 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.test.Helpers
 import uk.gov.hmrc.corporationtax.connectors.ReallocationsConnector
 import uk.gov.hmrc.corporationtax.helpers.ReallocationDataHelper
-import uk.gov.hmrc.corporationtax.models.Reallocations
+import uk.gov.hmrc.corporationtax.models.ReallocationToAccPeriod
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,116 +43,94 @@ class ReallocationServiceSpec extends AnyWordSpec with Matchers with ScalaFuture
     val service = new ReallocationService(mockReallocationsConnector)
 
   }
+  "ReallocationService.getByAccountingPeriod" should {
+    "returns list of ReallocationsToAccPeriod from connector " in new Fixture {
 
-  "getByAccountingPeriod returns list of Reallocations from connector" in new Fixture {
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(reallocationsTwoItems))
 
-    when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(reallocationsTwoItems))
+      val result: ReallocationToAccPeriod = service.getByAccountingPeriod(1L, 1L).futureValue
 
-    val result: Reallocations = service.getByAccountingPeriod(1L, 1L).futureValue
+      result shouldBe reallocationsToAccPeriodTwoItems
 
-    result shouldBe reallocationsExpected
+      verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
+    }
+    "returns empty of ReallocationsToAccPeriod from connector" in new Fixture {
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(reallocationEmptyList))
 
-    verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
-  }
+      val result: ReallocationToAccPeriod = service.getByAccountingPeriod(1L, 1L).futureValue
 
-  "getByAccountingPeriod returns failure from connector" in new Fixture {
+      result shouldBe reallocationToAccPeriodEmptyList
 
-    val error = new RuntimeException("Simulate error")
-    when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
-      .thenReturn(Future.failed(error))
+      verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
+    }
+    "returns ReallocationsToAccPeriod with sourceApEndDate = emptyString when sourceApEndDate is not defined in Reallocations " in new Fixture {
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(reallocationWithNoSourceApEndDate))
 
-    val result: Throwable = service.getByAccountingPeriod(1L, 1L).failed.futureValue
+      val result: ReallocationToAccPeriod = service.getByAccountingPeriod(1L, 1L).futureValue
 
-    result shouldBe error
+      result shouldBe reallocationToAccPeriodWithEmptySourceApEndDate
 
-    verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
-  }
+      verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
+    }
+    // Business Function -F32 - Get Reallocation To Accounting Period
+    "returns ReallocationToAccPeriod with transactionType = MiscTFR when sourceTaxPayerReference is OASTransfer" in new Fixture {
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(reallocationWithSourceTaxOASTransfer))
 
-  // Business Function : F31 - Get Reallocation From Accounting Period
-  "delegate to connector and successfully return RdsReallocationFromAccPeriodResponse when destinationTaxPayerReference = OasTransfer(99) and transform to TransformedReallocationFromAccPeriod with transactionType = MiscellaneousTransfer" in new BaseSetup {
-    val destinationTaxPayerReference: String = "99"
+      val result: ReallocationToAccPeriod = service.getByAccountingPeriod(1L, 1L).futureValue
 
-    val rdsReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse =
-      rdsReallocationFromAccPeriodResponse(destinationTaxPayerReference = destinationTaxPayerReference)
+      result shouldBe reallocationToAccPeriodSingleItemMisc
 
-    val transformedReallocation: TransformedReallocationFromAccPeriod = transformedReallocationFromAccPeriod(
-      BigDecimal(0.0),
-      emptyString,
-      destinationTaxPayerReference,
-      transactionType = MiscellaneousTransfer
-    )
+      verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
 
-    when(mockRds.getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
-      .thenReturn(Future.successful(rdsReallocationFromAccPeriod))
+    }
+    "returns ReallocationToAccPeriod with transactionType = MiscTFR when sourceTaxPayerReference is different from requestedTaxPayerReference" in new Fixture {
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(reallocationsWithSourceTaxRefDifferentToTaxRef))
 
-    val result: TransformedReallocationFromAccPeriod =
-      service.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod).futureValue
+      val result: ReallocationToAccPeriod = service.getByAccountingPeriod(1542L, 1L).futureValue
 
-    result shouldBe transformedReallocation
+      result shouldBe reallocationsToAccPeriodWithTransactionTypeMisc
 
-    result.reallocation.head.transactionType shouldBe MiscellaneousTransfer
+      verify(mockReallocationsConnector).getByAccountingPeriod(1542L, 1L)(hc)
 
-    verify(mockRds).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
+    }
+    "returns ReallocationToAccPeriod with transactionType = MiscTFR when sourceTaxPayerReference = requestedTaxPayerReference and sourceApEndDate is empty" in new Fixture {
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(reallocationsWithSourceAPEndDateNotDefined))
 
-    verify(mockRds, times(1)).getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)
+      val result: ReallocationToAccPeriod = service.getByAccountingPeriod(87L, 1L).futureValue
 
-  }
-  "delegate to connector and successfully return RdsReallocationFromAccPeriodResponse(destinationTaxPayerReference is different from requested taxPayerReference) and transform to TransformedReallocationFromAccPeriod with transactionType = MiscellaneousTransfer" in new BaseSetup {
-    val taxPayerReferenceNumber: Long = 1237L
+      result shouldBe reallocationsToAccPeriodWithTransactionTypeMiscFR
 
-    val destinationTaxPayerReference: String = "98765"
+      verify(mockReallocationsConnector).getByAccountingPeriod(87L, 1L)(hc)
 
-    val rdsReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse =
-      rdsReallocationFromAccPeriodResponse(destinationTaxPayerReference = destinationTaxPayerReference)
+    }
+    "returns ReallocationToAccPeriod with transactionType = RFR when sourceTaxPayerReference = requestedTaxPayerReference and sourceApEndDate is not empty" in new Fixture {
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(reallocationWithEqualSourceTaxRefAndTaxRef))
 
-    val transformedReallocation: TransformedReallocationFromAccPeriod = transformedReallocationFromAccPeriod(
-      BigDecimal(0.0),
-      emptyString,
-      destinationTaxPayerReference,
-      transactionType = MiscellaneousTransfer
-    )
+      val result: ReallocationToAccPeriod = service.getByAccountingPeriod(88, 1L).futureValue
 
-    when(mockRds.getReallocationFromAccPeriod(eqTo(taxPayerReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
-      .thenReturn(Future.successful(rdsReallocationFromAccPeriod))
+      result shouldBe reallocationToAccPeriodWithTransactionTypeRFR
 
-    val result: TransformedReallocationFromAccPeriod =
-      service.getReallocationFromAccPeriod(taxPayerReferenceNumber, accPeriod).futureValue
+      verify(mockReallocationsConnector).getByAccountingPeriod(88L, 1L)(hc)
 
-    result shouldBe transformedReallocation
+    }
+    "returns failure from connector" in new Fixture {
+      val error = new RuntimeException("Simulate error")
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.failed(error))
 
-    verify(mockRds).getReallocationFromAccPeriod(taxPayerReferenceNumber, accPeriod)
+      val result: Throwable = service.getByAccountingPeriod(1L, 1L).failed.futureValue
 
-    verify(mockRds, times(1)).getReallocationFromAccPeriod(taxPayerReferenceNumber, accPeriod)
+      result shouldBe error
 
-  }
-  "delegate to connector and successfully return RdsReallocationFromAccPeriodResponse and transform to TransformedReallocationFromAccPeriod with transactionType = ReallocationTo" in new BaseSetup {
-    val taxPayerReferenceNumber: Long = 1237L
-
-    val destinationTaxPayerReference: String = "1237"
-
-    val rdsReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse =
-      rdsReallocationFromAccPeriodResponse(destinationTaxPayerReference = destinationTaxPayerReference)
-
-    val transformedReallocation: TransformedReallocationFromAccPeriod = transformedReallocationFromAccPeriod(
-      BigDecimal(0.0),
-      emptyString,
-      destinationTaxPayerReference,
-      transactionType = ReallocationTo
-    )
-
-    when(mockRds.getReallocationFromAccPeriod(eqTo(taxPayerReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier]))
-      .thenReturn(Future.successful(rdsReallocationFromAccPeriod))
-
-    val result: TransformedReallocationFromAccPeriod =
-      service.getReallocationFromAccPeriod(taxPayerReferenceNumber, accPeriod).futureValue
-
-    result shouldBe transformedReallocation
-
-    verify(mockRds).getReallocationFromAccPeriod(taxPayerReferenceNumber, accPeriod)
-
-    verify(mockRds, times(1)).getReallocationFromAccPeriod(taxPayerReferenceNumber, accPeriod)
-
+      verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
+    }
   }
 
 }
