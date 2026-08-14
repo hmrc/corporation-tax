@@ -33,7 +33,7 @@ trait RepaymentsHelper {
       )
     )
   )
-  
+
   val beforeTransformedRepaymentsWithOneItem: Repayments = Repayments(
     List(
       RepaymentsDetails(
@@ -83,7 +83,7 @@ trait RepaymentsHelper {
       )
     )
   )
-  val afterTransformedRepaymentsWithMultipleItems: Repayments = Repayments(
+  val afterTransformedRepaymentsWithMultipleItems: Repayments  = Repayments(
     List(
       RepaymentsDetails(
         amount = Some(BigDecimal(20)),

@@ -76,14 +76,18 @@ class RepaymentsServiceSpec
 
     "delegate to connector and successfully return transformed repayment list when amount is None and transformed to 0" in new Setup {
       when(mockConnector.getRepayments(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Repayments(
-          List(
-            RepaymentsDetails(
-              amount = None,
-              repaymentType = "P",
-              repaymentDate = LocalDate.of(2026, 7, 24)
+        .thenReturn(
+          Future.successful(
+            Repayments(
+              List(
+                RepaymentsDetails(
+                  amount = None,
+                  repaymentType = "P",
+                  repaymentDate = LocalDate.of(2026, 7, 24)
+                )
+              )
             )
-          )))
+          )
         )
 
       val result = service.getRepayments(1L, 2L).futureValue
@@ -95,21 +99,26 @@ class RepaymentsServiceSpec
             repaymentType = "P",
             repaymentDate = LocalDate.of(2026, 7, 24)
           )
-        ))
+        )
+      )
 
       verify(mockConnector).getRepayments(1L, 2L)
     }
 
     "delegate to connector and successfully return transformed repayment list when amount > 0 and transformed repaymentType = CRT" in new Setup {
       when(mockConnector.getRepayments(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Repayments(
-          List(
-            RepaymentsDetails(
-              amount = Some(100),
-              repaymentType = "I",
-              repaymentDate = LocalDate.of(2026, 7, 24)
+        .thenReturn(
+          Future.successful(
+            Repayments(
+              List(
+                RepaymentsDetails(
+                  amount = Some(100),
+                  repaymentType = "I",
+                  repaymentDate = LocalDate.of(2026, 7, 24)
+                )
+              )
             )
-          )))
+          )
         )
 
       val result = service.getRepayments(1L, 2L).futureValue
@@ -121,21 +130,26 @@ class RepaymentsServiceSpec
             repaymentType = "CRT",
             repaymentDate = LocalDate.of(2026, 7, 24)
           )
-        ))
+        )
+      )
 
       verify(mockConnector).getRepayments(1L, 2L)
     }
 
     "delegate to connector and successfully return transformed repayment list where amount is negated" in new Setup {
       when(mockConnector.getRepayments(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Repayments(
-          List(
-            RepaymentsDetails(
-              amount = Some(-50),
-              repaymentType = "I",
-              repaymentDate = LocalDate.of(2026, 7, 24)
+        .thenReturn(
+          Future.successful(
+            Repayments(
+              List(
+                RepaymentsDetails(
+                  amount = Some(-50),
+                  repaymentType = "I",
+                  repaymentDate = LocalDate.of(2026, 7, 24)
+                )
+              )
             )
-          )))
+          )
         )
 
       val result = service.getRepayments(1L, 2L).futureValue
@@ -147,7 +161,8 @@ class RepaymentsServiceSpec
             repaymentType = "I",
             repaymentDate = LocalDate.of(2026, 7, 24)
           )
-        ))
+        )
+      )
 
       verify(mockConnector).getRepayments(1L, 2L)
     }

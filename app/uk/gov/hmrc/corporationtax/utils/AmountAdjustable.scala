@@ -30,7 +30,6 @@ def applyAmountTransform[A: AmountAdjustable](item: A): A = {
 def applyAmountTransformToList[A: AmountAdjustable](items: List[A]): List[A] =
   items.map(applyAmountTransform(_))
 
-
 def applyAmountNegation[A: AmountAdjustable](item: A): A = {
   val adjuster = implicitly[AmountAdjustable[A]]
   adjuster.amountFields.foldLeft(item) { case (currentItem, (get, set)) =>
@@ -40,4 +39,3 @@ def applyAmountNegation[A: AmountAdjustable](item: A): A = {
 
 def applyAmountNegateToList[A: AmountAdjustable](items: List[A]): List[A] =
   items.map(applyAmountNegation(_))
-

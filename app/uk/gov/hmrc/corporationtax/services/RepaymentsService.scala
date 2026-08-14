@@ -28,11 +28,11 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RepaymentsService @Inject() (repaymentsConnector: RepaymentsConnector)(implicit
-                                                                             ec: ExecutionContext) extends Logging {
+class RepaymentsService @Inject() (repaymentsConnector: RepaymentsConnector)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def getRepayments(taxRef: Long, accPeriod: Long)(implicit
-                                                   hc: HeaderCarrier
+    hc: HeaderCarrier
   ): Future[Repayments] = {
     logger.info(s"Calling connector for taxRef: $taxRef and accPeriod: $accPeriod")
 

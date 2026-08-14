@@ -17,7 +17,10 @@
 package uk.gov.hmrc.corporationtax.utils
 
 import uk.gov.hmrc.corporationtax.models.BusinessConstants.destinationTaxRefOASTransfer
-import uk.gov.hmrc.corporationtax.models.{MiscellaneousTransfer, RdsReallocationFromAccPeriodResponse, ReallocationTo, Repayments, TransactionTypesOfGetReallocationFromAcc, TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod}
+import uk.gov.hmrc.corporationtax.models.{
+  MiscellaneousTransfer, RdsReallocationFromAccPeriodResponse, ReallocationTo, Repayments,
+  TransactionTypesOfGetReallocationFromAcc, TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod
+}
 
 object DomainModelTransformationInstances {
 
@@ -41,8 +44,7 @@ object DomainModelTransformationInstances {
         }
       )
 
-  implicit val toTransformedRepayments
-  : TransformToDomainModel[(Repayments), Repayments] =
+  implicit val toTransformedRepayments: TransformToDomainModel[Repayments, Repayments] =
     (repayments: Repayments) =>
       Repayments(
         repayments.repayments.map { value =>
