@@ -20,6 +20,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.corporationtax.models.TaxTransactionsItem
+import uk.gov.hmrc.corporationtax.utils.TaxDescriptionHelper.{deriveTaxDescription, selfAssessment, selfAssessmentClaim}
 
 import java.time.LocalDate
 
@@ -38,27 +39,27 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
 
     "when Correction Claim Indicator is null" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 0" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 2" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessmentClaim.get(assessmentType)
+      val expectedResult = selfAssessmentClaim.get(assessmentType)
 
       result mustBe expectedResult
     }
@@ -69,27 +70,27 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
 
     "when Correction Claim Indicator is null" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 0" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 2" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessmentClaim.get(assessmentType)
+      val expectedResult = selfAssessmentClaim.get(assessmentType)
 
       result mustBe expectedResult
     }
@@ -100,27 +101,27 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
 
     "when Correction Claim Indicator is null" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 0" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 2" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessmentClaim.get(assessmentType)
+      val expectedResult = selfAssessmentClaim.get(assessmentType)
 
       result mustBe expectedResult
     }
@@ -131,27 +132,27 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
 
     "when Correction Claim Indicator is null" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 0" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 2" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessmentClaim.get(assessmentType)
+      val expectedResult = selfAssessmentClaim.get(assessmentType)
 
       result mustBe expectedResult
     }
@@ -162,27 +163,27 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
 
     "when Correction Claim Indicator is null" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 0" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 2" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessmentClaim.get(assessmentType)
+      val expectedResult = selfAssessmentClaim.get(assessmentType)
 
       result mustBe expectedResult
     }
@@ -193,27 +194,27 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
 
     "when Correction Claim Indicator is null" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 0" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 2" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessmentClaim.get(assessmentType)
+      val expectedResult = selfAssessmentClaim.get(assessmentType)
 
       result mustBe expectedResult
     }
@@ -224,27 +225,27 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
 
     "when Correction Claim Indicator is null" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 0" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 2" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessmentClaim.get(assessmentType)
+      val expectedResult = selfAssessmentClaim.get(assessmentType)
 
       result mustBe expectedResult
     }
@@ -255,27 +256,27 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
 
     "when Correction Claim Indicator is null" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 0" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 2" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessmentClaim.get(assessmentType)
+      val expectedResult = selfAssessmentClaim.get(assessmentType)
 
       result mustBe expectedResult
     }
@@ -286,27 +287,27 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
 
     "when Correction Claim Indicator is null" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 0" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 2" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessmentClaim.get(assessmentType)
+      val expectedResult = selfAssessmentClaim.get(assessmentType)
 
       result mustBe expectedResult
     }
@@ -317,27 +318,27 @@ class TaxDescriptionHelperSpec extends AnyWordSpec with Matchers with ScalaFutur
 
     "when Correction Claim Indicator is null" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some(null)));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 0" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("0")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessment.get(assessmentType)
+      val expectedResult = selfAssessment.get(assessmentType)
 
       result mustBe expectedResult
     }
 
     "when Correction Claim Indicator is 2" in {
       val result: Option[String] =
-        TaxDescriptionHelper.deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
+        deriveTaxDescription(createMockTaxTransaction(assessmentType, Some("2")));
 
-      val expectedResult = TaxDescriptionHelper.selfAssessmentClaim.get(assessmentType)
+      val expectedResult = selfAssessmentClaim.get(assessmentType)
 
       result mustBe expectedResult
     }
