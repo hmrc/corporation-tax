@@ -26,7 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.test.Helpers
 import uk.gov.hmrc.corporationtax.connectors.AccountingPeriodDetailsConnector
 import uk.gov.hmrc.corporationtax.helpers.AccountingPeriodDetailsHelper
-import uk.gov.hmrc.corporationtax.models.{AccountingPeriodDetailsResponse}
+import uk.gov.hmrc.corporationtax.models.AccountingPeriodDetailsResponse
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
