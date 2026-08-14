@@ -28,9 +28,10 @@ import play.api.mvc.ControllerComponents
 import play.api.test.Helpers.stubControllerComponents
 import uk.gov.hmrc.corporationtax.connectors.RepaymentsConnector
 import uk.gov.hmrc.corporationtax.helpers.RepaymentsHelper
-import uk.gov.hmrc.corporationtax.models.Repayments
+import uk.gov.hmrc.corporationtax.models.{Repayments, RepaymentsDetails}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class RepaymentsServiceSpec
@@ -51,24 +52,102 @@ class RepaymentsServiceSpec
 
   "getRepayments" should {
 
-    "delegate to connector and successfully return repayment list with one item" in new Setup {
+    "delegate to connector and successfully return transformed repayment list with one item" in new Setup {
       when(mockConnector.getRepayments(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(repaymentsWithOneItem))
+        .thenReturn(Future.successful(beforeTransformedRepaymentsWithOneItem))
 
       val result = service.getRepayments(1L, 2L).futureValue
 
-      result shouldBe repaymentsWithOneItem
+      result shouldBe afterTransformedRepaymentsWithOneItem
 
       verify(mockConnector).getRepayments(1L, 2L)
     }
 
-    "delegate to connector and successfully return repayment list with multiple items" in new Setup {
+    "delegate to connector and successfully return transformed repayment list with multiple items" in new Setup {
       when(mockConnector.getRepayments(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(repaymentsWithMultipleItems))
+        .thenReturn(Future.successful(beforeTransformedRepaymentsWithMultipleItems))
 
       val result = service.getRepayments(1L, 2L).futureValue
 
-      result shouldBe repaymentsWithMultipleItems
+      result shouldBe afterTransformedRepaymentsWithMultipleItems
+
+      verify(mockConnector).getRepayments(1L, 2L)
+    }
+
+    "delegate to connector and successfully return transformed repayment list when amount is None and transformed to 0" in new Setup {
+      when(mockConnector.getRepayments(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Repayments(
+          List(
+            RepaymentsDetails(
+              amount = None,
+              repaymentType = "P",
+              repaymentDate = LocalDate.of(2026, 7, 24)
+            )
+          )))
+        )
+
+      val result = service.getRepayments(1L, 2L).futureValue
+
+      result shouldBe Repayments(
+        List(
+          RepaymentsDetails(
+            amount = Some(0),
+            repaymentType = "P",
+            repaymentDate = LocalDate.of(2026, 7, 24)
+          )
+        ))
+
+      verify(mockConnector).getRepayments(1L, 2L)
+    }
+
+    "delegate to connector and successfully return transformed repayment list when amount > 0 and transformed repaymentType = CRT" in new Setup {
+      when(mockConnector.getRepayments(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Repayments(
+          List(
+            RepaymentsDetails(
+              amount = Some(100),
+              repaymentType = "I",
+              repaymentDate = LocalDate.of(2026, 7, 24)
+            )
+          )))
+        )
+
+      val result = service.getRepayments(1L, 2L).futureValue
+
+      result shouldBe Repayments(
+        List(
+          RepaymentsDetails(
+            amount = Some(-100),
+            repaymentType = "CRT",
+            repaymentDate = LocalDate.of(2026, 7, 24)
+          )
+        ))
+
+      verify(mockConnector).getRepayments(1L, 2L)
+    }
+
+    "delegate to connector and successfully return transformed repayment list where amount is negated" in new Setup {
+      when(mockConnector.getRepayments(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Repayments(
+          List(
+            RepaymentsDetails(
+              amount = Some(-50),
+              repaymentType = "I",
+              repaymentDate = LocalDate.of(2026, 7, 24)
+            )
+          )))
+        )
+
+      val result = service.getRepayments(1L, 2L).futureValue
+
+      result shouldBe Repayments(
+        List(
+          RepaymentsDetails(
+            amount = Some(50),
+            repaymentType = "I",
+            repaymentDate = LocalDate.of(2026, 7, 24)
+          )
+        ))
 
       verify(mockConnector).getRepayments(1L, 2L)
     }
