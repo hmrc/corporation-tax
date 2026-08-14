@@ -52,6 +52,13 @@ case class AccountingPeriodDetails(
   totalDerivedActualInterest: BigDecimal,
   amountDueForAp: BigDecimal
 )
+
 object AccountingPeriodDetails {
   implicit val format: OFormat[AccountingPeriodDetails] = Json.format[AccountingPeriodDetails]
+}
+
+case class AccountingPeriodDetailsResponse(accountingPeriodDetails: AccountingPeriodDetails)
+
+object AccountingPeriodDetailsResponse {
+  implicit val format: OFormat[AccountingPeriodDetailsResponse] = Json.format[AccountingPeriodDetailsResponse]
 }

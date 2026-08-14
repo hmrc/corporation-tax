@@ -27,6 +27,7 @@ import play.api.mvc.Result
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.corporationtax.helpers.AccountingPeriodDetailsHelper
+import uk.gov.hmrc.corporationtax.models.AccountingPeriodDetailsResponse
 import uk.gov.hmrc.corporationtax.services.AccountingPeriodDetailsService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -49,12 +50,12 @@ class AccountingPeriodDetailsControllerSpec extends AnyWordSpec with Matchers wi
 
     "return 200 and a successful response with one item transformed amounts" in new Setup {
       when(mockAccountingPeriodDetailsService.getAccountingDetails(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(accountingPeriodDetails))
+        .thenReturn(Future.successful(AccountingPeriodDetailsResponse(accountingPeriodDetails)))
 
       val result: Future[Result] = controller.getAccountingPeriodDetails(1L, 2L)(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson(accountingPeriodDetails)
+      contentAsJson(result) shouldBe Json.toJson(AccountingPeriodDetailsResponse(accountingPeriodDetails))
 
       verify(mockAccountingPeriodDetailsService).getAccountingDetails(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }

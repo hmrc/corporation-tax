@@ -26,7 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.test.Helpers
 import uk.gov.hmrc.corporationtax.connectors.AccountingPeriodDetailsConnector
 import uk.gov.hmrc.corporationtax.helpers.AccountingPeriodDetailsHelper
-import uk.gov.hmrc.corporationtax.models.AccountingPeriodDetails
+import uk.gov.hmrc.corporationtax.models.AccountingPeriodDetailsResponse
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -53,9 +53,9 @@ class AccountingPeriodDetailsServiceSpec
     when(mockAccPeriodDetailsConnector.getAccountingPeriodDetails(any[Long], any[Long])(any[HeaderCarrier]))
       .thenReturn(Future.successful(apBalanceResponse))
 
-    val result: AccountingPeriodDetails = service.getAccountingDetails(1L, 1L).futureValue
+    val result = service.getAccountingDetails(1L, 1L).futureValue
 
-    result shouldBe accountingPeriodDetails
+    result shouldBe AccountingPeriodDetailsResponse(accountingPeriodDetails)
 
     verify(mockAccPeriodDetailsConnector).getAccountingPeriodDetails(1L, 1L)(hc)
   }
@@ -64,9 +64,9 @@ class AccountingPeriodDetailsServiceSpec
     when(mockAccPeriodDetailsConnector.getAccountingPeriodDetails(any[Long], any[Long])(any[HeaderCarrier]))
       .thenReturn(Future.successful(apBalanceEmptyResponse))
 
-    val result: AccountingPeriodDetails = service.getAccountingDetails(7L, 9L).futureValue
+    val result = service.getAccountingDetails(7L, 9L).futureValue
 
-    result shouldBe accountingPeriodDetailsEmptyRecord
+    result shouldBe AccountingPeriodDetailsResponse(accountingPeriodDetailsEmptyRecord)
 
     verify(mockAccPeriodDetailsConnector).getAccountingPeriodDetails(7L, 9L)(hc)
   }
@@ -75,9 +75,9 @@ class AccountingPeriodDetailsServiceSpec
     when(mockAccPeriodDetailsConnector.getAccountingPeriodDetails(any[Long], any[Long])(any[HeaderCarrier]))
       .thenReturn(Future.successful(apBalanceResponseWithN))
 
-    val result: AccountingPeriodDetails = service.getAccountingDetails(1L, 1L).futureValue
+    val result = service.getAccountingDetails(1L, 1L).futureValue
 
-    result shouldBe accountingPeriodDetailsWithN
+    result shouldBe AccountingPeriodDetailsResponse(accountingPeriodDetailsWithN)
 
     verify(mockAccPeriodDetailsConnector).getAccountingPeriodDetails(1L, 1L)(hc)
   }

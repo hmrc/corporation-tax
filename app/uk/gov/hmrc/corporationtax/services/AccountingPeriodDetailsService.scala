@@ -18,9 +18,10 @@ package uk.gov.hmrc.corporationtax.services
 
 import play.api.i18n.Lang.logger
 import uk.gov.hmrc.corporationtax.connectors.AccountingPeriodDetailsConnector
-import uk.gov.hmrc.corporationtax.models.{APBalancedResponse, AccountingPeriodDetails}
+import uk.gov.hmrc.corporationtax.models.{APBalancedResponse, AccountingPeriodDetails, AccountingPeriodDetailsResponse}
 import uk.gov.hmrc.corporationtax.utils.AmountTransformation
 import uk.gov.hmrc.http.HeaderCarrier
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -63,11 +64,12 @@ class AccountingPeriodDetailsService @Inject() (connector: AccountingPeriodDetai
 
   def getAccountingDetails(taxRef: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
-  ): Future[AccountingPeriodDetails] = {
+  ): Future[AccountingPeriodDetailsResponse] = {
     logger.info(s"[AccountingPeriodDetailsService][getAccountingDetails] taxRef: $taxRef and accPeriod: $accPeriod")
     connector
       .getAccountingPeriodDetails(taxRef, accPeriod)
       .map(transform)
+      .map(record => AccountingPeriodDetailsResponse(record))
   }
 
 }
