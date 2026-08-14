@@ -19,18 +19,27 @@ package uk.gov.hmrc.corporationtax.services
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.models.Repayments
 import uk.gov.hmrc.corporationtax.connectors.RepaymentsConnector
+import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.repaymentsAdjustable
+import uk.gov.hmrc.corporationtax.utils.DomainModelTransformationInstances.toTransformedRepayments
+import uk.gov.hmrc.corporationtax.utils.applyAmountNegateToList
+import uk.gov.hmrc.corporationtax.utils.TransformToDomainModel.transform
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class RepaymentsService @Inject() (repaymentsConnector: RepaymentsConnector) extends Logging {
+class RepaymentsService @Inject() (repaymentsConnector: RepaymentsConnector)(implicit
+                                                                             ec: ExecutionContext) extends Logging {
 
   def getRepayments(taxRef: Long, accPeriod: Long)(implicit
-    hc: HeaderCarrier
+                                                   hc: HeaderCarrier
   ): Future[Repayments] = {
     logger.info(s"Calling connector for taxRef: $taxRef and accPeriod: $accPeriod")
 
-    repaymentsConnector.getRepayments(taxRef, accPeriod)
+    repaymentsConnector.getRepayments(taxRef, accPeriod).map { repayments =>
+      val transformedRepayments = transform(repayments)
+      transformedRepayments
+        .copy(repayments = applyAmountNegateToList(transformedRepayments.repayments))
+    }
   }
 }

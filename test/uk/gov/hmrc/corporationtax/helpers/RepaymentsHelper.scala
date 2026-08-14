@@ -33,8 +33,57 @@ trait RepaymentsHelper {
       )
     )
   )
+  
+  val beforeTransformedRepaymentsWithOneItem: Repayments = Repayments(
+    List(
+      RepaymentsDetails(
+        amount = Some(BigDecimal(10)),
+        repaymentType = "S",
+        repaymentDate = LocalDate.of(2026, 7, 24)
+      )
+    )
+  )
+
+  val afterTransformedRepaymentsWithOneItem: Repayments = Repayments(
+    List(
+      RepaymentsDetails(
+        amount = Some(BigDecimal(-10)),
+        repaymentType = "CRT",
+        repaymentDate = LocalDate.of(2026, 7, 24)
+      )
+    )
+  )
 
   val repaymentsWithMultipleItems: Repayments = Repayments(
+    List(
+      RepaymentsDetails(
+        amount = Some(BigDecimal(-20)),
+        repaymentType = "S",
+        repaymentDate = LocalDate.of(2027, 7, 24)
+      ),
+      RepaymentsDetails(
+        amount = Some(BigDecimal(30)),
+        repaymentType = "T",
+        repaymentDate = LocalDate.of(2028, 7, 24)
+      )
+    )
+  )
+
+  val beforeTransformedRepaymentsWithMultipleItems: Repayments = Repayments(
+    List(
+      RepaymentsDetails(
+        amount = Some(BigDecimal(-20)),
+        repaymentType = "S",
+        repaymentDate = LocalDate.of(2027, 7, 24)
+      ),
+      RepaymentsDetails(
+        amount = Some(BigDecimal(30)),
+        repaymentType = "T",
+        repaymentDate = LocalDate.of(2028, 7, 24)
+      )
+    )
+  )
+  val afterTransformedRepaymentsWithMultipleItems: Repayments = Repayments(
     List(
       RepaymentsDetails(
         amount = Some(BigDecimal(20)),
@@ -42,8 +91,8 @@ trait RepaymentsHelper {
         repaymentDate = LocalDate.of(2027, 7, 24)
       ),
       RepaymentsDetails(
-        amount = Some(BigDecimal(30)),
-        repaymentType = "T",
+        amount = Some(BigDecimal(-30)),
+        repaymentType = "CRT",
         repaymentDate = LocalDate.of(2028, 7, 24)
       )
     )

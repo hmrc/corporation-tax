@@ -26,10 +26,10 @@ object Repayments {
 }
 
 case class RepaymentsDetails(
-  amount: Option[BigDecimal],
-  repaymentType: String,
-  repaymentDate: LocalDate
-)
+                              amount: Option[BigDecimal],
+                              repaymentType: String,
+                              repaymentDate: LocalDate
+                            )
 
 object RepaymentsDetails {
   implicit val format: OFormat[RepaymentsDetails] = Json.format[RepaymentsDetails]

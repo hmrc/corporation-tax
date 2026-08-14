@@ -47,7 +47,7 @@ class RepaymentsControllerSpec extends AnyWordSpec with Matchers with Repayments
 
   "GET /repayments" should {
 
-    "return 200 and a successful response with the repayments list with one item" in new Setup {
+    "return 200 and a successful response with the transformed repayments list with one item" in new Setup {
       when(mockService.getRepayments(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(repaymentsWithOneItem))
 
@@ -59,7 +59,7 @@ class RepaymentsControllerSpec extends AnyWordSpec with Matchers with Repayments
       verify(mockService).getRepayments(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }
 
-    "return 200 and a successful response with the repayments list with multiple items" in new Setup {
+    "return 200 and a successful response with the transformed repayments list with multiple items" in new Setup {
       when(mockService.getRepayments(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(repaymentsWithMultipleItems))
 

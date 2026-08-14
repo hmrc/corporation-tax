@@ -25,4 +25,12 @@ object AmountTransformation {
 
     if (rounded.signum == 0) rounded else rounded * -1
   }
+
+  def negateAmount(amount: Option[BigDecimal]): BigDecimal = {
+    val currentAmount = amount.getOrElse(BigDecimal(0.00))
+
+    println("CURRENT AMOUNT: " + currentAmount)
+    println("CURRENT AMOUNT NEGATE: " + currentAmount * -1)
+    currentAmount * -1
+  }
 }
