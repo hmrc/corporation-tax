@@ -19,12 +19,15 @@ package uk.gov.hmrc.corporationtax.services
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.models.AdjustmentTransactionsList
 import uk.gov.hmrc.corporationtax.connectors.AdjustmentTransactionsConnector
+import uk.gov.hmrc.corporationtax.utils.applyAmountTransformToList
+import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class AdjustmentTransactionsService @Inject() (adjustmentTransactionsConnector: AdjustmentTransactionsConnector)
+class AdjustmentTransactionsService @Inject() (adjustmentTransactionsConnector: AdjustmentTransactionsConnector)(implicit
+                                                                                                                 ec: ExecutionContext)
     extends Logging {
 
   def getAdjustmentTransactions(taxRef: Long, accPeriod: Long)(implicit
@@ -32,6 +35,11 @@ class AdjustmentTransactionsService @Inject() (adjustmentTransactionsConnector: 
   ): Future[AdjustmentTransactionsList] = {
     logger.info(s"Calling connector for taxRef: $taxRef and accPeriod: $accPeriod")
 
-    adjustmentTransactionsConnector.getAdjustmentTransactions(taxRef, accPeriod)
+    adjustmentTransactionsConnector.getAdjustmentTransactions(taxRef, accPeriod).map { adjustmentTransaction =>
+      adjustmentTransaction
+        .copy(adjustmentTransactionsList =
+          applyAmountTransformToList(adjustmentTransaction.adjustmentTransactionsList)
+        )
+    }
   }
 }

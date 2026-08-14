@@ -28,7 +28,8 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers
 import uk.gov.hmrc.corporationtax.helpers.PenaltiesHelper
-import uk.gov.hmrc.corporationtax.models.{AdminRule, PenaltyItems}
+import uk.gov.hmrc.corporationtax.models.PenaltyTransactionType.*
+import uk.gov.hmrc.corporationtax.models.{AdminRule, Penalties, PenaltyItems, PenaltyTransaction, PenaltyTransactionItem}
 
 import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
@@ -53,7 +54,7 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
 
   }
 
-  "getPenaltyTransactionList returns list of Penalties from connector: isCTPF is true" in new Fixture {
+  "getPenaltyTransactionList returns transformed list of Penalties from connector: isCTPF is true" in new Fixture {
     when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
       .thenReturn(Future.successful(penalties))
     when(mockAdminRuleRdsProxyConnector.getAdminRule(any[String])(any[HeaderCarrier]))
@@ -67,7 +68,7 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
     verify(mockAdminRuleRdsProxyConnector).getAdminRule("START-OF-CTSA")(hc)
   }
 
-  "getPenaltyTransactionList returns list of Penalties from connector: isCTPF is false" in new Fixture {
+  "getPenaltyTransactionList returns transformed list of Penalties from connector: isCTPF is false" in new Fixture {
     when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
       .thenReturn(Future.successful(penalties))
     when(mockAdminRuleRdsProxyConnector.getAdminRule(any[String])(any[HeaderCarrier]))
@@ -81,7 +82,7 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
     verify(mockAdminRuleRdsProxyConnector).getAdminRule("START-OF-CTSA")(hc)
   }
 
-  "getPenaltyTransactionList returns list of Penalties from connector: isCTPF is true and adminRule is None" in new Fixture {
+  "getPenaltyTransactionList returns transformed list of Penalties from connector: isCTPF is true and adminRule is None" in new Fixture {
     when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
       .thenReturn(Future.successful(penalties))
     when(mockAdminRuleRdsProxyConnector.getAdminRule(any[String])(any[HeaderCarrier]))
@@ -95,7 +96,7 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
     verify(mockAdminRuleRdsProxyConnector).getAdminRule("START-OF-CTSA")(hc)
   }
 
-  "getPenaltyTransactionList returns list of Penalties from connector: isCTPF is true and accountPeriodDate is None" in new Fixture {
+  "getPenaltyTransactionList returns transformed list of Penalties from connector: isCTPF is true and accountPeriodDate is None" in new Fixture {
     when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
       .thenReturn(Future.successful(penalties))
     when(mockAdminRuleRdsProxyConnector.getAdminRule(any[String])(any[HeaderCarrier]))
@@ -104,6 +105,87 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
     val result: PenaltyItems = service.getPenaltyTransactionList(1L, 1L, None).futureValue
 
     result shouldBe penaltyItems
+
+    verify(mockPenaltiesConnector).getPenaltyTransactionList(1L, 1L)(hc)
+    verify(mockAdminRuleRdsProxyConnector).getAdminRule("START-OF-CTSA")(hc)
+  }
+
+  "getPenaltyTransactionList returns transformed list of Penalties from connector with negated postingAmount" in new Fixture {
+    when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(Penalties(
+        List(
+          PenaltyTransaction(
+            penaltyDate = LocalDate.of(2025, 5, 1),
+            `type` = "F",
+            postingAmount = BigDecimal(100.13)
+          ))))
+      )
+    when(mockAdminRuleRdsProxyConnector.getAdminRule(any[String])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(adminRule))
+
+    val result: PenaltyItems = service.getPenaltyTransactionList(1L, 1L, None).futureValue
+
+    result shouldBe PenaltyItems(
+      List(
+        PenaltyTransactionItem(
+          penaltyDate = LocalDate.of(2025, 5, 1),
+          `type` = FX,
+          postingAmount = BigDecimal(-100.13)
+        )))
+
+    verify(mockPenaltiesConnector).getPenaltyTransactionList(1L, 1L)(hc)
+    verify(mockAdminRuleRdsProxyConnector).getAdminRule("START-OF-CTSA")(hc)
+  }
+
+  "getPenaltyTransactionList returns transformed list of Penalties from connector with correct rounding" in new Fixture {
+    when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(Penalties(
+        List(
+          PenaltyTransaction(
+            penaltyDate = LocalDate.of(2025, 5, 1),
+            `type` = "F",
+            postingAmount = BigDecimal(100.13569)
+          ))))
+      )
+    when(mockAdminRuleRdsProxyConnector.getAdminRule(any[String])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(adminRule))
+
+    val result: PenaltyItems = service.getPenaltyTransactionList(1L, 1L, None).futureValue
+
+    result shouldBe PenaltyItems(
+      List(
+        PenaltyTransactionItem(
+          penaltyDate = LocalDate.of(2025, 5, 1),
+          `type` = FX,
+          postingAmount = BigDecimal(-100.14)
+        )))
+
+    verify(mockPenaltiesConnector).getPenaltyTransactionList(1L, 1L)(hc)
+    verify(mockAdminRuleRdsProxyConnector).getAdminRule("START-OF-CTSA")(hc)
+  }
+
+  "getPenaltyTransactionList returns transformed list of Penalties from connector with out negating 0 values" in new Fixture {
+    when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(Penalties(
+        List(
+          PenaltyTransaction(
+            penaltyDate = LocalDate.of(2025, 5, 1),
+            `type` = "F",
+            postingAmount = BigDecimal(0.00000012)
+          ))))
+      )
+    when(mockAdminRuleRdsProxyConnector.getAdminRule(any[String])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(adminRule))
+
+    val result: PenaltyItems = service.getPenaltyTransactionList(1L, 1L, None).futureValue
+
+    result shouldBe PenaltyItems(
+      List(
+        PenaltyTransactionItem(
+          penaltyDate = LocalDate.of(2025, 5, 1),
+          `type` = FX,
+          postingAmount = BigDecimal(0)
+        )))
 
     verify(mockPenaltiesConnector).getPenaltyTransactionList(1L, 1L)(hc)
     verify(mockAdminRuleRdsProxyConnector).getAdminRule("START-OF-CTSA")(hc)

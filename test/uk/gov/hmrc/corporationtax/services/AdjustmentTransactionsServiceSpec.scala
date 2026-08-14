@@ -28,7 +28,7 @@ import play.api.mvc.ControllerComponents
 import play.api.test.Helpers.stubControllerComponents
 import uk.gov.hmrc.corporationtax.connectors.AdjustmentTransactionsConnector
 import uk.gov.hmrc.corporationtax.helpers.AdjustmentTransactionsHelper
-import uk.gov.hmrc.corporationtax.models.AdjustmentTransactionsList
+import uk.gov.hmrc.corporationtax.models.{AdjustmentTransactions, AdjustmentTransactionsList}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -51,13 +51,113 @@ class AdjustmentTransactionsServiceSpec
 
   "getAdjustmentTransactions" should {
 
-    "delegate to connector and successfully return AdjustmentTransactionsList" in new Setup {
+    "delegate to connector and successfully return transformed AdjustmentTransactionsList with one item" in new Setup {
       when(mockAdjustmentTransactionsConnector.getAdjustmentTransactions(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(adjustmentTransactionsListWithOneItem))
 
       val result = adjustmentTransactionsService.getAdjustmentTransactions(1L, 2L).futureValue
 
-      result shouldBe adjustmentTransactionsListWithOneItem
+      result shouldBe transformedAdjustmentTransactionsListWithOneItem
+
+      verify(mockAdjustmentTransactionsConnector).getAdjustmentTransactions(1L, 2L)
+    }
+
+    "delegate to connector and successfully return transformed AdjustmentTransactionsList with multiple items" in new Setup {
+      when(mockAdjustmentTransactionsConnector.getAdjustmentTransactions(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(adjustmentTransactionsListWithMultipleItems))
+
+      val result = adjustmentTransactionsService.getAdjustmentTransactions(1L, 2L).futureValue
+
+      result shouldBe transformedAdjustmentTransactionsListWithMultipleItems
+
+      verify(mockAdjustmentTransactionsConnector).getAdjustmentTransactions(1L, 2L)
+    }
+
+    "delegate to connector and successfully return empty AdjustmentTransactionsList" in new Setup {
+      when(mockAdjustmentTransactionsConnector.getAdjustmentTransactions(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(emptyAdjustmentTransactionsList))
+
+      val result = adjustmentTransactionsService.getAdjustmentTransactions(1L, 2L).futureValue
+
+      result shouldBe emptyAdjustmentTransactionsList
+
+      verify(mockAdjustmentTransactionsConnector).getAdjustmentTransactions(1L, 2L)
+    }
+
+    "delegate to connector and successfully return transformed AdjustmentTransactionsList with negated value" in new Setup {
+      when(mockAdjustmentTransactionsConnector.getAdjustmentTransactions(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(
+          AdjustmentTransactionsList(
+          List(
+            AdjustmentTransactions(
+              amount = BigDecimal(50.00),
+              `type` = "N"
+            )
+          )
+        )))
+
+      val result = adjustmentTransactionsService.getAdjustmentTransactions(1L, 2L).futureValue
+
+      result shouldBe AdjustmentTransactionsList(
+        List(
+          AdjustmentTransactions(
+            amount = BigDecimal(-50.00),
+            `type` = "N"
+          )
+        )
+      )
+
+      verify(mockAdjustmentTransactionsConnector).getAdjustmentTransactions(1L, 2L)
+    }
+
+    "delegate to connector and successfully return transformed AdjustmentTransactionsList with correct rounding" in new Setup {
+      when(mockAdjustmentTransactionsConnector.getAdjustmentTransactions(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(
+          AdjustmentTransactionsList(
+            List(
+              AdjustmentTransactions(
+                amount = BigDecimal(50.1245),
+                `type` = "N"
+              )
+            )
+          )))
+
+      val result = adjustmentTransactionsService.getAdjustmentTransactions(1L, 2L).futureValue
+
+      result shouldBe AdjustmentTransactionsList(
+        List(
+          AdjustmentTransactions(
+            amount = BigDecimal(-50.12),
+            `type` = "N"
+          )
+        )
+      )
+
+      verify(mockAdjustmentTransactionsConnector).getAdjustmentTransactions(1L, 2L)
+    }
+
+    "delegate to connector and successfully return transformed AdjustmentTransactionsList with not negating 0 value" in new Setup {
+      when(mockAdjustmentTransactionsConnector.getAdjustmentTransactions(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(
+          AdjustmentTransactionsList(
+            List(
+              AdjustmentTransactions(
+                amount = BigDecimal(0.00001),
+                `type` = "N"
+              )
+            )
+          )))
+
+      val result = adjustmentTransactionsService.getAdjustmentTransactions(1L, 2L).futureValue
+
+      result shouldBe AdjustmentTransactionsList(
+        List(
+          AdjustmentTransactions(
+            amount = BigDecimal(0),
+            `type` = "N"
+          )
+        )
+      )
 
       verify(mockAdjustmentTransactionsConnector).getAdjustmentTransactions(1L, 2L)
     }

@@ -33,7 +33,31 @@ trait AdjustmentTransactionsHelper {
       )
     )
 
+  val transformedAdjustmentTransactionsListWithOneItem: AdjustmentTransactionsList =
+    AdjustmentTransactionsList(
+      List(
+        AdjustmentTransactions(
+          amount = BigDecimal(-50.00),
+          `type` = "N"
+        )
+      )
+    )
+
   val adjustmentTransactionsListWithMultipleItems: AdjustmentTransactionsList =
+    AdjustmentTransactionsList(
+      List(
+        AdjustmentTransactions(
+          amount = BigDecimal(-60.00),
+          `type` = "F"
+        ),
+        AdjustmentTransactions(
+          amount = BigDecimal(70.00),
+          `type` = "L"
+        )
+      )
+    )
+
+  val transformedAdjustmentTransactionsListWithMultipleItems: AdjustmentTransactionsList =
     AdjustmentTransactionsList(
       List(
         AdjustmentTransactions(
@@ -41,7 +65,7 @@ trait AdjustmentTransactionsHelper {
           `type` = "F"
         ),
         AdjustmentTransactions(
-          amount = BigDecimal(70.00),
+          amount = BigDecimal(-70.00),
           `type` = "L"
         )
       )

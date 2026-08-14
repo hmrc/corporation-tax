@@ -28,7 +28,7 @@ trait PenaltiesHelper {
     Penalties(
       List(
         PenaltyTransaction(penaltyDate = LocalDate.of(2025, 5, 1), `type` = "F", postingAmount = BigDecimal(100.13)),
-        PenaltyTransaction(penaltyDate = LocalDate.of(2021, 3, 7), `type` = "G", postingAmount = BigDecimal(27.19))
+        PenaltyTransaction(penaltyDate = LocalDate.of(2021, 3, 7), `type` = "G", postingAmount = BigDecimal(-27.19))
       )
     )
 
@@ -47,7 +47,7 @@ trait PenaltiesHelper {
   val penaltyItems =
     PenaltyItems(
       List(
-        PenaltyTransactionItem(penaltyDate = LocalDate.of(2025, 5, 1), `type` = FX, postingAmount = BigDecimal(100.13)),
+        PenaltyTransactionItem(penaltyDate = LocalDate.of(2025, 5, 1), `type` = FX, postingAmount = BigDecimal(-100.13)),
         PenaltyTransactionItem(penaltyDate = LocalDate.of(2021, 3, 7), `type` = TG, postingAmount = BigDecimal(27.19))
       )
     )
@@ -55,7 +55,7 @@ trait PenaltiesHelper {
   val penaltyItemsSecond =
     PenaltyItems(
       List(
-        PenaltyTransactionItem(penaltyDate = LocalDate.of(2025, 5, 1), `type` = FT, postingAmount = BigDecimal(100.13)),
+        PenaltyTransactionItem(penaltyDate = LocalDate.of(2025, 5, 1), `type` = FT, postingAmount = BigDecimal(-100.13)),
         PenaltyTransactionItem(penaltyDate = LocalDate.of(2021, 3, 7), `type` = TR, postingAmount = BigDecimal(27.19))
       )
     )
