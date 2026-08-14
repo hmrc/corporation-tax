@@ -26,9 +26,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AdjustmentTransactionsService @Inject() (adjustmentTransactionsConnector: AdjustmentTransactionsConnector)(implicit
-                                                                                                                 ec: ExecutionContext)
-    extends Logging {
+class AdjustmentTransactionsService @Inject() (adjustmentTransactionsConnector: AdjustmentTransactionsConnector)(
+  implicit ec: ExecutionContext
+) extends Logging {
 
   def getAdjustmentTransactions(taxRef: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
@@ -37,9 +37,7 @@ class AdjustmentTransactionsService @Inject() (adjustmentTransactionsConnector: 
 
     adjustmentTransactionsConnector.getAdjustmentTransactions(taxRef, accPeriod).map { adjustmentTransaction =>
       adjustmentTransaction
-        .copy(adjustmentTransactionsList =
-          applyAmountTransformToList(adjustmentTransaction.adjustmentTransactionsList)
-        )
+        .copy(adjustmentTransactionsList = applyAmountTransformToList(adjustmentTransaction.adjustmentTransactionsList))
     }
   }
 }

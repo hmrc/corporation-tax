@@ -29,7 +29,9 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers
 import uk.gov.hmrc.corporationtax.helpers.PenaltiesHelper
 import uk.gov.hmrc.corporationtax.models.PenaltyTransactionType.*
-import uk.gov.hmrc.corporationtax.models.{AdminRule, Penalties, PenaltyItems, PenaltyTransaction, PenaltyTransactionItem}
+import uk.gov.hmrc.corporationtax.models.{
+  AdminRule, Penalties, PenaltyItems, PenaltyTransaction, PenaltyTransactionItem
+}
 
 import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
@@ -112,13 +114,18 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
 
   "getPenaltyTransactionList returns transformed list of Penalties from connector with negated postingAmount" in new Fixture {
     when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(Penalties(
-        List(
-          PenaltyTransaction(
-            penaltyDate = LocalDate.of(2025, 5, 1),
-            `type` = "F",
-            postingAmount = BigDecimal(100.13)
-          ))))
+      .thenReturn(
+        Future.successful(
+          Penalties(
+            List(
+              PenaltyTransaction(
+                penaltyDate = LocalDate.of(2025, 5, 1),
+                `type` = "F",
+                postingAmount = BigDecimal(100.13)
+              )
+            )
+          )
+        )
       )
     when(mockAdminRuleRdsProxyConnector.getAdminRule(any[String])(any[HeaderCarrier]))
       .thenReturn(Future.successful(adminRule))
@@ -131,7 +138,9 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
           penaltyDate = LocalDate.of(2025, 5, 1),
           `type` = FX,
           postingAmount = BigDecimal(-100.13)
-        )))
+        )
+      )
+    )
 
     verify(mockPenaltiesConnector).getPenaltyTransactionList(1L, 1L)(hc)
     verify(mockAdminRuleRdsProxyConnector).getAdminRule("START-OF-CTSA")(hc)
@@ -139,13 +148,18 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
 
   "getPenaltyTransactionList returns transformed list of Penalties from connector with correct rounding" in new Fixture {
     when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(Penalties(
-        List(
-          PenaltyTransaction(
-            penaltyDate = LocalDate.of(2025, 5, 1),
-            `type` = "F",
-            postingAmount = BigDecimal(100.13569)
-          ))))
+      .thenReturn(
+        Future.successful(
+          Penalties(
+            List(
+              PenaltyTransaction(
+                penaltyDate = LocalDate.of(2025, 5, 1),
+                `type` = "F",
+                postingAmount = BigDecimal(100.13569)
+              )
+            )
+          )
+        )
       )
     when(mockAdminRuleRdsProxyConnector.getAdminRule(any[String])(any[HeaderCarrier]))
       .thenReturn(Future.successful(adminRule))
@@ -158,7 +172,9 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
           penaltyDate = LocalDate.of(2025, 5, 1),
           `type` = FX,
           postingAmount = BigDecimal(-100.14)
-        )))
+        )
+      )
+    )
 
     verify(mockPenaltiesConnector).getPenaltyTransactionList(1L, 1L)(hc)
     verify(mockAdminRuleRdsProxyConnector).getAdminRule("START-OF-CTSA")(hc)
@@ -166,13 +182,18 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
 
   "getPenaltyTransactionList returns transformed list of Penalties from connector with out negating 0 values" in new Fixture {
     when(mockPenaltiesConnector.getPenaltyTransactionList(any[Long], any[Long])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(Penalties(
-        List(
-          PenaltyTransaction(
-            penaltyDate = LocalDate.of(2025, 5, 1),
-            `type` = "F",
-            postingAmount = BigDecimal(0.00000012)
-          ))))
+      .thenReturn(
+        Future.successful(
+          Penalties(
+            List(
+              PenaltyTransaction(
+                penaltyDate = LocalDate.of(2025, 5, 1),
+                `type` = "F",
+                postingAmount = BigDecimal(0.00000012)
+              )
+            )
+          )
+        )
       )
     when(mockAdminRuleRdsProxyConnector.getAdminRule(any[String])(any[HeaderCarrier]))
       .thenReturn(Future.successful(adminRule))
@@ -185,7 +206,9 @@ class PenaltiesServiceSpec extends AnyWordSpec with Matchers with PenaltiesHelpe
           penaltyDate = LocalDate.of(2025, 5, 1),
           `type` = FX,
           postingAmount = BigDecimal(0)
-        )))
+        )
+      )
+    )
 
     verify(mockPenaltiesConnector).getPenaltyTransactionList(1L, 1L)(hc)
     verify(mockAdminRuleRdsProxyConnector).getAdminRule("START-OF-CTSA")(hc)
