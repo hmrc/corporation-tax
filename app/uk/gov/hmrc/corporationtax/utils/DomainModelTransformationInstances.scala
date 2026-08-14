@@ -51,7 +51,7 @@ object DomainModelTransformationInstances {
           value.amount match {
             case Some(amount) if value.amount > Some(BigDecimal(0)) =>
               value.copy(repaymentType = "CRT") // Cancelled Repayment
-            case _ =>
+            case _                                                  =>
               value
           }
         }
