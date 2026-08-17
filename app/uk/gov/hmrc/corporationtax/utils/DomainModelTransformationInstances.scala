@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.corporationtax.utils
 
-import uk.gov.hmrc.corporationtax.models.BusinessConstants.destinationTaxRefOASTransfer
+import uk.gov.hmrc.corporationtax.models.BusinessConstants.OASTransfer
 import uk.gov.hmrc.corporationtax.models.{
-  MiscellaneousTransfer, RdsReallocationFromAccPeriodResponse, ReallocationTo, Repayments,
-  TransactionTypesOfGetReallocationFromAcc, TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod
+  MiscellaneousTransfer, RdsReallocationFromAccPeriodResponse, ReallocationFrom, ReallocationTo,
+  ReallocationToAccPeriod, ReallocationToAccPeriodRow, ReallocationTransactionType, Reallocations, Repayments,
+  TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod
 }
 
 import java.time.LocalDate
@@ -60,8 +61,7 @@ object DomainModelTransformationInstances {
       )
 
   // Determine TransactionType for each ReallocationFromAccPeriod(BF-F31)
-  implicit val toReallocationToAccPeriod
-    : TransformToDomainModel[(Reallocations, Long), ReallocationToAccPeriod] =
+  implicit val toReallocationToAccPeriod: TransformToDomainModel[(Reallocations, Long), ReallocationToAccPeriod] =
     (reallocFromAcc: Reallocations, taxPayerReference: Long) =>
       ReallocationToAccPeriod(
         reallocFromAcc.reallocation.map { value =>
