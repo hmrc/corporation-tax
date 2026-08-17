@@ -40,18 +40,20 @@ object StatuteRule {
 }
 
 // BE Response
-// ruleStartDate and ruleEndDate not used in the FE so dropping these
 case class StatuteRuleRecord(
-                            numberOfDays: Int,
-                            ruleAmount: BigDecimal,
-                            ruleRate: BigDecimal
-                          )
+                              // rule~Date not used in the FE :: no need to map these in FE
+                              ruleStartDate: Option[LocalDate],
+                              ruleEndDate: Option[LocalDate],
+                              numberOfDays: Int,
+                              ruleAmount: BigDecimal,
+                              ruleRate: BigDecimal
+                            )
 
 object StatuteRuleRecord {
   implicit val format: OFormat[StatuteRuleRecord] = Json.format[StatuteRuleRecord]
 }
 
-case class StatuteRuleResponse(statuteRule: StatuteRuleRecord)
+case class StatuteRuleResponse(statuteRule: Option[StatuteRuleRecord])
 
 object StatuteRuleResponse {
   implicit val format: OFormat[StatuteRuleResponse] = Json.format[StatuteRuleResponse]

@@ -21,6 +21,7 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.corporationtax.services.StatuteRuleService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import play.api.libs.json.Json
+import uk.gov.hmrc.corporationtax.models.StatuteRuleResponse
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -46,23 +47,28 @@ class StatuteRuleController @Inject()(
       case (Right(_), Right(_)) =>
         service
           .getStatueRule(ruleRateKey, startDateStr, endDateStr)
-          .map { responseRecord =>
-            Ok(
-              Json.toJson(responseRecord)
-            )
+          .map {
+            case Some(responseRecord) =>
+              Ok(
+                Json.toJson(responseRecord)
+              )
+            case None =>
+              NotFound(
+                Json.toJson(StatuteRuleResponse(None))
+              )
           }
           .recover { case ex: Exception =>
             logger.error("Error while retrieving tax transactions", ex)
             InternalServerError(Json.obj("error" -> "Failed to retrieve accounting period details"))
           }
       case (_, _) =>
-        logger.error("Error while retrieving tax transactions")
+        logger.error(s"Error input parameters provided: $ruleRateKey-$startDateStr-$endDateStr")
         Future.successful(
-          InternalServerError(Json.obj("error" -> "Failed to retrieve accounting period details"))
+          InternalServerError(Json.obj("error" -> "Error input parameters provided"))
         )
 
     }
-    
+
   }
 
 }

@@ -18,27 +18,36 @@ package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.StatuteRuleConnector
-import uk.gov.hmrc.corporationtax.models.{StatuteRule, StatuteRuleResponse}
+import uk.gov.hmrc.corporationtax.models.{StatuteRuleItem, StatuteRuleRecord, StatuteRuleResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class StatuteRuleService @Inject() (
-                                     connector: StatuteRuleConnector
-                                 )(implicit ec: ExecutionContext)
+class StatuteRuleService @Inject()(
+                                    connector: StatuteRuleConnector
+                                  )(implicit ec: ExecutionContext)
   extends Logging {
 
-  private def transform(input: StatuteRule) : StatuteRuleResponse = ???
+  private def transform(e: StatuteRuleItem): StatuteRuleResponse = {
+    val record = StatuteRuleRecord(
+      ruleStartDate = e.ruleStartDate,
+      ruleEndDate = e.ruleEndDate,
+      numberOfDays = e.numberOfDays.getOrElse(0),
+      ruleAmount = e.ruleAmount.getOrElse(BigDecimal(0)),
+      ruleRate = e.ruleRate.getOrElse(BigDecimal(0))
+    )
+    StatuteRuleResponse(statuteRule = Some(record))
+  }
 
   def getStatueRule(ruleRateKey: String,
                     startDateStr: String, endDateStr: String)(implicit
-                                                          hc: HeaderCarrier
-  ): Future[StatuteRuleResponse] = {
+                                                              hc: HeaderCarrier
+                   ): Future[Option[StatuteRuleResponse]] = {
     logger.info(s"[StatuteRuleConnector][getStatueRule]: $ruleRateKey :: $startDateStr - $endDateStr")
     connector
       .getStatueRule(ruleRateKey, startDateStr, endDateStr)
-      .map(transform)
+      .map(e => e.statuteRule.map(transform))
 
   }
 
