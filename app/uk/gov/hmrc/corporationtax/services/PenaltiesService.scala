@@ -19,6 +19,8 @@ package uk.gov.hmrc.corporationtax.services
 import uk.gov.hmrc.corporationtax.models.*
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.{AdminRuleRdsProxyConnector, PenaltiesConnector}
+import uk.gov.hmrc.corporationtax.utils.applyAmountTransformToList
+import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
 import uk.gov.hmrc.http.HeaderCarrier
 import PenaltyTransaction.*
 
@@ -56,7 +58,10 @@ class PenaltiesService @Inject() (
     for {
       penalties <- penaltiesConnector.getPenaltyTransactionList(taxRef, accPeriod)
       isCTPF    <- getCTPFStatusAsync(accountingPeriodEndDateMaybe)
-    } yield PenaltyItems(penalties.penaltyTransactions.map(p => convertToItems(p, isCTPF)))
+    } yield {
+      val penaltyItem = PenaltyItems(penalties.penaltyTransactions.map(p => convertToItems(p, isCTPF)))
+      penaltyItem.copy(penaltyTransactions = applyAmountTransformToList(penaltyItem.penaltyTransactions))
+    }
   }
 
 }
