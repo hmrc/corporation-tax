@@ -42,10 +42,8 @@ class StatuteConnectorISpec
 
   "getStatueRule" should {
 
-    def url(ruleRateKey: String,
-            startDateStr: String, endDateStr: String) =
+    def url(ruleRateKey: String, startDateStr: String, endDateStr: String) =
       s"/rds-datacache-proxy/corporation-tax/statue-rule/$ruleRateKey/$startDateStr/$endDateStr"
-
 
     "return no StatuteRule record" in {
       stubFor(
@@ -53,8 +51,7 @@ class StatuteConnectorISpec
           .willReturn(
             aResponse()
               .withStatus(NOT_FOUND)
-              .withBody(s"""{}""".stripMargin
-              )
+              .withBody(s"""{}""".stripMargin)
           )
       )
 
@@ -83,7 +80,7 @@ class StatuteConnectorISpec
       )
 
       val result = connector.getStatueRule("C1", "1999-01-19", "1999-07-20").futureValue
-      result mustBe Some( StatuteRule(defaultRecord) )
+      result mustBe Some(StatuteRule(defaultRecord))
     }
 
     "return StatuteRule record with empty fields" in {
@@ -105,7 +102,6 @@ class StatuteConnectorISpec
       val result = connector.getStatueRule("C1", "1999-01-19", "1999-07-20").futureValue
       result mustBe Some(StatuteRule(recordWithEmptyFields))
     }
-
 
     "return INTERNAL_ERROR when service failed" in {
       stubFor(

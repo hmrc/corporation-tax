@@ -22,8 +22,8 @@ import java.time.LocalDate
 
 trait StatuteRuleHelper {
   val defaultRecord = StatuteRuleItem(
-    ruleStartDate = Some( LocalDate.parse("1999-01-18")),
-    ruleEndDate = Some( LocalDate.parse("1999-02-14")),
+    ruleStartDate = Some(LocalDate.parse("1999-01-18")),
+    ruleEndDate = Some(LocalDate.parse("1999-02-14")),
     numberOfDays = Some(27),
     ruleAmount = Some(BigDecimal(100.011)),
     ruleRate = Some(BigDecimal(5.75))

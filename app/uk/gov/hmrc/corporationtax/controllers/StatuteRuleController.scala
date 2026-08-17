@@ -28,44 +28,45 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class StatuteRuleController @Inject()(
-                                       cc: ControllerComponents,
-                                       service: StatuteRuleService
-                                     )(implicit ec: ExecutionContext)
-  extends BackendController(cc)
+class StatuteRuleController @Inject() (
+  cc: ControllerComponents,
+  service: StatuteRuleService
+)(implicit ec: ExecutionContext)
+    extends BackendController(cc)
     with Logging {
 
-  def getStatueRule(ruleRateKey: String,
-                    startDateStr: String, endDateStr: String): Action[AnyContent] = Action.async { implicit request =>
-    (Try {
-      LocalDate.parse(startDateStr)
-    }.toEither,
-      Try {
-        LocalDate.parse(endDateStr)
-      }.toEither
-    ) match {
-      case (Right(_), Right(_)) =>
-        service
-          .getStatueRule(ruleRateKey, startDateStr, endDateStr)
-          .map {
-            case Some(responseRecord) =>
-              Ok(
-                Json.toJson(responseRecord)
-              )
-            case None =>
-              NotFound
-          }
-          .recover { case ex: Exception =>
-            logger.error("Error while retrieving tax transactions", ex)
-            InternalServerError(Json.obj("error" -> "Failed to retrieve accounting period details"))
-          }
-      case (_, _) =>
-        logger.error(s"Error input parameters provided: $ruleRateKey-$startDateStr-$endDateStr")
-        Future.successful(
-          InternalServerError(Json.obj("error" -> "Error input parameters provided"))
-        )
+  def getStatueRule(ruleRateKey: String, startDateStr: String, endDateStr: String): Action[AnyContent] = Action.async {
+    implicit request =>
+      (
+        Try {
+          LocalDate.parse(startDateStr)
+        }.toEither,
+        Try {
+          LocalDate.parse(endDateStr)
+        }.toEither
+      ) match {
+        case (Right(_), Right(_)) =>
+          service
+            .getStatueRule(ruleRateKey, startDateStr, endDateStr)
+            .map {
+              case Some(responseRecord) =>
+                Ok(
+                  Json.toJson(responseRecord)
+                )
+              case None                 =>
+                NotFound
+            }
+            .recover { case ex: Exception =>
+              logger.error("Error while retrieving tax transactions", ex)
+              InternalServerError(Json.obj("error" -> "Failed to retrieve accounting period details"))
+            }
+        case (_, _)               =>
+          logger.error(s"Error input parameters provided: $ruleRateKey-$startDateStr-$endDateStr")
+          Future.successful(
+            InternalServerError(Json.obj("error" -> "Error input parameters provided"))
+          )
 
-    }
+      }
 
   }
 

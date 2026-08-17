@@ -28,8 +28,7 @@ import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class StatuteRuleConnector @Inject()(http: HttpClientV2,
-                                     config: ServicesConfig)(implicit ec: ExecutionContext)
+class StatuteRuleConnector @Inject() (http: HttpClientV2, config: ServicesConfig)(implicit ec: ExecutionContext)
     extends Logging {
 
   private val stubEnabled: Boolean = config.getBoolean("features.corporation-tax-stub-enabled")
@@ -41,9 +40,9 @@ class StatuteRuleConnector @Inject()(http: HttpClientV2,
       config.baseUrl("rds-datacache-proxy") + "/rds-datacache-proxy"
     }
 
-  def getStatueRule(ruleRateKey: String,
-        startDateStr: String, endDateStr: String)
-                   (implicit hc: HeaderCarrier): Future[Option[StatuteRule]] = {
+  def getStatueRule(ruleRateKey: String, startDateStr: String, endDateStr: String)(implicit
+    hc: HeaderCarrier
+  ): Future[Option[StatuteRule]] = {
     val url: URL = url"$dataProxyPath/corporation-tax/statue-rule/$ruleRateKey/$startDateStr/$endDateStr"
 
     http
