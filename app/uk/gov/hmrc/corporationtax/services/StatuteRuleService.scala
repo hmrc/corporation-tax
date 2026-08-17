@@ -18,7 +18,7 @@ package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.StatuteRuleConnector
-import uk.gov.hmrc.corporationtax.models.{StatuteRuleItem, StatuteRuleRecord, StatuteRuleResponse}
+import uk.gov.hmrc.corporationtax.models.*
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -37,7 +37,7 @@ class StatuteRuleService @Inject()(
       ruleAmount = e.ruleAmount.getOrElse(BigDecimal(0)),
       ruleRate = e.ruleRate.getOrElse(BigDecimal(0))
     )
-    StatuteRuleResponse(statuteRule = Some(record))
+    StatuteRuleResponse(statuteRule = record)
   }
 
   def getStatueRule(ruleRateKey: String,
@@ -47,7 +47,13 @@ class StatuteRuleService @Inject()(
     logger.info(s"[StatuteRuleConnector][getStatueRule]: $ruleRateKey :: $startDateStr - $endDateStr")
     connector
       .getStatueRule(ruleRateKey, startDateStr, endDateStr)
-      .map(e => e.statuteRule.map(transform))
+      .collect{
+        case Some(StatuteRule(item)) =>
+          Some(
+            transform(item)
+          )
+        case None => None
+      }
 
   }
 

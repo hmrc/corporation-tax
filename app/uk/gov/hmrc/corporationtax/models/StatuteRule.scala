@@ -33,7 +33,7 @@ object StatuteRuleItem {
   implicit val format: OFormat[StatuteRuleItem] = Json.format[StatuteRuleItem]
 }
 
-case class StatuteRule(statuteRule: Option[StatuteRuleItem])
+case class StatuteRule(statuteRule: StatuteRuleItem)
 
 object StatuteRule {
   implicit val format: OFormat[StatuteRule] = Json.format[StatuteRule]
@@ -53,7 +53,7 @@ object StatuteRuleRecord {
   implicit val format: OFormat[StatuteRuleRecord] = Json.format[StatuteRuleRecord]
 }
 
-case class StatuteRuleResponse(statuteRule: Option[StatuteRuleRecord])
+case class StatuteRuleResponse(statuteRule: StatuteRuleRecord)
 
 object StatuteRuleResponse {
   implicit val format: OFormat[StatuteRuleResponse] = Json.format[StatuteRuleResponse]

@@ -53,9 +53,7 @@ class StatuteRuleController @Inject()(
                 Json.toJson(responseRecord)
               )
             case None =>
-              NotFound(
-                Json.toJson(StatuteRuleResponse(None))
-              )
+              NotFound
           }
           .recover { case ex: Exception =>
             logger.error("Error while retrieving tax transactions", ex)
