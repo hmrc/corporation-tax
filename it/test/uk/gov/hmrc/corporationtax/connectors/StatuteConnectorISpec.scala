@@ -106,32 +106,10 @@ class StatuteConnectorISpec
       result mustBe Some(StatuteRule(recordWithEmptyFields))
     }
 
-    /*
-
-    "return Penalties list (two items) from BE with status code OK" in {
-      stubFor(
-        get(urlPathEqualTo(url(1L, 5L)))
-          .willReturn(
-            aResponse()
-              .withStatus(OK)
-              .withBody(
-                s"""{
-                   |"penaltyTransactions":
-                   |[
-                   |  {"penaltyDate":"2025-05-01","type":"F","postingAmount":100.13 },
-                   |  {"penaltyDate":"2021-03-07","type":"G","postingAmount":29.13 }
-                   |]}""".stripMargin
-              )
-          )
-      )
-
-      val result = connector.getPenaltyTransactionList(1L, 5L).futureValue
-      result.penaltyTransactions must contain allElementsOf penaltiesSingleItemList.penaltyTransactions
-    }
 
     "return INTERNAL_ERROR when service failed" in {
       stubFor(
-        get(urlPathEqualTo(url(1L, 5L)))
+        get(urlPathEqualTo(url("C1", "1999-01-19", "1999-07-20")))
           .willReturn(
             aResponse()
               .withStatus(INTERNAL_SERVER_ERROR)
@@ -144,11 +122,10 @@ class StatuteConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getPenaltyTransactionList(1L, 5L).futureValue
+        connector.getStatueRule("C1", "1999-01-19", "1999-07-20").futureValue
       }
       ex.getMessage.toLowerCase must include("error")
     }
 
-     */
   }
 }
