@@ -34,7 +34,7 @@ case object ReallocationFrom extends ReallocationTransactionType {
 
 object ReallocationTransactionType {
 
-  val values: Seq[ReallocationTransactionType] = Seq(MiscellaneousTransfer, ReallocationTo)
+  val values: Seq[ReallocationTransactionType] = Seq(MiscellaneousTransfer, ReallocationTo, ReallocationFrom)
 
   private def fromString(value: String): Option[ReallocationTransactionType] =
     values.find(_.value == value)
