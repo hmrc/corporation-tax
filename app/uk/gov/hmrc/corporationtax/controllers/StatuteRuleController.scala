@@ -58,7 +58,7 @@ class StatuteRuleController @Inject() (
             }
             .recover { case ex: Exception =>
               logger.error("Error while retrieving tax transactions", ex)
-              InternalServerError(Json.obj("error" -> "Failed to retrieve accounting period details"))
+              InternalServerError(Json.obj("error" -> "Failed to retrieve StatueRule"))
             }
         case (_, _)               =>
           logger.error(s"Error input parameters provided: $ruleRateKey-$startDateStr-$endDateStr")
