@@ -31,18 +31,14 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class StatuteRuleServiceSpec
-  extends AnyWordSpec
-    with Matchers
-    with StatuteRuleHelper
-    with ScalaFutures {
+class StatuteRuleServiceSpec extends AnyWordSpec with Matchers with StatuteRuleHelper with ScalaFutures {
 
   private trait Fixture {
     val mockStatuteRuleConnector: StatuteRuleConnector = mock[StatuteRuleConnector]
 
-    val cc = Helpers.stubControllerComponents()
+    val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val hc: HeaderCarrier    = HeaderCarrier()
 
     val service =
       new StatuteRuleService(mockStatuteRuleConnector)
@@ -81,5 +77,5 @@ class StatuteRuleServiceSpec
 
     verify(mockStatuteRuleConnector).getStatueRule("C", "1991-04-19", "1992-06-20")(hc)
   }
-  
+
 }
