@@ -38,13 +38,13 @@ class StatuteRuleControllerSpec extends AnyWordSpec with Matchers with StatuteRu
   private trait Fixture {
     val mockStatuteRuleService: StatuteRuleService = mock[StatuteRuleService]
 
-    val cc = Helpers.stubControllerComponents()
+    val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val hc: HeaderCarrier    = HeaderCarrier()
 
-    val fakeRequest = FakeRequest("GET", "/")
+    val fakeRequest     = FakeRequest("GET", "/")
     val fakePostRequest = FakeRequest("GET", "/WrongUrl")
-    val controller = new StatuteRuleController(Helpers.stubControllerComponents(), mockStatuteRuleService)
+    val controller      = new StatuteRuleController(Helpers.stubControllerComponents(), mockStatuteRuleService)
   }
 
   "GET /" should {
@@ -82,7 +82,7 @@ class StatuteRuleControllerSpec extends AnyWordSpec with Matchers with StatuteRu
       val result: Future[Result] = controller
         .getStatueRule("C", "1991-04-19", "1992-06-20")(fakeRequest)
 
-      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve StatueRule"
 
       verify(mockStatuteRuleService)
@@ -96,7 +96,7 @@ class StatuteRuleControllerSpec extends AnyWordSpec with Matchers with StatuteRu
       val result: Future[Result] = controller
         .getStatueRule("C", "1991-04", "1992-06")(fakeRequest)
 
-      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
       (contentAsJson(result) \ "error").as[String] shouldBe "Error input parameters provided"
 
       verify(mockStatuteRuleService, times(0))
