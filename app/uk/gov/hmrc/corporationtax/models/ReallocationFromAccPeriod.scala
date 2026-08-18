@@ -48,7 +48,7 @@ case class TransformedReallocationFromAccDetails(
   reallocationDate: LocalDate,
   destinationApEndDate: String,
   destinationTaxPayerReference: String,
-  transactionType: TransactionTypesOfGetReallocationFromAcc
+  transactionType: ReallocationTransactionType
 )
 
 object TransformedReallocationFromAccDetails {

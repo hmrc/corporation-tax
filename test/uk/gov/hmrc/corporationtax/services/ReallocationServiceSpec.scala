@@ -26,7 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.test.Helpers
 import uk.gov.hmrc.corporationtax.connectors.ReallocationsConnector
 import uk.gov.hmrc.corporationtax.helpers.ReallocationDataHelper
-import uk.gov.hmrc.corporationtax.models.Reallocations
+import uk.gov.hmrc.corporationtax.models.ReallocationToAccPeriod
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,30 +43,94 @@ class ReallocationServiceSpec extends AnyWordSpec with Matchers with ScalaFuture
     val service = new ReallocationService(mockReallocationsConnector)
 
   }
+  "ReallocationService.getByAccountingPeriod" should {
+    "returns list of ReallocationsToAccPeriod from connector " in new Fixture {
 
-  "getByAccountingPeriod returns list of Reallocations from connector" in new Fixture {
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(reallocationsTwoItems))
 
-    when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(reallocationsTwoItems))
+      val result: ReallocationToAccPeriod = service.getByAccountingPeriod(1L, 1L).futureValue
 
-    val result: Reallocations = service.getByAccountingPeriod(1L, 1L).futureValue
+      result shouldBe reallocationsToAccPeriodTwoItems
 
-    result shouldBe reallocationsExpected
+      verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
+    }
+    "returns empty of ReallocationsToAccPeriod from connector" in new Fixture {
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(reallocationEmptyList))
 
-    verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
-  }
+      val result: ReallocationToAccPeriod = service.getByAccountingPeriod(1L, 1L).futureValue
 
-  "getByAccountingPeriod returns failure from connector" in new Fixture {
+      result shouldBe reallocationToAccPeriodEmptyList
 
-    val error = new RuntimeException("Simulate error")
-    when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
-      .thenReturn(Future.failed(error))
+      verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
+    }
+    "returns ReallocationsToAccPeriod with sourceApEndDate = emptyString when sourceApEndDate is not defined in Reallocations " in new Fixture {
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(reallocationWithNoSourceApEndDate))
 
-    val result: Throwable = service.getByAccountingPeriod(1L, 1L).failed.futureValue
+      val result: ReallocationToAccPeriod = service.getByAccountingPeriod(1L, 1L).futureValue
 
-    result shouldBe error
+      result shouldBe reallocationToAccPeriodWithEmptySourceApEndDate
 
-    verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
+      verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
+    }
+    // Business Function -F32 - Get Reallocation To Accounting Period
+    "returns ReallocationToAccPeriod with transactionType = MiscTFR when sourceTaxPayerReference is OASTransfer" in new Fixture {
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(reallocationWithSourceTaxOASTransfer))
+
+      val result: ReallocationToAccPeriod = service.getByAccountingPeriod(1L, 1L).futureValue
+
+      result shouldBe reallocationToAccPeriodSingleItemMisc
+
+      verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
+
+    }
+    "returns ReallocationToAccPeriod with transactionType = MiscTFR when sourceTaxPayerReference is different from requestedTaxPayerReference" in new Fixture {
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(reallocationsWithSourceTaxRefDifferentToTaxRef))
+
+      val result: ReallocationToAccPeriod = service.getByAccountingPeriod(1542L, 1L).futureValue
+
+      result shouldBe reallocationsToAccPeriodWithTransactionTypeMisc
+
+      verify(mockReallocationsConnector).getByAccountingPeriod(1542L, 1L)(hc)
+
+    }
+    "returns ReallocationToAccPeriod with transactionType = MiscTFR when sourceTaxPayerReference = requestedTaxPayerReference and sourceApEndDate is empty" in new Fixture {
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(reallocationsWithSourceAPEndDateNotDefined))
+
+      val result: ReallocationToAccPeriod = service.getByAccountingPeriod(87L, 1L).futureValue
+
+      result shouldBe reallocationsToAccPeriodWithTransactionTypeMiscFR
+
+      verify(mockReallocationsConnector).getByAccountingPeriod(87L, 1L)(hc)
+
+    }
+    "returns ReallocationToAccPeriod with transactionType = RFR when sourceTaxPayerReference = requestedTaxPayerReference and sourceApEndDate is not empty" in new Fixture {
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(reallocationWithEqualSourceTaxRefAndTaxRef))
+
+      val result: ReallocationToAccPeriod = service.getByAccountingPeriod(88, 1L).futureValue
+
+      result shouldBe reallocationToAccPeriodWithTransactionTypeRFR
+
+      verify(mockReallocationsConnector).getByAccountingPeriod(88L, 1L)(hc)
+
+    }
+    "returns failure from connector" in new Fixture {
+      val error = new RuntimeException("Simulate error")
+      when(mockReallocationsConnector.getByAccountingPeriod(any[Long], any[Long])(any[HeaderCarrier]))
+        .thenReturn(Future.failed(error))
+
+      val result: Throwable = service.getByAccountingPeriod(1L, 1L).failed.futureValue
+
+      result shouldBe error
+
+      verify(mockReallocationsConnector).getByAccountingPeriod(1L, 1L)(hc)
+    }
   }
 
 }

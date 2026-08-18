@@ -18,35 +18,38 @@ package uk.gov.hmrc.corporationtax.models
 
 import play.api.libs.json.*
 
-sealed trait TransactionTypesOfGetReallocationFromAcc {
+sealed trait ReallocationTransactionType {
   def value: String
 }
 
-case object MiscellaneousTransfer extends TransactionTypesOfGetReallocationFromAcc {
+case object MiscellaneousTransfer extends ReallocationTransactionType {
   override def value: String = "MiscTFR"
 }
-case object ReallocationTo extends TransactionTypesOfGetReallocationFromAcc {
+case object ReallocationTo extends ReallocationTransactionType {
   override def value: String = "RTO"
 }
+case object ReallocationFrom extends ReallocationTransactionType {
+  override def value: String = "RFR"
+}
 
-object TransactionTypesOfGetReallocationFromAcc {
+object ReallocationTransactionType {
 
-  val values: Seq[TransactionTypesOfGetReallocationFromAcc] = Seq(MiscellaneousTransfer, ReallocationTo)
+  val values: Seq[ReallocationTransactionType] = Seq(MiscellaneousTransfer, ReallocationTo, ReallocationFrom)
 
-  private def fromString(value: String): Option[TransactionTypesOfGetReallocationFromAcc] =
+  private def fromString(value: String): Option[ReallocationTransactionType] =
     values.find(_.value == value)
 
-  implicit val reads: Reads[TransactionTypesOfGetReallocationFromAcc] =
+  implicit val reads: Reads[ReallocationTransactionType] =
     Reads {
       case JsString(s) =>
         fromString(s) match {
           case Some(s) => JsSuccess(s)
-          case None    => JsError(s"Unknown TransactionTypesOfGetReallocationFromAcc: $s")
+          case None    => JsError(s"Unknown ReallocationTransactionType: $s")
         }
 
-      case unexpected => JsError(s"Expected JsString for TransactionTypesOfGetReallocationFromAcc, got: $unexpected")
+      case unexpected => JsError(s"Expected JsString for ReallocationTransactionType, got: $unexpected")
     }
 
-  implicit val writes: Writes[TransactionTypesOfGetReallocationFromAcc] =
+  implicit val writes: Writes[ReallocationTransactionType] =
     Writes(transactionType => JsString(transactionType.value))
 }

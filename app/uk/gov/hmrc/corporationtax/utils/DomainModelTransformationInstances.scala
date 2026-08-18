@@ -16,11 +16,14 @@
 
 package uk.gov.hmrc.corporationtax.utils
 
-import uk.gov.hmrc.corporationtax.models.BusinessConstants.destinationTaxRefOASTransfer
+import uk.gov.hmrc.corporationtax.models.BusinessConstants.OASTransfer
 import uk.gov.hmrc.corporationtax.models.{
-  MiscellaneousTransfer, RdsReallocationFromAccPeriodResponse, ReallocationTo, Repayments,
-  TransactionTypesOfGetReallocationFromAcc, TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod
+  MiscellaneousTransfer, RdsReallocationFromAccPeriodResponse, ReallocationFrom, ReallocationTo,
+  ReallocationToAccPeriod, ReallocationToAccPeriodRow, ReallocationTransactionType, Reallocations, Repayments,
+  TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod
 }
+
+import java.time.LocalDate
 
 object DomainModelTransformationInstances {
 
@@ -30,8 +33,8 @@ object DomainModelTransformationInstances {
       TransformedReallocationFromAccPeriod(
         reallocFromAcc.reallocation.map { value =>
           // Determine TransactionType for each Reallocation(BF-F31)
-          val transactionType: TransactionTypesOfGetReallocationFromAcc =
-            determineTransactionType(value.destinationTaxPayerReference, taxPayerReference)
+          val transactionType: ReallocationTransactionType =
+            reallocationFromTransactionType(value.destinationTaxPayerReference, taxPayerReference)
           TransformedReallocationFromAccDetails(
             amount = value.amount.getOrElse(BigDecimal(0.00)),
             reallocationDate = value.reallocationDate,
@@ -58,13 +61,46 @@ object DomainModelTransformationInstances {
       )
 
   // Determine TransactionType for each ReallocationFromAccPeriod(BF-F31)
-  private def determineTransactionType(
+  implicit val toReallocationToAccPeriod: TransformToDomainModel[(Reallocations, Long), ReallocationToAccPeriod] =
+    (reallocFromAcc: Reallocations, taxPayerReference: Long) =>
+      ReallocationToAccPeriod(
+        reallocFromAcc.reallocation.map { value =>
+          // Determine TransactionType for each Reallocation(BF-F32)
+          val transactionType: ReallocationTransactionType =
+            reallocationToTransactionType(value.sourceTaxpayerReference, taxPayerReference, value.sourceApEndDate)
+          ReallocationToAccPeriodRow(
+            amount = value.amount,
+            reallocationDate = value.reallocationDate,
+            sourceApEndDate = value.sourceApEndDate
+              .map(_.toString)
+              .getOrElse(""), // converting to string and assigning empty string if it's null,
+            sourceTaxpayerReference = value.sourceTaxpayerReference,
+            transactionType = transactionType
+          )
+        }
+      )
+
+  // Determine TransactionType for each ReallocationFromAccPeriod(BF-F31)
+  private def reallocationFromTransactionType(
     destinationTaxPayerRef: String,
     requestedTaxPayerRef: Long
-  ): TransactionTypesOfGetReallocationFromAcc = {
+  ): ReallocationTransactionType = {
     val taxRef: String = requestedTaxPayerRef.toString
-    if ((destinationTaxPayerRef == destinationTaxRefOASTransfer) || (destinationTaxPayerRef != taxRef))
+    if ((destinationTaxPayerRef == OASTransfer) || (destinationTaxPayerRef != taxRef))
       MiscellaneousTransfer
     else ReallocationTo
+  }
+
+  // Determine TransactionType for each ReallocationFromAccPeriod(BF-F32)
+  private def reallocationToTransactionType(
+    sourceTaxRef: String,
+    requestedTaxPayerRef: Long,
+    sourceApEndDate: Option[LocalDate]
+  ): ReallocationTransactionType = {
+    val taxRef: String = requestedTaxPayerRef.toString
+    if (
+      (sourceTaxRef == OASTransfer) || (sourceTaxRef != taxRef) || (sourceTaxRef == taxRef && sourceApEndDate.isEmpty)
+    ) MiscellaneousTransfer
+    else ReallocationFrom
   }
 }
