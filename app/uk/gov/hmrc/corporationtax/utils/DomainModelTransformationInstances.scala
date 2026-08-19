@@ -18,8 +18,9 @@ package uk.gov.hmrc.corporationtax.utils
 
 import uk.gov.hmrc.corporationtax.models.BusinessConstants.OASTransfer
 import uk.gov.hmrc.corporationtax.models.{
-  MiscellaneousTransfer, RdsReallocationFromAccPeriodResponse, ReallocationFrom, ReallocationTo,
-  ReallocationToAccPeriod, ReallocationToAccPeriodRow, ReallocationTransactionType, Reallocations, Repayments,
+  AccountingPeriods, AccountingPeriodsRowResponse, MiscellaneousTransfer, RdsAccountingPeriod,
+  RdsReallocationFromAccPeriodResponse, ReallocationFrom, ReallocationTo, ReallocationToAccPeriod,
+  ReallocationToAccPeriodRow, ReallocationTransactionType, Reallocations, Repayments,
   TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod
 }
 
@@ -80,6 +81,27 @@ object DomainModelTransformationInstances {
         }
       )
 
+  implicit val toAccountingPeriods: TransformToDomainModel[RdsAccountingPeriod, AccountingPeriods] =
+    (rdsAccountingPeriods: RdsAccountingPeriod) =>
+      AccountingPeriods(
+        rdsAccountingPeriods.accountingPeriods.map { value =>
+          AccountingPeriodsRowResponse(
+            accountingPeriod = value.accountingPeriod,
+            apStartDate = value.apStartDate,
+            apEndDate = value.apEndDate,
+            apStatus = value.apStatus,
+            taxChargePresent = value.taxChargePresent,
+            clericalIntSig = value.clericalIntSig,
+            creditDebitInterestInd = value.creditDebitInterestInd,
+            taxTotal = AmountTransformation(value.taxTotal),
+            interestTotal = AmountTransformation(value.interestTotal),
+            penaltyTotal = AmountTransformation(value.penaltyTotal),
+            payslipTotal = AmountTransformation(value.payslipTotal),
+            repayReallocTotal = AmountTransformation(value.repayReallocTotal),
+            adjustmentTotal = AmountTransformation(value.adjustmentTotal)
+          )
+        }
+      )
   // Determine TransactionType for each ReallocationFromAccPeriod(BF-F31)
   private def reallocationFromTransactionType(
     destinationTaxPayerRef: String,
