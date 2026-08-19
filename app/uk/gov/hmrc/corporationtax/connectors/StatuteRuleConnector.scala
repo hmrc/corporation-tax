@@ -43,7 +43,7 @@ class StatuteRuleConnector @Inject() (http: HttpClientV2, config: ServicesConfig
   def getStatueRule(ruleRateKey: String, startDateStr: String, endDateStr: String)(implicit
     hc: HeaderCarrier
   ): Future[Option[StatuteRule]] = {
-    val url: URL = url"$dataProxyPath/corporation-tax/statue-rule/$ruleRateKey/$startDateStr/$endDateStr"
+    val url: URL = url"$dataProxyPath/corporation-tax/statute-rule?ruleKey=$ruleRateKey&startDate=$startDateStr&endDate=$endDateStr"
 
     http
       .get(url)

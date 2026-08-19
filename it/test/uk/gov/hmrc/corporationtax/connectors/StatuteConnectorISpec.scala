@@ -28,7 +28,7 @@ import uk.gov.hmrc.corporationtax.testdata.StatuteRuleHelper
 import uk.gov.hmrc.http.HeaderCarrier
 
 class StatuteConnectorISpec
-    extends AnyWordSpec
+  extends AnyWordSpec
     with Matchers
     with ScalaFutures
     with IntegrationPatience
@@ -43,11 +43,11 @@ class StatuteConnectorISpec
   "getStatueRule" should {
 
     def url(ruleRateKey: String, startDateStr: String, endDateStr: String) =
-      s"/rds-datacache-proxy/corporation-tax/statue-rule/$ruleRateKey/$startDateStr/$endDateStr"
+      s"/rds-datacache-proxy/corporation-tax/statute-rule?ruleKey=$ruleRateKey&startDate=$startDateStr&endDate=$endDateStr"
 
     "return no StatuteRule record" in {
       stubFor(
-        get(urlPathEqualTo(url("C1", "1999-01-19", "1999-07-20")))
+        get(urlEqualTo(url("C1", "1999-01-19", "1999-07-20")))
           .willReturn(
             aResponse()
               .withStatus(NOT_FOUND)
@@ -61,7 +61,7 @@ class StatuteConnectorISpec
 
     "return StatuteRule default" in {
       stubFor(
-        get(urlPathEqualTo(url("C1", "1999-01-19", "1999-07-20")))
+        get(urlEqualTo(url("C2", "1999-01-19", "1999-07-20")))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -79,13 +79,13 @@ class StatuteConnectorISpec
           )
       )
 
-      val result = connector.getStatueRule("C1", "1999-01-19", "1999-07-20").futureValue
+      val result = connector.getStatueRule("C2", "1999-01-19", "1999-07-20").futureValue
       result mustBe Some(StatuteRule(defaultRecord))
     }
 
     "return StatuteRule record with empty fields" in {
       stubFor(
-        get(urlPathEqualTo(url("C1", "1999-01-19", "1999-07-20")))
+        get(urlEqualTo(url("C1", "1999-01-19", "1999-07-20")))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -105,7 +105,7 @@ class StatuteConnectorISpec
 
     "return INTERNAL_ERROR when service failed" in {
       stubFor(
-        get(urlPathEqualTo(url("C1", "1999-01-19", "1999-07-20")))
+        get(urlEqualTo(url("C1", "1999-01-19", "1999-07-20")))
           .willReturn(
             aResponse()
               .withStatus(INTERNAL_SERVER_ERROR)
@@ -122,6 +122,5 @@ class StatuteConnectorISpec
       }
       ex.getMessage.toLowerCase must include("error")
     }
-
   }
 }
