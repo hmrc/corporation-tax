@@ -27,29 +27,42 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.util.Try
 
-// TODO: apply auth when its ready
 
-class PenaltiesController @Inject() (
-  cc: ControllerComponents,
-  service: PenaltiesService
-)(implicit ec: ExecutionContext)
-    extends BackendController(cc)
+class PenaltiesController @Inject()(
+                                     cc: ControllerComponents,
+                                     service: PenaltiesService
+                                   )(implicit ec: ExecutionContext)
+  extends BackendController(cc)
     with Logging {
 
   def getPenaltyTransactionList(
-    taxRef: Long,
-    accPeriod: Long,
-    accountingPeriodEndDateMaybe: String
-  ): Action[AnyContent] = Action.async { implicit request =>
-    service
-      .getPenaltyTransactionList(taxRef, accPeriod, Try(LocalDate.parse(accountingPeriodEndDateMaybe)).toOption)
-      .map { penalties =>
-        Ok(Json.toJson(penalties))
-      }
-      .recover { case ex: Exception =>
-        logger.error("Error while retrieving penalties", ex)
-        InternalServerError(Json.obj("error" -> "Failed to retrieve penalties"))
-      }
+                                 taxRef: Long,
+                                 accPeriod: Long,
+                                 endDateMaybe: Option[String]
+                               ): Action[AnyContent] = Action.async { implicit request =>
+    endDateMaybe match {
+      case Some(endDateStr) =>
+        service
+          .getPenaltyTransactionList(taxRef, accPeriod, Try{ LocalDate.parse(endDateStr) }.toOption )
+          .map { penalties =>
+            Ok(Json.toJson(penalties))
+          }
+          .recover { case ex: Exception =>
+              logger.error("Error while retrieving penalties", ex)
+              InternalServerError(Json.obj("error" -> "Failed to retrieve penalties: 11"))
+          }
+      case None =>
+        service
+          .getPenaltyTransactionList(taxRef, accPeriod, None )
+          .map { penalties =>
+            Ok(Json.toJson(penalties))
+          }
+          .recover { case ex: Exception =>
+            logger.error("Error while retrieving penalties", ex)
+            InternalServerError(Json.obj("error" -> "Failed to retrieve penalties: 11"))
+          }
+    }
+
   }
 
 }
