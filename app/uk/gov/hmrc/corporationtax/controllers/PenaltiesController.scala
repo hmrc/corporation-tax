@@ -47,7 +47,7 @@ class PenaltiesController @Inject()(
       }
       .recover { case ex: Exception =>
         logger.error("Error while retrieving penalties", ex)
-        InternalServerError(Json.obj("error" -> s"Failed to retrieve penalties: $ex"))
+        InternalServerError(Json.obj("error" -> s"Failed to retrieve penalties"))
       }
   }
 
