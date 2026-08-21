@@ -18,16 +18,15 @@ package uk.gov.hmrc.corporationtax.controllers
 
 import play.api.Logging
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.corporationtax.services.PenaltiesService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import java.time.LocalDate
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
-
-// TODO: apply auth when its ready
 
 class PenaltiesController @Inject() (
   cc: ControllerComponents,
@@ -36,20 +35,41 @@ class PenaltiesController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def getPenaltyTransactionList(
-    taxRef: Long,
-    accPeriod: Long,
-    accountingPeriodEndDateMaybe: String
-  ): Action[AnyContent] = Action.async { implicit request =>
+  private def callPenaltiesService(taxRef: Long, accPeriod: Long, endDate: Option[LocalDate])(implicit
+    hc: HeaderCarrier
+  ): Future[Result] =
     service
-      .getPenaltyTransactionList(taxRef, accPeriod, Try(LocalDate.parse(accountingPeriodEndDateMaybe)).toOption)
+      .getPenaltyTransactionList(taxRef, accPeriod, endDate)
       .map { penalties =>
         Ok(Json.toJson(penalties))
       }
       .recover { case ex: Exception =>
         logger.error("Error while retrieving penalties", ex)
-        InternalServerError(Json.obj("error" -> "Failed to retrieve penalties"))
+        InternalServerError(Json.obj("error" -> s"Failed to retrieve penalties"))
       }
+
+  def getPenaltyTransactionList(
+    taxRef: Long,
+    accPeriod: Long,
+    endDateMaybe: Option[String]
+  ): Action[AnyContent] = Action.async { implicit request =>
+    endDateMaybe match {
+      case Some(endDateStr) =>
+        Try {
+          LocalDate.parse(endDateStr)
+        }.toOption match {
+          case Some(endDate) =>
+            callPenaltiesService(taxRef, accPeriod, Some(endDate))
+          case None          =>
+            logger.error("Error while retrieving penalties: date conversion error")
+            Future.successful {
+              InternalServerError(Json.obj("error" -> "Failed to retrieve penalties: date conversion error"))
+            }
+        }
+      case None             =>
+        callPenaltiesService(taxRef, accPeriod, None)
+    }
+
   }
 
 }
