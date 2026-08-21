@@ -18,22 +18,22 @@ package uk.gov.hmrc.corporationtax.models
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{JsError, JsNumber, JsString, JsSuccess, Json}
+import play.api.libs.json.*
 
 import java.time.LocalDate
 
-class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matchers {
+class ReallocationToAccPeriodRowSpec extends AnyWordSpec with Matchers {
 
-  "TransformedReallocationFromAccDetails" should {
+  "ReallocationToAccPeriod"     should {
     "serialize to JSON correctly" in {
-      val details = TransformedReallocationFromAccPeriod(
+      val details = ReallocationToAccPeriod(
         reallocation = List(
-          TransformedReallocationFromAccDetails(
+          ReallocationToAccPeriodRow(
             amount = BigDecimal(1234.56),
             reallocationDate = LocalDate.of(2024, 1, 15),
-            destinationApEndDate = "2024-12-31",
-            destinationTaxPayerReference = "123",
-            transactionType = ReallocationTo
+            sourceApEndDate = "2024-12-31",
+            sourceTaxpayerReference = "123",
+            transactionType = ReallocationFrom
           )
         )
       )
@@ -49,24 +49,24 @@ class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matcher
            |{
            |"amount" : 1234.56,
            |"reallocationDate" : "2024-01-15",
-           |"destinationApEndDate" : "2024-12-31",
-           |"destinationTaxPayerReference" : "123",
-           |"transactionType" : "RTO"
+           |"sourceApEndDate" : "2024-12-31",
+           |"sourceTaxpayerReference" : "123",
+           |"transactionType" : "RFR"
            |}
            |]
            |}
            |""".stripMargin
       )
     }
-    "serialize to JSON correctly when destinationApEndDate is empty " in {
-      val details = TransformedReallocationFromAccPeriod(
+    "serialize to JSON correctly when sourceApEndDate is empty " in {
+      val details = ReallocationToAccPeriod(
         reallocation = List(
-          TransformedReallocationFromAccDetails(
+          ReallocationToAccPeriodRow(
             amount = BigDecimal(1234.56),
             reallocationDate = LocalDate.of(2024, 1, 15),
-            destinationApEndDate = "",
-            destinationTaxPayerReference = "123",
-            transactionType = ReallocationTo
+            sourceApEndDate = "",
+            sourceTaxpayerReference = "123",
+            transactionType = ReallocationFrom
           )
         )
       )
@@ -82,9 +82,9 @@ class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matcher
            |{
            |"amount" : 1234.56,
            |"reallocationDate" : "2024-01-15",
-           |"destinationApEndDate" : "",
-           |"destinationTaxPayerReference" : "123",
-           |"transactionType" : "RTO"
+           |"sourceApEndDate" : "",
+           |"sourceTaxpayerReference" : "123",
+           |"transactionType" : "RFR"
            |}
            |]
            |}
@@ -92,7 +92,7 @@ class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matcher
       )
     }
     "de-serialize from JSON correctly" in {
-      val json           = Json.parse(
+      val json         = Json.parse(
         s"""
            |
            |{
@@ -101,40 +101,40 @@ class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matcher
            |{
            |"amount" : 1234.56,
            |"reallocationDate" : "2024-01-15",
-           |"destinationApEndDate" : "2024-12-31",
-           |"destinationTaxPayerReference" : "123",
-           |"transactionType" : "RTO"
+           |"sourceApEndDate" : "2024-12-31",
+           |"sourceTaxpayerReference" : "123",
+           |"transactionType" : "RFR"
            |},
            |{
            |"amount" : 0.00,
            |"reallocationDate" : "2024-01-15",
-           |"destinationApEndDate" : "2024-12-31",
-           |"destinationTaxPayerReference" : "123",
+           |"sourceApEndDate" : "2024-12-31",
+           |"sourceTaxpayerReference" : "123",
            |"transactionType" : "MiscTFR"
            |}
            |]
            |}
            |""".stripMargin
       )
-      val reallocFromAcc = TransformedReallocationFromAccPeriod(
+      val reallocToAcc = ReallocationToAccPeriod(
         reallocation = List(
-          TransformedReallocationFromAccDetails(
+          ReallocationToAccPeriodRow(
             amount = BigDecimal(1234.56),
             reallocationDate = LocalDate.of(2024, 1, 15),
-            destinationApEndDate = "2024-12-31",
-            destinationTaxPayerReference = "123",
-            transactionType = ReallocationTo
+            sourceApEndDate = "2024-12-31",
+            sourceTaxpayerReference = "123",
+            transactionType = ReallocationFrom
           ),
-          TransformedReallocationFromAccDetails(
+          ReallocationToAccPeriodRow(
             amount = BigDecimal(0.00),
             reallocationDate = LocalDate.of(2024, 1, 15),
-            destinationApEndDate = "2024-12-31",
-            destinationTaxPayerReference = "123",
+            sourceApEndDate = "2024-12-31",
+            sourceTaxpayerReference = "123",
             transactionType = MiscellaneousTransfer
           )
         )
       )
-      Json.fromJson[TransformedReallocationFromAccPeriod](json) shouldBe JsSuccess(reallocFromAcc)
+      Json.fromJson[ReallocationToAccPeriod](json) shouldBe JsSuccess(reallocToAcc)
 
     }
     "fail to deserialize when transactionType field is missing" in {
@@ -147,14 +147,14 @@ class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matcher
            |{
            |"amount" : 1234.56,
            |"reallocationDate" : "2024-01-15",
-           |"destinationApEndDate" : "2024-12-31",
-           |"destinationTaxPayerReference" : "123"
+           |"sourceApEndDate" : "2024-12-31",
+           |"sourceTaxpayerReference" : "123"
            |}
            |]
            |}
            |""".stripMargin
       )
-      json.validate[TransformedReallocationFromAccDetails] shouldBe a[JsError]
+      json.validate[ReallocationToAccPeriod] shouldBe a[JsError]
     }
     "fail to deserialize when transactionType is an unknown string" in {
       val json = Json.parse(
@@ -166,15 +166,15 @@ class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matcher
            |{
            |"amount" : 1234.56,
            |"reallocationDate" : "2024-01-15",
-           |"destinationApEndDate" : "2024-12-31",
-           |"destinationTaxPayerReference" : "123",
+           |"sourceApEndDate" : "2024-12-31",
+           |"sourceTaxpayerReference" : "123",
            |"transactionType" : "unknown-value"
            |}
            |]
            |}
            |""".stripMargin
       )
-      json.validate[TransformedReallocationFromAccDetails] shouldBe a[JsError]
+      json.validate[ReallocationToAccPeriod] shouldBe a[JsError]
     }
     "fail to deserialize when transactionType is a number" in {
       val json = Json.parse(
@@ -186,25 +186,25 @@ class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matcher
            |{
            |"amount" : 1234.56,
            |"reallocationDate" : "2024-01-15",
-           |"destinationApEndDate" : "2024-12-31",
-           |"destinationTaxPayerReference" : "123",
+           |"sourceApEndDate" : "2024-12-31",
+           |"sourceTaxpayerReference" : "123",
            |"transactionType" : 16
            |}
            |]
            |}
            |""".stripMargin
       )
-      json.validate[TransformedReallocationFromAccDetails] shouldBe a[JsError]
+      json.validate[ReallocationToAccPeriod] shouldBe a[JsError]
     }
   }
-  "ReallocationTransactionType"           should {
+  "ReallocationTransactionType" should {
 
     "write MiscellaneousTransfer as MiscTFR" in {
       Json.toJson[ReallocationTransactionType](MiscellaneousTransfer) shouldBe JsString("MiscTFR")
     }
 
-    "write ReallocationTo as RTO " in {
-      Json.toJson[ReallocationTransactionType](ReallocationTo) shouldBe JsString("RTO")
+    "write ReallocationFrom as RFR " in {
+      Json.toJson[ReallocationTransactionType](ReallocationFrom) shouldBe JsString("RFR")
     }
 
     "read MiscTFR as MiscellaneousTransfer" in {

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.corporationtax.controllers
 
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -51,11 +51,11 @@ class PenaltiesControllerSpec extends AnyWordSpec with Matchers with PenaltiesHe
 
   "GET /" should {
 
-    "return 200: OK" in new Fixture {
+    "return 200: OK when endDate provided" in new Fixture {
       when(mockPenaltiesService.getPenaltyTransactionList(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(penaltyItems))
 
-      val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L, "2025-02-01")(fakeRequest)
+      val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L, Some("2025-02-01"))(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(penaltyItems)
@@ -64,18 +64,42 @@ class PenaltiesControllerSpec extends AnyWordSpec with Matchers with PenaltiesHe
         .getPenaltyTransactionList(eqTo(1L), eqTo(2L), eqTo(Some(LocalDate.of(2025, 2, 1))))(any[HeaderCarrier])
     }
 
+    "return 200: OK when no endDate provided" in new Fixture {
+      when(mockPenaltiesService.getPenaltyTransactionList(any(), any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(penaltyItems))
+
+      val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L, None)(fakeRequest)
+      status(result) shouldBe Status.OK
+
+      contentAsJson(result) shouldBe Json.toJson(penaltyItems)
+
+      verify(mockPenaltiesService)
+        .getPenaltyTransactionList(eqTo(1L), eqTo(2L), eqTo(None))(any[HeaderCarrier])
+    }
+
     "return 500: INTERNAL_SERVER_ERROR" in new Fixture {
       when(mockPenaltiesService.getPenaltyTransactionList(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("unexpected")))
 
-      val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L, "2025-02-01")(fakeRequest)
+      val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L, Some("2025-02-01"))(fakeRequest)
       status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve penalties"
 
       verify(mockPenaltiesService).getPenaltyTransactionList(eqTo(1L), eqTo(2L), any())(any[HeaderCarrier])
     }
 
-    // TODO: implement auth failed scenario
+    "return 500: INTERNAL_SERVER_ERROR :: invalid date provided" in new Fixture {
+      when(mockPenaltiesService.getPenaltyTransactionList(any(), any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(penaltyItems))
+
+      val result: Future[Result] = controller.getPenaltyTransactionList(1L, 2L, Some("2025-02"))(fakeRequest)
+
+      status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
+      (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve penalties: date conversion error"
+
+      verify(mockPenaltiesService, times(0))
+        .getPenaltyTransactionList(eqTo(1L), eqTo(2L), eqTo(None))(any[HeaderCarrier])
+    }
 
   }
 

@@ -57,7 +57,7 @@ class ReallocationFromAccPeriodServiceSpec
 
   "ReallocationFromAccPeriodService.getReallocationFromAccPeriod" should {
 
-    "delegate to connector and successfully return RdsReallocationFromAccPeriodResponse with amount = None  and transform to TransformedReallocationFromAccPeriod to 0.00" in new BaseSetup {
+    "delegate to connector and successfully return RdsReallocationFromAccPeriodResponse with amount = None  and transform to TransformedReallocationFromAccPeriod with amount = 0.00" in new BaseSetup {
       val destinationTaxPayerReference: String = "7865"
 
       val rdsReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse =
@@ -254,7 +254,7 @@ class ReallocationFromAccPeriodServiceSpec
       verify(mockRds, times(1)).getReallocationFromAccPeriod(taxPayerReferenceNumber, accPeriod)
 
     }
-    "delegate to connector and successfully return RdsReallocationFromAccPeriodResponse and transform to TransformedReallocationFromAccPeriod with transactionType = ReallocationTo" in new BaseSetup {
+    "delegate to connector and successfully return RdsReallocationFromAccPeriodResponse(destinationTaxPayerReference = requested taxPayerReference) and transform to TransformedReallocationFromAccPeriod with transactionType = ReallocationTo" in new BaseSetup {
       val taxPayerReferenceNumber: Long = 1237L
 
       val destinationTaxPayerReference: String = "1237"

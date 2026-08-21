@@ -18,6 +18,6 @@ package uk.gov.hmrc.corporationtax.models
 
 object BusinessConstants {
 
-  val destinationTaxRefOASTransfer: String = "99"
+  val OASTransfer: String = "99"
 
 }
