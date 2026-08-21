@@ -41,7 +41,6 @@ object StatuteRule {
 
 // BE Response
 case class StatuteRuleRecord(
-  // rule~Date not used in the FE :: no need to map these in FE
   ruleStartDate: LocalDate,
   ruleEndDate: LocalDate,
   numberOfDays: Int,
