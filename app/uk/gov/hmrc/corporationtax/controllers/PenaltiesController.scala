@@ -28,15 +28,15 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class PenaltiesController @Inject()(
-                                     cc: ControllerComponents,
-                                     service: PenaltiesService
-                                   )(implicit ec: ExecutionContext)
-  extends BackendController(cc)
+class PenaltiesController @Inject() (
+  cc: ControllerComponents,
+  service: PenaltiesService
+)(implicit ec: ExecutionContext)
+    extends BackendController(cc)
     with Logging {
 
   private def callPenaltiesService(taxRef: Long, accPeriod: Long, endDate: Option[LocalDate])(implicit
-                                                                                              hc: HeaderCarrier
+    hc: HeaderCarrier
   ): Future[Result] =
     service
       .getPenaltyTransactionList(taxRef, accPeriod, endDate)
@@ -49,10 +49,10 @@ class PenaltiesController @Inject()(
       }
 
   def getPenaltyTransactionList(
-                                 taxRef: Long,
-                                 accPeriod: Long,
-                                 endDateMaybe: Option[String]
-                               ): Action[AnyContent] = Action.async { implicit request =>
+    taxRef: Long,
+    accPeriod: Long,
+    endDateMaybe: Option[String]
+  ): Action[AnyContent] = Action.async { implicit request =>
     endDateMaybe match {
       case Some(endDateStr) =>
         Try {
@@ -60,13 +60,13 @@ class PenaltiesController @Inject()(
         }.toOption match {
           case Some(endDate) =>
             callPenaltiesService(taxRef, accPeriod, Some(endDate))
-          case None =>
+          case None          =>
             logger.error("Error while retrieving penalties: date conversion error")
             Future.successful {
               InternalServerError(Json.obj("error" -> "Failed to retrieve penalties: date conversion error"))
             }
         }
-      case None =>
+      case None             =>
         callPenaltiesService(taxRef, accPeriod, None)
     }
 
