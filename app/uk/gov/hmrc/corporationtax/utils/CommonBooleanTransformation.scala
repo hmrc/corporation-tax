@@ -23,7 +23,7 @@ object CommonBooleanTransformation {
     val flagPreProcessed: String = flag.trim.toUpperCase
     flagPreProcessed match {
       case "Y" | "1" => true
-      case _         => false // Return false for ("N" , "0" or any other values)
+      case _         => false // Return false for ("N" , "0", null or any other values)
     }
 
 }
