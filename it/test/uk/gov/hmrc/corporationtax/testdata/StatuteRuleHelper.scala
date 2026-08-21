@@ -30,12 +30,16 @@ trait StatuteRuleHelper {
   )
 
   val recordWithEmptyFields = StatuteRuleItem(
+    ruleStartDate = None,
+    ruleEndDate = None,
     numberOfDays = None,
     ruleAmount = None,
     ruleRate = None
   )
 
   val defaultResponseRecord = StatuteRuleRecord(
+    ruleStartDate = None,
+    ruleEndDate = None,
     numberOfDays = 87,
     ruleAmount = BigDecimal(145.001),
     ruleRate = BigDecimal(1.47)
