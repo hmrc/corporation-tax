@@ -38,8 +38,8 @@ trait StatuteRuleHelper {
   )
 
   val defaultResponseRecord = StatuteRuleRecord(
-    ruleStartDate = None,
-    ruleEndDate = None,
+    ruleStartDate =  LocalDate.of(2011, 1, 1),
+    ruleEndDate = LocalDate.of(2012, 1, 1),
     numberOfDays = 87,
     ruleAmount = BigDecimal(145.001),
     ruleRate = BigDecimal(1.47)
