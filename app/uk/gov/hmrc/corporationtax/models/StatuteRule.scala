@@ -41,9 +41,9 @@ object StatuteRule {
 
 // BE Response
 case class StatuteRuleRecord(
-  // rule~Date not used in the FE :: no need to map these in FE
-  ruleStartDate: Option[LocalDate],
-  ruleEndDate: Option[LocalDate],
+  // rule~Date fields not used in the FE
+  //  ruleStartDate: Option[LocalDate],
+  //  ruleEndDate: Option[LocalDate],
   numberOfDays: Int,
   ruleAmount: BigDecimal,
   ruleRate: BigDecimal

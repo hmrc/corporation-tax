@@ -24,15 +24,13 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class StatuteRuleService @Inject() (
-  connector: StatuteRuleConnector
-)(implicit ec: ExecutionContext)
-    extends Logging {
+class StatuteRuleService @Inject()(
+                                    connector: StatuteRuleConnector
+                                  )(implicit ec: ExecutionContext)
+  extends Logging {
 
   private def transform(e: StatuteRuleItem): StatuteRuleResponse = {
     val record = StatuteRuleRecord(
-      ruleStartDate = e.ruleStartDate,
-      ruleEndDate = e.ruleEndDate,
       numberOfDays = e.numberOfDays.getOrElse(0),
       ruleAmount = e.ruleAmount.getOrElse(BigDecimal(0)),
       ruleRate = e.ruleRate.getOrElse(BigDecimal(0))
@@ -41,7 +39,7 @@ class StatuteRuleService @Inject() (
   }
 
   def getStatueRule(ruleRateKey: String, startDateStr: String, endDateStr: String)(implicit
-    hc: HeaderCarrier
+                                                                                   hc: HeaderCarrier
   ): Future[Option[StatuteRuleResponse]] = {
     logger.info(s"[StatuteRuleConnector][getStatueRule]: $ruleRateKey :: $startDateStr - $endDateStr")
     connector
@@ -51,7 +49,7 @@ class StatuteRuleService @Inject() (
           Some(
             transform(item)
           )
-        case None                    => None
+        case None => None
       }
 
   }
