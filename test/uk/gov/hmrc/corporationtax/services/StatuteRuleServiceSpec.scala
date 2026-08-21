@@ -26,7 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.test.Helpers
 import uk.gov.hmrc.corporationtax.connectors.StatuteRuleConnector
 import uk.gov.hmrc.corporationtax.helpers.StatuteRuleHelper
-import uk.gov.hmrc.corporationtax.models.{StatuteRule, StatuteRuleRecord, StatuteRuleResponse}
+import uk.gov.hmrc.corporationtax.models.{StatuteRule, StatuteRuleResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -67,15 +67,16 @@ class StatuteRuleServiceSpec extends AnyWordSpec with Matchers with StatuteRuleH
     verify(mockStatuteRuleConnector).getStatueRule("C", "1991-04-19", "1992-06-20")(hc)
   }
 
-  "getStatueRule returns empty record" in new Fixture {
+  "getStatueRule return an error when no date provided" in new Fixture {
     when(mockStatuteRuleConnector.getStatueRule(any[String], any[String], any[String])(any[HeaderCarrier]))
       .thenReturn(Future.successful(Some(StatuteRule(recordWithEmptyFields))))
 
-    val result: Option[StatuteRuleResponse] = service.getStatueRule("C", "1991-04-19", "1992-06-20").futureValue
+    val ex = intercept[RuntimeException] {
+      service.getStatueRule("C", "1991-04-19", "1992-06-20").futureValue
+    }
 
-    result shouldBe Some(StatuteRuleResponse(StatuteRuleRecord(None, None, 0, 0, 0)))
+    ex.getMessage should include("No ruleStartDate value found")
 
-    verify(mockStatuteRuleConnector).getStatueRule("C", "1991-04-19", "1992-06-20")(hc)
   }
 
 }
