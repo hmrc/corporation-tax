@@ -73,7 +73,7 @@ class StatuteRuleServiceSpec extends AnyWordSpec with Matchers with StatuteRuleH
 
     val result: Option[StatuteRuleResponse] = service.getStatueRule("C", "1991-04-19", "1992-06-20").futureValue
 
-    result shouldBe Some(StatuteRuleResponse(StatuteRuleRecord(None, None, 0, 0, 0)))
+    result shouldBe Some(StatuteRuleResponse(StatuteRuleRecord(0, 0, 0)))
 
     verify(mockStatuteRuleConnector).getStatueRule("C", "1991-04-19", "1992-06-20")(hc)
   }
