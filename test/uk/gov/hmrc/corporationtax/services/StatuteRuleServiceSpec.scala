@@ -67,16 +67,26 @@ class StatuteRuleServiceSpec extends AnyWordSpec with Matchers with StatuteRuleH
     verify(mockStatuteRuleConnector).getStatueRule("C", "1991-04-19", "1992-06-20")(hc)
   }
 
-  "getStatueRule return an error when no date provided" in new Fixture {
+  "getStatueRule return an error when no ruleStartDate provided" in new Fixture {
     when(mockStatuteRuleConnector.getStatueRule(any[String], any[String], any[String])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(Some(StatuteRule(recordWithEmptyFields))))
+      .thenReturn(Future.successful(Some(StatuteRule(recordWithEmptyFieldsOne))))
 
     val ex = intercept[RuntimeException] {
       service.getStatueRule("C", "1991-04-19", "1992-06-20").futureValue
     }
 
     ex.getMessage should include("No ruleStartDate value found")
+  }
 
+  "getStatueRule return an error when no ruleEndDate provided" in new Fixture {
+    when(mockStatuteRuleConnector.getStatueRule(any[String], any[String], any[String])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(Some(StatuteRule(recordWithEmptyFieldsTwo))))
+
+    val ex = intercept[RuntimeException] {
+      service.getStatueRule("C", "1991-04-19", "1992-06-20").futureValue
+    }
+
+    ex.getMessage should include("No ruleEndDate value found")
   }
 
 }

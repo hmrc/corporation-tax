@@ -29,8 +29,16 @@ trait StatuteRuleHelper {
     ruleRate = Some(BigDecimal(5.75))
   )
 
-  val recordWithEmptyFields = StatuteRuleItem(
+  val recordWithEmptyFieldsOne = StatuteRuleItem(
     ruleStartDate = None,
+    ruleEndDate = None,
+    numberOfDays = None,
+    ruleAmount = None,
+    ruleRate = None
+  )
+
+  val recordWithEmptyFieldsTwo = StatuteRuleItem(
+    ruleStartDate = Some(LocalDate.of(2011, 1, 1)),
     ruleEndDate = None,
     numberOfDays = None,
     ruleAmount = None,
