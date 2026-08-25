@@ -27,13 +27,13 @@ object RdsAccountingPeriod {
 }
 
 case class RdsAccountingPeriodsRowResponse(
-  accountingPeriod: BigDecimal,
-  apStartDate: LocalDate,
-  apEndDate: LocalDate,
-  apStatus: String,
-  taxChargePresent: Boolean,
-  clericalIntSig: Boolean,
-  creditDebitInterestInd: Boolean,
+  accountingPeriod: Option[BigDecimal],
+  apStartDate: Option[LocalDate],
+  apEndDate: Option[LocalDate],
+  apStatus: Option[String],
+  taxChargePresent: Option[String],
+  clericalIntSig: Option[String],
+  creditDebitInterestInd: Option[String],
   taxTotal: Option[BigDecimal],
   interestTotal: Option[BigDecimal],
   penaltyTotal: Option[BigDecimal],
@@ -55,8 +55,8 @@ object AccountingPeriods {
 
 case class AccountingPeriodsRowResponse(
   accountingPeriod: BigDecimal,
-  apStartDate: LocalDate,
-  apEndDate: LocalDate,
+  apStartDate: Option[LocalDate],
+  apEndDate: Option[LocalDate],
   apStatus: String,
   taxChargePresent: Boolean,
   clericalIntSig: Boolean,

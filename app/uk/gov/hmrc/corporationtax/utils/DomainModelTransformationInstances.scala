@@ -17,17 +17,13 @@
 package uk.gov.hmrc.corporationtax.utils
 
 import uk.gov.hmrc.corporationtax.models.BusinessConstants.OASTransfer
-import uk.gov.hmrc.corporationtax.models.{
-  AccountingPeriods, AccountingPeriodsRowResponse, MiscellaneousTransfer, RdsAccountingPeriod,
-  RdsReallocationFromAccPeriodResponse, ReallocationFrom, ReallocationTo, ReallocationToAccPeriod,
-  ReallocationToAccPeriodRow, ReallocationTransactionType, Reallocations, Repayments,
-  TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod
-}
+import uk.gov.hmrc.corporationtax.models.{MiscellaneousTransfer, RdsReallocationFromAccPeriodResponse, ReallocationFrom, ReallocationTo, ReallocationToAccPeriod, ReallocationToAccPeriodRow, ReallocationTransactionType, Reallocations, Repayments, TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod}
+import uk.gov.hmrc.corporationtax.utils.EmptyString.emptyString
 
 import java.time.LocalDate
 
 object DomainModelTransformationInstances {
-
+  
   implicit val toTransformedReallocationFromAccPeriod
     : TransformToDomainModel[(RdsReallocationFromAccPeriodResponse, Long), TransformedReallocationFromAccPeriod] =
     (reallocFromAcc: RdsReallocationFromAccPeriodResponse, taxPayerReference: Long) =>
@@ -41,7 +37,7 @@ object DomainModelTransformationInstances {
             reallocationDate = value.reallocationDate,
             destinationApEndDate = value.destinationApEndDate
               .map(_.toString)
-              .getOrElse(""), // converting to string and assigning empty string if it's null
+              .getOrElse(emptyString), // converting to string and assigning empty string if it's null
             destinationTaxPayerReference = value.destinationTaxPayerReference,
             transactionType = transactionType
           )
@@ -74,31 +70,9 @@ object DomainModelTransformationInstances {
             reallocationDate = value.reallocationDate,
             sourceApEndDate = value.sourceApEndDate
               .map(_.toString)
-              .getOrElse(""), // converting to string and assigning empty string if it's null,
+              .getOrElse(emptyString), // converting to string and assigning empty string if it's null,
             sourceTaxpayerReference = value.sourceTaxpayerReference,
             transactionType = transactionType
-          )
-        }
-      )
-
-  implicit val toAccountingPeriods: TransformToDomainModel[RdsAccountingPeriod, AccountingPeriods] =
-    (rdsAccountingPeriods: RdsAccountingPeriod) =>
-      AccountingPeriods(
-        rdsAccountingPeriods.accountingPeriods.map { value =>
-          AccountingPeriodsRowResponse(
-            accountingPeriod = value.accountingPeriod,
-            apStartDate = value.apStartDate,
-            apEndDate = value.apEndDate,
-            apStatus = value.apStatus,
-            taxChargePresent = value.taxChargePresent,
-            clericalIntSig = value.clericalIntSig,
-            creditDebitInterestInd = value.creditDebitInterestInd,
-            taxTotal = AmountTransformation(value.taxTotal),
-            interestTotal = AmountTransformation(value.interestTotal),
-            penaltyTotal = AmountTransformation(value.penaltyTotal),
-            payslipTotal = AmountTransformation(value.payslipTotal),
-            repayReallocTotal = AmountTransformation(value.repayReallocTotal),
-            adjustmentTotal = AmountTransformation(value.adjustmentTotal)
           )
         }
       )
