@@ -40,8 +40,8 @@ class AccountingPeriodsController @Inject() (
       .map {
         case Right(value)                              => Ok(Json.toJson(value))
         case Left(error: MissingAccountingPeriodError) =>
-          logger.warn(s"Cannot find accounting Period:  ${error.value}")
-          NotFound(Json.obj("error" -> s"Cannot find AccountingPeriods for taxRef :$taxRef"))
+          logger.warn(s"Cannot find accounting Period:${error.value}")
+          NotFound(Json.obj("error" -> s"Cannot find AccountingPeriods for taxRef:$taxRef"))
       }
       .recover {
         case u: UpstreamErrorResponse =>
