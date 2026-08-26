@@ -17,7 +17,7 @@
 package uk.gov.hmrc.corporationtax.utils
 
 object EmptyString {
-  
+
   val emptyString = ""
 
 }

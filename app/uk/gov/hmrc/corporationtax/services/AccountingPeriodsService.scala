@@ -18,7 +18,10 @@ package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.AccountingPeriodsConnector
-import uk.gov.hmrc.corporationtax.models.{AccountingPeriods, AccountingPeriodsRowResponse, MissingAccountingPeriodError, RdsAccountingPeriod, RdsAccountingPeriodsRowResponse, TransformToDomainModelError}
+import uk.gov.hmrc.corporationtax.models.{
+  AccountingPeriods, AccountingPeriodsRowResponse, MissingAccountingPeriodError, RdsAccountingPeriod,
+  RdsAccountingPeriodsRowResponse, TransformToDomainModelError
+}
 import uk.gov.hmrc.corporationtax.utils.CommonBooleanTransformation.toBool
 import uk.gov.hmrc.corporationtax.utils.AmountTransformation
 import uk.gov.hmrc.corporationtax.utils.EmptyString.emptyString
@@ -34,15 +37,18 @@ class AccountingPeriodsService @Inject (connector: AccountingPeriodsConnector)(i
   def getAccountingPeriod(
     taxRef: Long
   )(implicit hc: HeaderCarrier): Future[Either[TransformToDomainModelError, AccountingPeriods]] =
-    connector.getAccountingPeriods(taxRef).map { rdsAccountingPeriod =>
-      transformToAccountingPeriod(rdsAccountingPeriod, taxRef) match {
-        case Right(value) => 
-          Future.successful(Right(value))
-        case Left(error) =>
-          logger.error(s"Couldn't retrieve accountingPeriod for taxRef: $taxRef")
-          Future.successful(Left(error))
+    connector
+      .getAccountingPeriods(taxRef)
+      .map { rdsAccountingPeriod =>
+        transformToAccountingPeriod(rdsAccountingPeriod, taxRef) match {
+          case Right(value) =>
+            Future.successful(Right(value))
+          case Left(error)  =>
+            logger.error(s"Couldn't retrieve accountingPeriod for taxRef: $taxRef")
+            Future.successful(Left(error))
+        }
       }
-    }.flatten
+      .flatten
 
   private def transformToAccountingPeriod(
     rdsAccountingPeriod: RdsAccountingPeriod,

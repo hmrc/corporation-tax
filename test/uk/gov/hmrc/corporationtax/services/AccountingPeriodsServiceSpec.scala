@@ -27,7 +27,9 @@ import play.api.mvc.ControllerComponents
 import play.api.test.Helpers.stubControllerComponents
 import uk.gov.hmrc.corporationtax.connectors.AccountingPeriodsConnector
 import uk.gov.hmrc.corporationtax.helpers.AccountingPeriodsHelper
-import uk.gov.hmrc.corporationtax.models.{AccountingPeriods, MissingAccountingPeriodError, RdsAccountingPeriod, TransformToDomainModelError}
+import uk.gov.hmrc.corporationtax.models.{
+  AccountingPeriods, MissingAccountingPeriodError, RdsAccountingPeriod, TransformToDomainModelError
+}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -61,7 +63,8 @@ class AccountingPeriodsServiceSpec
       when(mockRds.getAccountingPeriods(eqTo(taxReferenceNumber))(any[HeaderCarrier]))
         .thenReturn(Future.successful(rdsAccountingPeriodResponse))
 
-      val result: Either[TransformToDomainModelError, AccountingPeriods] = service.getAccountingPeriod(taxReferenceNumber).futureValue
+      val result: Either[TransformToDomainModelError, AccountingPeriods] =
+        service.getAccountingPeriod(taxReferenceNumber).futureValue
 
       result shouldBe Right(accPeriodResponse)
 
@@ -72,7 +75,7 @@ class AccountingPeriodsServiceSpec
         Some(BigDecimal(-1000.8765)),
         Some(BigDecimal(-9875.8895)),
         Some(BigDecimal(100058.254222)),
-        Some(BigDecimal(0)),
+        None,
         Some(BigDecimal(-34534342.36262)),
         Some(BigDecimal(1200.00)),
         Some("N"),
@@ -94,7 +97,8 @@ class AccountingPeriodsServiceSpec
       when(mockRds.getAccountingPeriods(eqTo(taxReferenceNumber))(any[HeaderCarrier]))
         .thenReturn(Future.successful(rdsAccountingPeriodResponse))
 
-      val result: Either[TransformToDomainModelError, AccountingPeriods] = service.getAccountingPeriod(taxReferenceNumber).futureValue
+      val result: Either[TransformToDomainModelError, AccountingPeriods] =
+        service.getAccountingPeriod(taxReferenceNumber).futureValue
 
       result shouldBe Right(accPeriodResponse)
 
@@ -127,7 +131,8 @@ class AccountingPeriodsServiceSpec
       when(mockRds.getAccountingPeriods(eqTo(taxReferenceNumber))(any[HeaderCarrier]))
         .thenReturn(Future.successful(rdsAccountingPeriodResponse))
 
-      val result: Either[TransformToDomainModelError, AccountingPeriods] = service.getAccountingPeriod(taxReferenceNumber).futureValue
+      val result: Either[TransformToDomainModelError, AccountingPeriods] =
+        service.getAccountingPeriod(taxReferenceNumber).futureValue
 
       result shouldBe Right(accPeriodResponse)
 
@@ -140,7 +145,8 @@ class AccountingPeriodsServiceSpec
       when(mockRds.getAccountingPeriods(eqTo(taxReferenceNumber))(any[HeaderCarrier]))
         .thenReturn(Future.successful(rdsAccountingPeriodResponse))
 
-      val result: Either[TransformToDomainModelError, AccountingPeriods] = service.getAccountingPeriod(taxReferenceNumber).futureValue
+      val result: Either[TransformToDomainModelError, AccountingPeriods] =
+        service.getAccountingPeriod(taxReferenceNumber).futureValue
 
       result shouldBe Right(accPeriodResponse)
 
@@ -164,9 +170,12 @@ class AccountingPeriodsServiceSpec
       when(mockRds.getAccountingPeriods(eqTo(taxReferenceNumber))(any[HeaderCarrier]))
         .thenReturn(Future.successful(rdsAccountingPeriodWithNoAccPeriod))
 
-      val result: Either[TransformToDomainModelError, AccountingPeriods] = service.getAccountingPeriod(taxReferenceNumber).futureValue
+      val result: Either[TransformToDomainModelError, AccountingPeriods] =
+        service.getAccountingPeriod(taxReferenceNumber).futureValue
 
-      result shouldBe Left(MissingAccountingPeriodError(s"Cannot find accountingPeriod for taxRef : $taxReferenceNumber"))
+      result shouldBe Left(
+        MissingAccountingPeriodError(s"Cannot find accountingPeriod for taxRef : $taxReferenceNumber")
+      )
 
       verify(mockRds).getAccountingPeriods(taxReferenceNumber)(hc)
     }

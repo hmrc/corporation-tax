@@ -24,8 +24,8 @@ import java.time.LocalDate
 
 trait AccountingPeriodsHelper {
 
-  val emptyRdsAccountingPeriods: RdsAccountingPeriod = RdsAccountingPeriod(accountingPeriods = List.empty)
-  val emptyAccountingPeriods: AccountingPeriods      = AccountingPeriods(accountingPeriods = List.empty)
+  val emptyRdsAccountingPeriods: RdsAccountingPeriod          = RdsAccountingPeriod(accountingPeriods = List.empty)
+  val emptyAccountingPeriods: AccountingPeriods               = AccountingPeriods(accountingPeriods = List.empty)
   val rdsAccountingPeriodWithNoAccPeriod: RdsAccountingPeriod = RdsAccountingPeriod(accountingPeriods =
     List(
       RdsAccountingPeriodsRowResponse(
