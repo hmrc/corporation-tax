@@ -35,7 +35,7 @@ class InterestAccrualListService @Inject() (
     hc: HeaderCarrier
   ): Future[InterestAccrualList] = {
     logger.info(
-      s"[InterestAccrualListService][getInterestAccrualList] Calling InterestAccrualListConnector: taxRef: $taxRef, accPeriod: $accPeriod, interestType: $interestType"
+      s"Calling RDS InterestAccrual with params: taxRef: $taxRef, accPeriod: $accPeriod, interestType: $interestType"
     )
     connector.getInterestAccrualList(taxRef, accPeriod, interestType).map { interestAccruals =>
       interestAccruals
