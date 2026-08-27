@@ -16,14 +16,12 @@
 
 package uk.gov.hmrc.corporationtax.models
 
-import play.api.libs.json.{Format, Json}
-
+import play.api.libs.json.{Json, OFormat}
 import java.time.LocalDate
 
-case class InterestAccrualList(interestAccrualList: List[InterestAccrual])
-
+case class InterestAccrualList(interestAccruals: List[InterestAccrual])
 object InterestAccrualList {
-  implicit val format: Format[InterestAccrualList] = Json.format[InterestAccrualList]
+  implicit val format: OFormat[InterestAccrualList] = Json.format[InterestAccrualList]
 }
 
 case class InterestAccrual(
@@ -34,7 +32,6 @@ case class InterestAccrual(
   interestAmount: BigDecimal,
   apEndDate: LocalDate
 )
-
 object InterestAccrual {
-  implicit val format: Format[InterestAccrual] = Json.format[InterestAccrual]
+  implicit val format: OFormat[InterestAccrual] = Json.format[InterestAccrual]
 }

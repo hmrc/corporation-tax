@@ -39,7 +39,7 @@ class InterestAccrualListService @Inject() (
     )
     connector.getInterestAccrualList(taxRef, accPeriod, interestType).map { interestAccruals =>
       interestAccruals
-        .copy(interestAccrualList = applyAmountTransformToList(interestAccruals.interestAccrualList))
+        .copy(interestAccruals = applyAmountTransformToList(interestAccruals.interestAccruals))
     }
   }
 

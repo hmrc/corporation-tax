@@ -58,7 +58,7 @@ class InterestAccrualListConnectorISpec
       )
 
       val result = connector.getInterestAccrualList(2L, 5L, "IDE").futureValue
-      result.interestAccrualList must contain allElementsOf emptyInterestAccrualList.interestAccrualList
+      result.interestAccruals must contain allElementsOf emptyInterestAccrualList.interestAccruals
     }
 
     "return Tax Transactions list (single item) from BE with status code OK" in {
@@ -76,7 +76,7 @@ class InterestAccrualListConnectorISpec
       verify(
         getRequestedFor(urlPathEqualTo(url(1L, 5L, "IDE")))
       )
-      result.interestAccrualList must contain allElementsOf interestAccrualSingleItemList.interestAccrualList
+      result.interestAccruals must contain allElementsOf interestAccrualSingleItemList.interestAccruals
     }
 
     "return Penalties list (two items) from BE with status code OK" in {
@@ -90,7 +90,7 @@ class InterestAccrualListConnectorISpec
       )
 
       val result = connector.getInterestAccrualList(1L, 5L, "IDE").futureValue
-      result.interestAccrualList must contain allElementsOf interestAccrualList.interestAccrualList
+      result.interestAccruals must contain allElementsOf interestAccrualList.interestAccruals
     }
 
     "return failure when downstream returns INTERNAL_SERVER_ERROR" in {
