@@ -19,7 +19,6 @@ package uk.gov.hmrc.corporationtax.controllers
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.corporationtax.models.MissingAccountingPeriodError
 import uk.gov.hmrc.corporationtax.services.AccountingPeriodsService
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -37,11 +36,8 @@ class AccountingPeriodsController @Inject() (
   def getAccountingPeriods(taxRef: Long): Action[AnyContent] = Action.async { implicit request =>
     service
       .getAccountingPeriod(taxRef)
-      .map {
-        case Right(value)                              => Ok(Json.toJson(value))
-        case Left(error: MissingAccountingPeriodError) =>
-          logger.warn(s"Cannot find accounting Period:${error.value}")
-          NotFound(Json.obj("error" -> s"Cannot find AccountingPeriods for taxRef:$taxRef"))
+      .map { response =>
+        Ok(Json.toJson(response))
       }
       .recover {
         case u: UpstreamErrorResponse =>

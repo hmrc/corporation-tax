@@ -24,27 +24,8 @@ import java.time.LocalDate
 
 trait AccountingPeriodsHelper {
 
-  val emptyRdsAccountingPeriods: RdsAccountingPeriod          = RdsAccountingPeriod(accountingPeriods = List.empty)
-  val emptyAccountingPeriods: AccountingPeriods               = AccountingPeriods(accountingPeriods = List.empty)
-  val rdsAccountingPeriodWithNoAccPeriod: RdsAccountingPeriod = RdsAccountingPeriod(accountingPeriods =
-    List(
-      RdsAccountingPeriodsRowResponse(
-        accountingPeriod = None,
-        apStartDate = Some(LocalDate.of(2025, 1, 1)),
-        apEndDate = Some(LocalDate.of(2025, 12, 31)),
-        apStatus = Some("Open"),
-        taxChargePresent = Some("Y"),
-        clericalIntSig = Some("N"),
-        creditDebitInterestInd = Some("Y"),
-        taxTotal = Some(BigDecimal(-12.45)),
-        interestTotal = Some(BigDecimal(-10.45)),
-        penaltyTotal = Some(BigDecimal(12.45)),
-        payslipTotal = Some(BigDecimal(-12334.45)),
-        repayReallocTotal = Some(BigDecimal(-12.45343)),
-        adjustmentTotal = Some(BigDecimal(-1253.45))
-      )
-    )
-  )
+  val emptyRdsAccountingPeriods: RdsAccountingPeriod = RdsAccountingPeriod(accountingPeriods = List.empty)
+  val emptyAccountingPeriods: AccountingPeriods      = AccountingPeriods(accountingPeriods = List.empty)
   def rdsAccountingPeriod(
     taxTotal: Option[BigDecimal] = None,
     interestTotal: Option[BigDecimal] = None,
@@ -58,10 +39,10 @@ trait AccountingPeriodsHelper {
   ): RdsAccountingPeriod = RdsAccountingPeriod(accountingPeriods =
     List(
       RdsAccountingPeriodsRowResponse(
-        accountingPeriod = Some(BigDecimal(202501)),
-        apStartDate = Some(LocalDate.of(2025, 1, 1)),
-        apEndDate = Some(LocalDate.of(2025, 12, 31)),
-        apStatus = Some("Open"),
+        accountingPeriod = BigDecimal(202501),
+        apStartDate = LocalDate.of(2025, 1, 1),
+        apEndDate = LocalDate.of(2025, 12, 31),
+        apStatus = "Open",
         taxChargePresent = taxChargePresent,
         clericalIntSig = clericalIntSig,
         creditDebitInterestInd = creditDebitInterestInd,
@@ -73,10 +54,10 @@ trait AccountingPeriodsHelper {
         adjustmentTotal = adjustmentTotal
       ),
       RdsAccountingPeriodsRowResponse(
-        accountingPeriod = Some(BigDecimal(20501)),
-        apStartDate = Some(LocalDate.of(2025, 1, 1)),
-        apEndDate = Some(LocalDate.of(2025, 12, 31)),
-        apStatus = Some("Closed"),
+        accountingPeriod = BigDecimal(20501),
+        apStartDate = LocalDate.of(2025, 1, 1),
+        apEndDate = LocalDate.of(2025, 12, 31),
+        apStatus = "Closed",
         taxChargePresent = taxChargePresent,
         clericalIntSig = clericalIntSig,
         creditDebitInterestInd = creditDebitInterestInd,
@@ -88,10 +69,10 @@ trait AccountingPeriodsHelper {
         adjustmentTotal = adjustmentTotal
       ),
       RdsAccountingPeriodsRowResponse(
-        accountingPeriod = Some(BigDecimal(20201)),
-        apStartDate = Some(LocalDate.of(2019, 1, 1)),
-        apEndDate = Some(LocalDate.of(2025, 12, 31)),
-        apStatus = Some("Open"),
+        accountingPeriod = BigDecimal(20201),
+        apStartDate = LocalDate.of(2019, 1, 1),
+        apEndDate = LocalDate.of(2025, 12, 31),
+        apStatus = "Open",
         taxChargePresent = taxChargePresent,
         clericalIntSig = clericalIntSig,
         creditDebitInterestInd = creditDebitInterestInd,
@@ -119,8 +100,8 @@ trait AccountingPeriodsHelper {
     List(
       AccountingPeriodsRowResponse(
         accountingPeriod = BigDecimal(202501),
-        apStartDate = Some(LocalDate.of(2025, 1, 1)),
-        apEndDate = Some(LocalDate.of(2025, 12, 31)),
+        apStartDate = LocalDate.of(2025, 1, 1),
+        apEndDate = LocalDate.of(2025, 12, 31),
         apStatus = "Open",
         taxChargePresent = taxChargePresent,
         clericalIntSig = clericalIntSig,
@@ -134,8 +115,8 @@ trait AccountingPeriodsHelper {
       ),
       AccountingPeriodsRowResponse(
         accountingPeriod = BigDecimal(20501),
-        apStartDate = Some(LocalDate.of(2025, 1, 1)),
-        apEndDate = Some(LocalDate.of(2025, 12, 31)),
+        apStartDate = LocalDate.of(2025, 1, 1),
+        apEndDate = LocalDate.of(2025, 12, 31),
         apStatus = "Closed",
         taxChargePresent = taxChargePresent,
         clericalIntSig = clericalIntSig,
@@ -149,8 +130,8 @@ trait AccountingPeriodsHelper {
       ),
       AccountingPeriodsRowResponse(
         accountingPeriod = BigDecimal(20201),
-        apStartDate = Some(LocalDate.of(2019, 1, 1)),
-        apEndDate = Some(LocalDate.of(2025, 12, 31)),
+        apStartDate = LocalDate.of(2019, 1, 1),
+        apEndDate = LocalDate.of(2025, 12, 31),
         apStatus = "Open",
         taxChargePresent = taxChargePresent,
         clericalIntSig = clericalIntSig,

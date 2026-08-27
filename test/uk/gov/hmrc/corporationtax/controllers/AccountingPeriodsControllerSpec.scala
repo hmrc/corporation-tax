@@ -27,7 +27,7 @@ import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.corporationtax.helpers.AccountingPeriodsHelper
-import uk.gov.hmrc.corporationtax.models.{AccountingPeriods, MissingAccountingPeriodError}
+import uk.gov.hmrc.corporationtax.models.AccountingPeriods
 import uk.gov.hmrc.corporationtax.services.AccountingPeriodsService
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
@@ -61,7 +61,7 @@ class AccountingPeriodsControllerSpec extends AnyWordSpec with Matchers with Acc
         true
       )
       when(mockAccountingPeriodsService.getAccountingPeriod(any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Right(accPeriodResponse)))
+        .thenReturn(Future.successful(accPeriodResponse))
 
       val result: Future[Result] = controller.getAccountingPeriods(1L)(fakeRequest)
       status(result) shouldBe Status.OK
@@ -70,23 +70,12 @@ class AccountingPeriodsControllerSpec extends AnyWordSpec with Matchers with Acc
 
       verify(mockAccountingPeriodsService).getAccountingPeriod(eqTo(1L))(any[HeaderCarrier])
     }
-    "return 404 NOT_FOUND when we get Left(MissingAccountingPeriod) error " in new Setup {
-      when(mockAccountingPeriodsService.getAccountingPeriod(any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Left(MissingAccountingPeriodError("error"))))
-
-      val result: Future[Result] = controller.getAccountingPeriods(1L)(fakeRequest)
-      status(result) shouldBe Status.NOT_FOUND
-
-      (contentAsJson(result) \ "error").as[String] should include("Cannot find AccountingPeriods")
-
-      verify(mockAccountingPeriodsService).getAccountingPeriod(eqTo(1L))(any[HeaderCarrier])
-    }
     "return 200 and a successful response with empty Response of AccountingPeriods " in new Setup {
 
       val accPeriodResponse: AccountingPeriods = emptyAccountingPeriods
 
       when(mockAccountingPeriodsService.getAccountingPeriod(any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Right(accPeriodResponse)))
+        .thenReturn(Future.successful(accPeriodResponse))
 
       val result: Future[Result] = controller.getAccountingPeriods(1L)(fakeRequest)
 

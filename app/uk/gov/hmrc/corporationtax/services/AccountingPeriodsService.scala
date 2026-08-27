@@ -18,13 +18,9 @@ package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.AccountingPeriodsConnector
-import uk.gov.hmrc.corporationtax.models.{
-  AccountingPeriods, AccountingPeriodsRowResponse, MissingAccountingPeriodError, RdsAccountingPeriod,
-  RdsAccountingPeriodsRowResponse, TransformToDomainModelError
-}
-import uk.gov.hmrc.corporationtax.utils.CommonBooleanTransformation.toBool
+import uk.gov.hmrc.corporationtax.models.{AccountingPeriods, AccountingPeriodsRowResponse, RdsAccountingPeriod}
 import uk.gov.hmrc.corporationtax.utils.AmountTransformation
-import uk.gov.hmrc.corporationtax.utils.EmptyString.emptyString
+import uk.gov.hmrc.corporationtax.utils.CommonBooleanTransformation.toBool
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -36,57 +32,34 @@ class AccountingPeriodsService @Inject (connector: AccountingPeriodsConnector)(i
 
   def getAccountingPeriod(
     taxRef: Long
-  )(implicit hc: HeaderCarrier): Future[Either[TransformToDomainModelError, AccountingPeriods]] =
+  )(implicit hc: HeaderCarrier): Future[AccountingPeriods] =
     connector
       .getAccountingPeriods(taxRef)
       .map { rdsAccountingPeriod =>
-        transformToAccountingPeriod(rdsAccountingPeriod, taxRef) match {
-          case Right(value) =>
-            Future.successful(Right(value))
-          case Left(error)  =>
-            logger.error(s"Couldn't retrieve accountingPeriod for taxRef: $taxRef")
-            Future.successful(Left(error))
-        }
+        toAccountingPeriods(rdsAccountingPeriod)
       }
-      .flatten
 
-  private def transformToAccountingPeriod(
-    rdsAccountingPeriod: RdsAccountingPeriod,
-    taxRef: Long
-  ): Either[TransformToDomainModelError, AccountingPeriods] = {
-    val rowsEither: Either[TransformToDomainModelError, List[AccountingPeriodsRowResponse]] =
-      rdsAccountingPeriod.accountingPeriods.foldRight(
-        Right(Nil): Either[TransformToDomainModelError, List[AccountingPeriodsRowResponse]]
-      ) { (value, accEither) =>
-        for {
-          row <- toAccountingPeriodsRowResponse(value, taxRef)
-          acc <- accEither
-        } yield row :: acc
+  private def toAccountingPeriods(
+    rdsAccountingPeriod: RdsAccountingPeriod
+  ): AccountingPeriods =
+    AccountingPeriods(
+      accountingPeriods = rdsAccountingPeriod.accountingPeriods.map { value =>
+        AccountingPeriodsRowResponse(
+          accountingPeriod = value.accountingPeriod,
+          apStartDate = value.apStartDate,
+          apEndDate = value.apEndDate,
+          apStatus = value.apStatus,
+          taxChargePresent = value.taxChargePresent.exists(toBool),
+          clericalIntSig = value.clericalIntSig.exists(toBool),
+          creditDebitInterestInd = value.creditDebitInterestInd.exists(toBool),
+          taxTotal = AmountTransformation(value.taxTotal),
+          interestTotal = AmountTransformation(value.interestTotal),
+          penaltyTotal = AmountTransformation(value.penaltyTotal),
+          payslipTotal = AmountTransformation(value.payslipTotal),
+          repayReallocTotal = AmountTransformation(value.repayReallocTotal),
+          adjustmentTotal = AmountTransformation(value.adjustmentTotal)
+        )
       }
-    rowsEither.map(AccountingPeriods.apply)
-  }
-
-  private def toAccountingPeriodsRowResponse(
-    row: RdsAccountingPeriodsRowResponse,
-    taxRef: Long
-  ): Either[TransformToDomainModelError, AccountingPeriodsRowResponse] =
-    for {
-      accountingPeriod <-
-        row.accountingPeriod.toRight(MissingAccountingPeriodError(s"Cannot find accountingPeriod for taxRef : $taxRef"))
-    } yield AccountingPeriodsRowResponse(
-      accountingPeriod = accountingPeriod,
-      apStartDate = row.apStartDate,
-      apEndDate = row.apEndDate,
-      apStatus = row.apStatus.getOrElse(emptyString),
-      taxChargePresent = row.taxChargePresent.exists(toBool),
-      clericalIntSig = row.clericalIntSig.exists(toBool),
-      creditDebitInterestInd = row.creditDebitInterestInd.exists(toBool),
-      taxTotal = AmountTransformation(row.taxTotal),
-      interestTotal = AmountTransformation(row.interestTotal),
-      penaltyTotal = AmountTransformation(row.penaltyTotal),
-      payslipTotal = AmountTransformation(row.payslipTotal),
-      repayReallocTotal = AmountTransformation(row.repayReallocTotal),
-      adjustmentTotal = AmountTransformation(row.adjustmentTotal)
     )
 
 }
