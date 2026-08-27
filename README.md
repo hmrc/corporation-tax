@@ -5,7 +5,7 @@ This is a placeholder README.md for a new repository
 
 Service Manager: `sm2 --start DASS_CTCORE_ALL`
 
-To run all tests and coverage: `sbt clean compile coverage test it/test coverageOff coverageReport`
+To run all tests and coverage: `sbt scalafmtAll clean compile coverage test it/test coverageOff coverageReport`
 
 ### License
 
