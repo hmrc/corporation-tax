@@ -17,4 +17,4 @@ GET        /total-amount-payment-repayment-reallocation/:taxRef/:accPeriod      
 GET        /repayments/:taxRef/:accPeriod                                       uk.gov.hmrc.corporationtax.controllers.RepaymentsController.getRepayments(taxRef: Long, accPeriod: Long)
 
 GET        /accounting-periods/:taxRef                                         uk.gov.hmrc.corporationtax.controllers.AccountingPeriodsController.getAccountingPeriods(taxRef: Long)
-GET        /statute-rule/:ruleRateKey/:startDateStr/:endDateStr              uk.gov.hmrc.corporationtax.controllers.StatuteRuleController.getStatueRule(ruleRateKey, startDateStr, endDateStr)
+GET        /statute-rule             uk.gov.hmrc.corporationtax.controllers.StatuteRuleController.getStatueRule(queryParams: uk.gov.hmrc.corporationtax.queryParams.StatuteQueryParams)

@@ -21,6 +21,7 @@ import uk.gov.hmrc.corporationtax.connectors.StatuteRuleConnector
 import uk.gov.hmrc.corporationtax.models.*
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,12 +41,12 @@ class StatuteRuleService @Inject() (
     StatuteRuleResponse(statuteRule = record)
   }
 
-  def getStatueRule(ruleRateKey: String, startDateStr: String, endDateStr: String)(implicit
-    hc: HeaderCarrier
+  def getStatueRule(ruleRateKey: String, startDateStr: LocalDate, endDateStr: LocalDate)(implicit
+                                                                                      hc: HeaderCarrier
   ): Future[Option[StatuteRuleResponse]] = {
     logger.info(s"[StatuteRuleConnector][getStatueRule]: $ruleRateKey :: $startDateStr - $endDateStr")
     connector
-      .getStatueRule(ruleRateKey, startDateStr, endDateStr)
+      .getStatueRule(ruleRateKey, startDateStr.toString, endDateStr.toString)
       .collect {
         case Some(StatuteRule(item)) =>
           Some(
