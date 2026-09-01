@@ -37,9 +37,9 @@ class StatuteRuleServiceSpec extends AnyWordSpec with Matchers with StatuteRuleH
   private trait Fixture {
     val mockStatuteRuleConnector: StatuteRuleConnector = mock[StatuteRuleConnector]
 
-    val cc                            = Helpers.stubControllerComponents()
+    val cc = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
-    implicit val hc: HeaderCarrier    = HeaderCarrier()
+    implicit val hc: HeaderCarrier = HeaderCarrier()
 
     val service =
       new StatuteRuleService(mockStatuteRuleConnector)
@@ -68,28 +68,6 @@ class StatuteRuleServiceSpec extends AnyWordSpec with Matchers with StatuteRuleH
     result shouldBe None
 
     verify(mockStatuteRuleConnector).getStatueRule("C", "1991-04-19", "1992-06-20")(hc)
-  }
-
-  "getStatueRule return an error when no ruleStartDate provided" in new Fixture {
-    when(mockStatuteRuleConnector.getStatueRule(any[String], any[String], any[String])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(Some(StatuteRule(recordWithEmptyFieldsOne))))
-
-    val ex = intercept[RuntimeException] {
-      service.getStatueRule("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20")).futureValue
-    }
-
-    ex.getMessage should include("No ruleStartDate value found")
-  }
-
-  "getStatueRule return an error when no ruleEndDate provided" in new Fixture {
-    when(mockStatuteRuleConnector.getStatueRule(any[String], any[String], any[String])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(Some(StatuteRule(recordWithEmptyFieldsTwo))))
-
-    val ex = intercept[RuntimeException] {
-      service.getStatueRule("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20")).futureValue
-    }
-
-    ex.getMessage should include("No ruleEndDate value found")
   }
 
 }

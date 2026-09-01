@@ -46,16 +46,16 @@ trait StatuteRuleHelper {
   )
 
   val defaultResponseRecord = StatuteRuleRecord(
-    ruleStartDate = LocalDate.of(2011, 1, 1),
-    ruleEndDate = LocalDate.of(2012, 1, 1),
+    ruleStartDate = Some(LocalDate.of(2011, 1, 1)),
+    ruleEndDate = Some(LocalDate.of(2012, 1, 1)),
     numberOfDays = 87,
     ruleAmount = BigDecimal(145.001),
     ruleRate = BigDecimal(1.47)
   )
 
   val defaultResponseRecordWithData = StatuteRuleRecord(
-    ruleStartDate = LocalDate.parse("1999-01-18"),
-    ruleEndDate = LocalDate.parse("1999-02-14"),
+    ruleStartDate = Some(LocalDate.parse("1999-01-18")),
+    ruleEndDate = Some(LocalDate.parse("1999-02-14")),
     numberOfDays = 27,
     ruleAmount = BigDecimal(100.011),
     ruleRate = BigDecimal(5.75)
