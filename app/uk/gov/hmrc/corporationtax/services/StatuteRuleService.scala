@@ -32,8 +32,8 @@ class StatuteRuleService @Inject() (
 
   private def transform(e: StatuteRuleItem): StatuteRuleResponse = {
     val record = StatuteRuleRecord(
-      ruleStartDate = e.ruleStartDate.getOrElse(throw new Error("No ruleStartDate value found")),
-      ruleEndDate = e.ruleEndDate.getOrElse(throw new Error("No ruleEndDate value found")),
+      ruleStartDate = e.ruleStartDate,
+      ruleEndDate = e.ruleEndDate,
       numberOfDays = e.numberOfDays.getOrElse(0),
       ruleAmount = e.ruleAmount.getOrElse(BigDecimal(0)),
       ruleRate = e.ruleRate.getOrElse(BigDecimal(0))
