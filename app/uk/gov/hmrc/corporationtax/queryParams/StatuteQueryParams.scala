@@ -28,35 +28,31 @@ object StatuteQueryParams {
 
   given QueryStringBindable[StatuteQueryParams] with {
 
-    override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, StatuteQueryParams]] = {
+    override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, StatuteQueryParams]] =
       for {
         ruleKeyE   <- summon[QueryStringBindable[String]].bind("ruleKey", params)
         startDateE <- summon[QueryStringBindable[String]].bind("startDate", params)
         endDateE   <- summon[QueryStringBindable[String]].bind("endDate", params)
-      } yield {
-        (ruleKeyE, startDateE, endDateE) match
-          case (Right(ruleKey), Right(startDateE), Right(endDateE)) =>
-            val startDateLocalDateE = Try(LocalDate.parse(startDateE)).toEither
-            val endDateLocalDateE = Try(LocalDate.parse(endDateE)).toEither
-            (startDateLocalDateE, endDateLocalDateE) match {
-              case (Right(startDateLocalDate), Right(endDateLocalDate)) =>
-                Right(
-                  StatuteQueryParams(ruleKey = ruleKey, startDate = startDateLocalDate, endDate = endDateLocalDate)
-                )
-              case (_, _) =>
-                Left("Unable to bind QueryStringBindable: date conversion")
-            }
+      } yield (ruleKeyE, startDateE, endDateE) match
+        case (Right(ruleKey), Right(startDateE), Right(endDateE)) =>
+          val startDateLocalDateE = Try(LocalDate.parse(startDateE)).toEither
+          val endDateLocalDateE   = Try(LocalDate.parse(endDateE)).toEither
+          (startDateLocalDateE, endDateLocalDateE) match {
+            case (Right(startDateLocalDate), Right(endDateLocalDate)) =>
+              Right(
+                StatuteQueryParams(ruleKey = ruleKey, startDate = startDateLocalDate, endDate = endDateLocalDate)
+              )
+            case (_, _)                                               =>
+              Left("Unable to bind QueryStringBindable: date conversion")
+          }
 
-          case (_, _, _) =>
-            Left("Unable to bind QueryStringBindable: missing params")
-      }
-    }
+        case (_, _, _) =>
+          Left("Unable to bind QueryStringBindable: missing params")
 
-    override def unbind(key: String, value: StatuteQueryParams): String = {
+    override def unbind(key: String, value: StatuteQueryParams): String =
       "ruleKey=" + URLEncoder.encode(value.ruleKey, "utf-8") + "&" +
         "startDate=" + value.startDate.toString + "&" +
         "endDate=" + value.endDate.toString
-    }
 
   }
 

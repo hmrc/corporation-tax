@@ -27,29 +27,28 @@ import uk.gov.hmrc.corporationtax.queryParams.StatuteQueryParams
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class StatuteRuleController @Inject()(
-                                       cc: ControllerComponents,
-                                       service: StatuteRuleService
-                                     )(implicit ec: ExecutionContext)
-  extends BackendController(cc)
+class StatuteRuleController @Inject() (
+  cc: ControllerComponents,
+  service: StatuteRuleService
+)(implicit ec: ExecutionContext)
+    extends BackendController(cc)
     with Logging {
 
-  def getStatueRule(queryParams: StatuteQueryParams): Action[AnyContent] = Action.async {
-    implicit request =>
-      service
-        .getStatueRule(queryParams.ruleKey, queryParams.startDate, queryParams.endDate)
-        .map {
-          case Some(responseRecord) =>
-            Ok(
-              Json.toJson(responseRecord)
-            )
-          case None =>
-            NotFound
-        }
-        .recover { case ex: Exception =>
-          logger.error("Error while retrieving tax transactions", ex)
-          InternalServerError(Json.obj("error" -> "Failed to retrieve StatueRule"))
-        }
+  def getStatueRule(queryParams: StatuteQueryParams): Action[AnyContent] = Action.async { implicit request =>
+    service
+      .getStatueRule(queryParams.ruleKey, queryParams.startDate, queryParams.endDate)
+      .map {
+        case Some(responseRecord) =>
+          Ok(
+            Json.toJson(responseRecord)
+          )
+        case None                 =>
+          NotFound
+      }
+      .recover { case ex: Exception =>
+        logger.error("Error while retrieving tax transactions", ex)
+        InternalServerError(Json.obj("error" -> "Failed to retrieve StatueRule"))
+      }
   }
 
 }

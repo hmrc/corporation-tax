@@ -42,7 +42,7 @@ class StatuteRuleService @Inject() (
   }
 
   def getStatueRule(ruleRateKey: String, startDateStr: LocalDate, endDateStr: LocalDate)(implicit
-                                                                                      hc: HeaderCarrier
+    hc: HeaderCarrier
   ): Future[Option[StatuteRuleResponse]] = {
     logger.info(s"[StatuteRuleConnector][getStatueRule]: $ruleRateKey :: $startDateStr - $endDateStr")
     connector
