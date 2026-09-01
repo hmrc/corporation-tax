@@ -37,9 +37,9 @@ class StatuteRuleServiceSpec extends AnyWordSpec with Matchers with StatuteRuleH
   private trait Fixture {
     val mockStatuteRuleConnector: StatuteRuleConnector = mock[StatuteRuleConnector]
 
-    val cc = Helpers.stubControllerComponents()
+    val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val hc: HeaderCarrier    = HeaderCarrier()
 
     val service =
       new StatuteRuleService(mockStatuteRuleConnector)

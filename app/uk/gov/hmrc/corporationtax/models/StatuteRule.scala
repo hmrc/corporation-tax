@@ -22,12 +22,12 @@ import java.time.LocalDate
 
 // RDS Cache response :: incoming data
 case class StatuteRuleItem(
-                            ruleStartDate: Option[LocalDate],
-                            ruleEndDate: Option[LocalDate],
-                            numberOfDays: Option[Int],
-                            ruleAmount: Option[BigDecimal],
-                            ruleRate: Option[BigDecimal]
-                          )
+  ruleStartDate: Option[LocalDate],
+  ruleEndDate: Option[LocalDate],
+  numberOfDays: Option[Int],
+  ruleAmount: Option[BigDecimal],
+  ruleRate: Option[BigDecimal]
+)
 
 object StatuteRuleItem {
   implicit val format: OFormat[StatuteRuleItem] = Json.format[StatuteRuleItem]
@@ -41,12 +41,12 @@ object StatuteRule {
 
 // BE Response
 case class StatuteRuleRecord(
-                              ruleStartDate: Option[LocalDate],
-                              ruleEndDate: Option[LocalDate],
-                              numberOfDays: Int,
-                              ruleAmount: BigDecimal,
-                              ruleRate: BigDecimal
-                            )
+  ruleStartDate: Option[LocalDate],
+  ruleEndDate: Option[LocalDate],
+  numberOfDays: Int,
+  ruleAmount: BigDecimal,
+  ruleRate: BigDecimal
+)
 
 object StatuteRuleRecord {
   implicit val format: OFormat[StatuteRuleRecord] = Json.format[StatuteRuleRecord]
