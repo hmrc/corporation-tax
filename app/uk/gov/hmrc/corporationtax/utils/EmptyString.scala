@@ -16,14 +16,8 @@
 
 package uk.gov.hmrc.corporationtax.utils
 
-object CommonBooleanTransformation {
+object EmptyString {
 
-  // BF-F36 Boolean Common Transformation
-  def toBool(flag: String): Boolean =
-    val flagPreProcessed: String = flag.trim.toUpperCase
-    flagPreProcessed match {
-      case "Y" | "1" => true
-      case _         => false // Return false for ("N" , "0", null or any other values)
-    }
+  val emptyString = ""
 
 }

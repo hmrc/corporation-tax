@@ -153,7 +153,7 @@ class InterestChargesSummaryRdsProxyConnectorISpec extends AnyWordSpec
       ex.getMessage must include("Invalid Request")
     }
 
-    "return 404 when BE returns BAD_REQUEST " in {
+    "return 404 when BE returns NOT_FOUND " in {
       stubFor(
         get(urlPathEqualTo(url(123L)))
           .willReturn(

@@ -46,7 +46,7 @@ trait InterestAccrualListHelper {
       )
     )
 
-  val interestAccrualSingleItemList =
+  val interestAccrualSingleItemList: InterestAccrualList =
     InterestAccrualList(
       List(
         InterestAccrual(

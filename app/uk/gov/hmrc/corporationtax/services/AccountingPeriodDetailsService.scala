@@ -21,6 +21,8 @@ import uk.gov.hmrc.corporationtax.connectors.AccountingPeriodDetailsConnector
 import uk.gov.hmrc.corporationtax.models.{APBalancedResponse, AccountingPeriodDetails, AccountingPeriodDetailsResponse}
 import uk.gov.hmrc.corporationtax.utils.AmountTransformation
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.corporationtax.utils.CommonBooleanTransformation
+import uk.gov.hmrc.corporationtax.utils.CommonBooleanTransformation.toBool
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -28,12 +30,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class AccountingPeriodDetailsService @Inject() (connector: AccountingPeriodDetailsConnector)(implicit
   ec: ExecutionContext
 ) {
-
-  private def booleanConverter(in: String): Boolean =
-    in.toUpperCase() match {
-      case "Y" => true
-      case _   => false
-    }
 
   private def calcTotalDerivedActualInterest(e: APBalancedResponse): Option[BigDecimal] =
     Seq(
@@ -51,9 +47,9 @@ class AccountingPeriodDetailsService @Inject() (connector: AccountingPeriodDetai
 
   private def transform(e: APBalancedResponse): AccountingPeriodDetails =
     AccountingPeriodDetails(
-      isApBalanced = e.accountingPeriodDetails.isApBalanced.exists(booleanConverter),
-      lpiCalcFlag = e.accountingPeriodDetails.lpiCalcFlag.exists(booleanConverter),
-      crDbCalcFlag = e.accountingPeriodDetails.crDbCalcFlag.exists(booleanConverter),
+      isApBalanced = e.accountingPeriodDetails.isApBalanced.exists(toBool),
+      lpiCalcFlag = e.accountingPeriodDetails.lpiCalcFlag.exists(toBool),
+      crDbCalcFlag = e.accountingPeriodDetails.crDbCalcFlag.exists(toBool),
       creditInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.creditInterestAmount),
       debitInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.debitInterestAmount),
       latePaymentInterestAmount = AmountTransformation.apply(e.accountingPeriodDetails.latePaymentInterestAmount),

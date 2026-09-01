@@ -22,6 +22,7 @@ import uk.gov.hmrc.corporationtax.models.{
   ReallocationToAccPeriod, ReallocationToAccPeriodRow, ReallocationTransactionType, Reallocations, Repayments,
   TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod
 }
+import uk.gov.hmrc.corporationtax.utils.EmptyString.emptyString
 
 import java.time.LocalDate
 
@@ -40,7 +41,7 @@ object DomainModelTransformationInstances {
             reallocationDate = value.reallocationDate,
             destinationApEndDate = value.destinationApEndDate
               .map(_.toString)
-              .getOrElse(""), // converting to string and assigning empty string if it's null
+              .getOrElse(emptyString), // converting to string and assigning empty string if it's null
             destinationTaxPayerReference = value.destinationTaxPayerReference,
             transactionType = transactionType
           )
@@ -73,13 +74,12 @@ object DomainModelTransformationInstances {
             reallocationDate = value.reallocationDate,
             sourceApEndDate = value.sourceApEndDate
               .map(_.toString)
-              .getOrElse(""), // converting to string and assigning empty string if it's null,
+              .getOrElse(emptyString), // converting to string and assigning empty string if it's null,
             sourceTaxpayerReference = value.sourceTaxpayerReference,
             transactionType = transactionType
           )
         }
       )
-
   // Determine TransactionType for each ReallocationFromAccPeriod(BF-F31)
   private def reallocationFromTransactionType(
     destinationTaxPayerRef: String,
