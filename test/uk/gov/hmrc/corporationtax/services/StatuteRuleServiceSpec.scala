@@ -29,6 +29,7 @@ import uk.gov.hmrc.corporationtax.helpers.StatuteRuleHelper
 import uk.gov.hmrc.corporationtax.models.{StatuteRule, StatuteRuleResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class StatuteRuleServiceSpec extends AnyWordSpec with Matchers with StatuteRuleHelper with ScalaFutures {
@@ -49,7 +50,7 @@ class StatuteRuleServiceSpec extends AnyWordSpec with Matchers with StatuteRuleH
     when(mockStatuteRuleConnector.getStatueRule(any[String], any[String], any[String])(any[HeaderCarrier]))
       .thenReturn(Future.successful(Some(StatuteRule(defaultRecord))))
 
-    val result: Option[StatuteRuleResponse] = service.getStatueRule("C", "1991-04-19", "1992-06-20").futureValue
+    val result: Option[StatuteRuleResponse] = service.getStatueRule("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20") ).futureValue
 
     result shouldBe Some(StatuteRuleResponse(defaultResponseRecordWithData))
 
@@ -60,7 +61,7 @@ class StatuteRuleServiceSpec extends AnyWordSpec with Matchers with StatuteRuleH
     when(mockStatuteRuleConnector.getStatueRule(any[String], any[String], any[String])(any[HeaderCarrier]))
       .thenReturn(Future.successful(None))
 
-    val result: Option[StatuteRuleResponse] = service.getStatueRule("C", "1991-04-19", "1992-06-20").futureValue
+    val result: Option[StatuteRuleResponse] = service.getStatueRule("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20") ).futureValue
 
     result shouldBe None
 
@@ -72,7 +73,7 @@ class StatuteRuleServiceSpec extends AnyWordSpec with Matchers with StatuteRuleH
       .thenReturn(Future.successful(Some(StatuteRule(recordWithEmptyFieldsOne))))
 
     val ex = intercept[RuntimeException] {
-      service.getStatueRule("C", "1991-04-19", "1992-06-20").futureValue
+      service.getStatueRule("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20") ).futureValue
     }
 
     ex.getMessage should include("No ruleStartDate value found")
@@ -83,7 +84,7 @@ class StatuteRuleServiceSpec extends AnyWordSpec with Matchers with StatuteRuleH
       .thenReturn(Future.successful(Some(StatuteRule(recordWithEmptyFieldsTwo))))
 
     val ex = intercept[RuntimeException] {
-      service.getStatueRule("C", "1991-04-19", "1992-06-20").futureValue
+      service.getStatueRule("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20") ).futureValue
     }
 
     ex.getMessage should include("No ruleEndDate value found")
