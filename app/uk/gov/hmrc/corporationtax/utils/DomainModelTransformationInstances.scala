@@ -17,31 +17,23 @@
 package uk.gov.hmrc.corporationtax.utils
 
 import uk.gov.hmrc.corporationtax.models.BusinessConstants.OASTransfer
-import uk.gov.hmrc.corporationtax.models.{
-  MiscellaneousTransfer, RdsReallocationFromAccPeriodResponse, ReallocationFrom, ReallocationTo,
-  ReallocationToAccPeriod, ReallocationToAccPeriodRow, ReallocationTransactionType, Reallocations, Repayments,
-  TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod
-}
-import uk.gov.hmrc.corporationtax.utils.EmptyString.emptyString
-
+import uk.gov.hmrc.corporationtax.models.*
 import java.time.LocalDate
 
 object DomainModelTransformationInstances {
 
   implicit val toTransformedReallocationFromAccPeriod
-    : TransformToDomainModel[(RdsReallocationFromAccPeriodResponse, Long), TransformedReallocationFromAccPeriod] =
+    : TransformToDomainModel[(RdsReallocationFromAccPeriodResponse, Long), ReallocationFromAccPeriod] =
     (reallocFromAcc: RdsReallocationFromAccPeriodResponse, taxPayerReference: Long) =>
-      TransformedReallocationFromAccPeriod(
+      ReallocationFromAccPeriod(
         reallocFromAcc.reallocation.map { value =>
           // Determine TransactionType for each Reallocation(BF-F31)
           val transactionType: ReallocationTransactionType =
             reallocationFromTransactionType(value.destinationTaxPayerReference, taxPayerReference)
-          TransformedReallocationFromAccDetails(
+          ReallocationFromAccDetails(
             amount = value.amount.getOrElse(BigDecimal(0.00)),
             reallocationDate = value.reallocationDate,
-            destinationApEndDate = value.destinationApEndDate
-              .map(_.toString)
-              .getOrElse(emptyString), // converting to string and assigning empty string if it's null
+            destinationApEndDate = value.destinationApEndDate,
             destinationTaxPayerReference = value.destinationTaxPayerReference,
             transactionType = transactionType
           )
@@ -72,9 +64,7 @@ object DomainModelTransformationInstances {
           ReallocationToAccPeriodRow(
             amount = value.amount,
             reallocationDate = value.reallocationDate,
-            sourceApEndDate = value.sourceApEndDate
-              .map(_.toString)
-              .getOrElse(emptyString), // converting to string and assigning empty string if it's null,
+            sourceApEndDate = value.sourceApEndDate,
             sourceTaxpayerReference = value.sourceTaxpayerReference,
             transactionType = transactionType
           )

@@ -27,10 +27,11 @@ import play.api.mvc.{AnyContentAsEmpty, ControllerComponents, Result}
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.corporationtax.helpers.ReallocationFromAccPeriodHelper
-import uk.gov.hmrc.corporationtax.models.{MiscellaneousTransfer, TransformedReallocationFromAccPeriod}
+import uk.gov.hmrc.corporationtax.models.{MiscellaneousTransfer, ReallocationFromAccPeriod}
 import uk.gov.hmrc.corporationtax.services.ReallocationFromAccPeriodService
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class ReallocationFromAccPeriodDetailsControllerSpec
@@ -54,8 +55,13 @@ class ReallocationFromAccPeriodDetailsControllerSpec
 
     "return 200: OK" in new Fixture {
 
-      val response: TransformedReallocationFromAccPeriod =
-        transformedReallocationFromAccPeriod(BigDecimal(45876.87), "2026-12-03", "99", MiscellaneousTransfer)
+      val response: ReallocationFromAccPeriod =
+        transformedReallocationFromAccPeriod(
+          BigDecimal(45876.87),
+          Some(LocalDate.of(2026, 12, 3)),
+          "99",
+          MiscellaneousTransfer
+        )
       when(mockService.getReallocationFromAccPeriod(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(response))
 
