@@ -22,16 +22,16 @@ import play.api.libs.json.{JsError, JsNumber, JsString, JsSuccess, Json}
 
 import java.time.LocalDate
 
-class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matchers {
+class ReallocationFromAccDetailsSpec extends AnyWordSpec with Matchers {
 
-  "TransformedReallocationFromAccDetails" should {
+  "ReallocationFromAccDetails"  should {
     "serialize to JSON correctly" in {
-      val details = TransformedReallocationFromAccPeriod(
+      val details = ReallocationFromAccPeriod(
         reallocation = List(
-          TransformedReallocationFromAccDetails(
+          ReallocationFromAccDetails(
             amount = BigDecimal(1234.56),
             reallocationDate = LocalDate.of(2024, 1, 15),
-            destinationApEndDate = "2024-12-31",
+            destinationApEndDate = Some(LocalDate.of(2024, 12, 31)),
             destinationTaxPayerReference = "123",
             transactionType = ReallocationTo
           )
@@ -59,12 +59,12 @@ class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matcher
       )
     }
     "serialize to JSON correctly when destinationApEndDate is empty " in {
-      val details = TransformedReallocationFromAccPeriod(
+      val details = ReallocationFromAccPeriod(
         reallocation = List(
-          TransformedReallocationFromAccDetails(
+          ReallocationFromAccDetails(
             amount = BigDecimal(1234.56),
             reallocationDate = LocalDate.of(2024, 1, 15),
-            destinationApEndDate = "",
+            destinationApEndDate = None,
             destinationTaxPayerReference = "123",
             transactionType = ReallocationTo
           )
@@ -82,7 +82,6 @@ class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matcher
            |{
            |"amount" : 1234.56,
            |"reallocationDate" : "2024-01-15",
-           |"destinationApEndDate" : "",
            |"destinationTaxPayerReference" : "123",
            |"transactionType" : "RTO"
            |}
@@ -116,25 +115,25 @@ class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matcher
            |}
            |""".stripMargin
       )
-      val reallocFromAcc = TransformedReallocationFromAccPeriod(
+      val reallocFromAcc = ReallocationFromAccPeriod(
         reallocation = List(
-          TransformedReallocationFromAccDetails(
+          ReallocationFromAccDetails(
             amount = BigDecimal(1234.56),
             reallocationDate = LocalDate.of(2024, 1, 15),
-            destinationApEndDate = "2024-12-31",
+            destinationApEndDate = Some(LocalDate.of(2024, 12, 31)),
             destinationTaxPayerReference = "123",
             transactionType = ReallocationTo
           ),
-          TransformedReallocationFromAccDetails(
+          ReallocationFromAccDetails(
             amount = BigDecimal(0.00),
             reallocationDate = LocalDate.of(2024, 1, 15),
-            destinationApEndDate = "2024-12-31",
+            destinationApEndDate = Some(LocalDate.of(2024, 12, 31)),
             destinationTaxPayerReference = "123",
             transactionType = MiscellaneousTransfer
           )
         )
       )
-      Json.fromJson[TransformedReallocationFromAccPeriod](json) shouldBe JsSuccess(reallocFromAcc)
+      Json.fromJson[ReallocationFromAccPeriod](json) shouldBe JsSuccess(reallocFromAcc)
 
     }
     "fail to deserialize when transactionType field is missing" in {
@@ -154,7 +153,7 @@ class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matcher
            |}
            |""".stripMargin
       )
-      json.validate[TransformedReallocationFromAccDetails] shouldBe a[JsError]
+      json.validate[ReallocationFromAccDetails] shouldBe a[JsError]
     }
     "fail to deserialize when transactionType is an unknown string" in {
       val json = Json.parse(
@@ -174,7 +173,7 @@ class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matcher
            |}
            |""".stripMargin
       )
-      json.validate[TransformedReallocationFromAccDetails] shouldBe a[JsError]
+      json.validate[ReallocationFromAccDetails] shouldBe a[JsError]
     }
     "fail to deserialize when transactionType is a number" in {
       val json = Json.parse(
@@ -194,10 +193,10 @@ class TransformedReallocationFromAccDetailsSpec extends AnyWordSpec with Matcher
            |}
            |""".stripMargin
       )
-      json.validate[TransformedReallocationFromAccDetails] shouldBe a[JsError]
+      json.validate[ReallocationFromAccDetails] shouldBe a[JsError]
     }
   }
-  "ReallocationTransactionType"           should {
+  "ReallocationTransactionType" should {
 
     "write MiscellaneousTransfer as MiscTFR" in {
       Json.toJson[ReallocationTransactionType](MiscellaneousTransfer) shouldBe JsString("MiscTFR")

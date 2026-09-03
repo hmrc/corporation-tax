@@ -43,7 +43,7 @@ trait ReallocationDataHelper {
       ReallocationToAccPeriodRow(
         amount = BigDecimal(-117.01),
         reallocationDate = LocalDate.of(2025, 5, 1),
-        sourceApEndDate = "2026-07-01",
+        sourceApEndDate = Some(LocalDate.of(2026, 7, 1)),
         sourceTaxpayerReference = "9369369363",
         transactionType = MiscellaneousTransfer
       )
@@ -65,7 +65,7 @@ trait ReallocationDataHelper {
       ReallocationToAccPeriodRow(
         amount = BigDecimal(-117.01),
         reallocationDate = LocalDate.of(2025, 5, 1),
-        sourceApEndDate = "",
+        sourceApEndDate = None,
         sourceTaxpayerReference = "9369369363",
         transactionType = MiscellaneousTransfer
       )
@@ -93,14 +93,14 @@ trait ReallocationDataHelper {
       ReallocationToAccPeriodRow(
         amount = BigDecimal(-117.02),
         reallocationDate = LocalDate.of(2025, 5, 1),
-        sourceApEndDate = "2026-07-01",
+        sourceApEndDate = Some(LocalDate.of(2026, 7, 1)),
         sourceTaxpayerReference = "9369369363",
         transactionType = MiscellaneousTransfer
       ),
       ReallocationToAccPeriodRow(
         amount = BigDecimal(29.02),
         reallocationDate = LocalDate.of(2025, 5, 1),
-        sourceApEndDate = "2026-07-01",
+        sourceApEndDate = Some(LocalDate.of(2026, 7, 1)),
         sourceTaxpayerReference = "9369369363",
         transactionType = MiscellaneousTransfer
       )
@@ -140,7 +140,7 @@ trait ReallocationDataHelper {
       ReallocationToAccPeriodRow(
         amount = BigDecimal(-117.01),
         reallocationDate = LocalDate.of(2025, 5, 1),
-        sourceApEndDate = "2026-07-01",
+        sourceApEndDate = Some(LocalDate.of(2026, 7, 1)),
         sourceTaxpayerReference = "99",
         transactionType = MiscellaneousTransfer
       )
@@ -168,14 +168,14 @@ trait ReallocationDataHelper {
       ReallocationToAccPeriodRow(
         amount = BigDecimal(-117.02),
         reallocationDate = LocalDate.of(2025, 5, 1),
-        sourceApEndDate = "2026-07-01",
+        sourceApEndDate = Some(LocalDate.of(2026, 7, 1)),
         sourceTaxpayerReference = "9369369363",
         transactionType = MiscellaneousTransfer
       ),
       ReallocationToAccPeriodRow(
         amount = BigDecimal(29.02),
         reallocationDate = LocalDate.of(2025, 5, 1),
-        sourceApEndDate = "2026-07-01",
+        sourceApEndDate = Some(LocalDate.of(2026, 7, 1)),
         sourceTaxpayerReference = "93",
         transactionType = MiscellaneousTransfer
       )
@@ -203,14 +203,14 @@ trait ReallocationDataHelper {
       ReallocationToAccPeriodRow(
         amount = BigDecimal(-117.02),
         reallocationDate = LocalDate.of(2025, 5, 1),
-        sourceApEndDate = "",
+        sourceApEndDate = None,
         sourceTaxpayerReference = "87",
         transactionType = MiscellaneousTransfer
       ),
       ReallocationToAccPeriodRow(
         amount = BigDecimal(29.02),
         reallocationDate = LocalDate.of(2025, 5, 1),
-        sourceApEndDate = "",
+        sourceApEndDate = None,
         sourceTaxpayerReference = "87",
         transactionType = MiscellaneousTransfer
       )
@@ -232,7 +232,7 @@ trait ReallocationDataHelper {
       ReallocationToAccPeriodRow(
         amount = BigDecimal(-117.01),
         reallocationDate = LocalDate.of(2025, 5, 1),
-        sourceApEndDate = "2026-07-01",
+        sourceApEndDate = Some(LocalDate.of(2026, 7, 1)),
         sourceTaxpayerReference = "88",
         transactionType = ReallocationFrom
       )

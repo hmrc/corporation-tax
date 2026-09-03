@@ -17,8 +17,8 @@
 package uk.gov.hmrc.corporationtax.helpers
 
 import uk.gov.hmrc.corporationtax.models.{
-  RdsReallocationFromAccDetails, RdsReallocationFromAccPeriodResponse, ReallocationTransactionType,
-  TransformedReallocationFromAccDetails, TransformedReallocationFromAccPeriod
+  RdsReallocationFromAccDetails, RdsReallocationFromAccPeriodResponse, ReallocationFromAccDetails,
+  ReallocationFromAccPeriod, ReallocationTransactionType
 }
 
 import java.time.LocalDate
@@ -27,11 +27,11 @@ trait ReallocationFromAccPeriodHelper {
 
   val emptyString: String = ""
 
-  val emptyListReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse            = RdsReallocationFromAccPeriodResponse(
+  val emptyListReallocationFromAccPeriod: RdsReallocationFromAccPeriodResponse = RdsReallocationFromAccPeriodResponse(
     List.empty
   )
-  val emptyTransformedListReallocationFromAccPeriod: TransformedReallocationFromAccPeriod =
-    TransformedReallocationFromAccPeriod(List.empty)
+  val emptyTransformedListReallocationFromAccPeriod: ReallocationFromAccPeriod =
+    ReallocationFromAccPeriod(List.empty)
 
   def rdsReallocationFromAccPeriodResponse(
     amount: Option[BigDecimal] = None,
@@ -63,27 +63,27 @@ trait ReallocationFromAccPeriodHelper {
 
   def transformedReallocationFromAccPeriod(
     amount: BigDecimal,
-    destinationApEndDate: String,
+    destinationApEndDate: Option[LocalDate],
     destinationTaxPayerReference: String,
     transactionType: ReallocationTransactionType
-  ): TransformedReallocationFromAccPeriod =
-    TransformedReallocationFromAccPeriod(
+  ): ReallocationFromAccPeriod =
+    ReallocationFromAccPeriod(
       List(
-        TransformedReallocationFromAccDetails(
+        ReallocationFromAccDetails(
           amount,
           LocalDate.of(2026, 12, 2),
           destinationApEndDate,
           destinationTaxPayerReference,
           transactionType
         ),
-        TransformedReallocationFromAccDetails(
+        ReallocationFromAccDetails(
           amount,
           LocalDate.of(2026, 12, 2),
           destinationApEndDate,
           destinationTaxPayerReference,
           transactionType
         ),
-        TransformedReallocationFromAccDetails(
+        ReallocationFromAccDetails(
           amount,
           LocalDate.of(2026, 12, 2),
           destinationApEndDate,

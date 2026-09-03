@@ -31,7 +31,7 @@ class ReallocationToAccPeriodRowSpec extends AnyWordSpec with Matchers {
           ReallocationToAccPeriodRow(
             amount = BigDecimal(1234.56),
             reallocationDate = LocalDate.of(2024, 1, 15),
-            sourceApEndDate = "2024-12-31",
+            sourceApEndDate = Some(LocalDate.of(2024, 12, 31)),
             sourceTaxpayerReference = "123",
             transactionType = ReallocationFrom
           )
@@ -64,7 +64,7 @@ class ReallocationToAccPeriodRowSpec extends AnyWordSpec with Matchers {
           ReallocationToAccPeriodRow(
             amount = BigDecimal(1234.56),
             reallocationDate = LocalDate.of(2024, 1, 15),
-            sourceApEndDate = "",
+            sourceApEndDate = None,
             sourceTaxpayerReference = "123",
             transactionType = ReallocationFrom
           )
@@ -82,7 +82,6 @@ class ReallocationToAccPeriodRowSpec extends AnyWordSpec with Matchers {
            |{
            |"amount" : 1234.56,
            |"reallocationDate" : "2024-01-15",
-           |"sourceApEndDate" : "",
            |"sourceTaxpayerReference" : "123",
            |"transactionType" : "RFR"
            |}
@@ -121,14 +120,14 @@ class ReallocationToAccPeriodRowSpec extends AnyWordSpec with Matchers {
           ReallocationToAccPeriodRow(
             amount = BigDecimal(1234.56),
             reallocationDate = LocalDate.of(2024, 1, 15),
-            sourceApEndDate = "2024-12-31",
+            sourceApEndDate = Some(LocalDate.of(2024, 12, 31)),
             sourceTaxpayerReference = "123",
             transactionType = ReallocationFrom
           ),
           ReallocationToAccPeriodRow(
             amount = BigDecimal(0.00),
             reallocationDate = LocalDate.of(2024, 1, 15),
-            sourceApEndDate = "2024-12-31",
+            sourceApEndDate = Some(LocalDate.of(2024, 12, 31)),
             sourceTaxpayerReference = "123",
             transactionType = MiscellaneousTransfer
           )
