@@ -45,7 +45,7 @@ object ReallocationToAccPeriod {
 case class ReallocationToAccPeriodRow(
   amount: BigDecimal,
   reallocationDate: LocalDate,
-  sourceApEndDate: String,
+  sourceApEndDate: Option[LocalDate],
   sourceTaxpayerReference: String,
   transactionType: ReallocationTransactionType
 )

@@ -37,22 +37,22 @@ object RdsReallocationFromAccDetails {
   implicit val format: OFormat[RdsReallocationFromAccDetails] = Json.format[RdsReallocationFromAccDetails]
 }
 
-case class TransformedReallocationFromAccPeriod(reallocation: List[TransformedReallocationFromAccDetails])
+case class ReallocationFromAccPeriod(reallocation: List[ReallocationFromAccDetails])
 
-object TransformedReallocationFromAccPeriod {
-  implicit val format: OFormat[TransformedReallocationFromAccPeriod] = Json.format[TransformedReallocationFromAccPeriod]
+object ReallocationFromAccPeriod {
+  implicit val format: OFormat[ReallocationFromAccPeriod] = Json.format[ReallocationFromAccPeriod]
 }
 
-case class TransformedReallocationFromAccDetails(
+case class ReallocationFromAccDetails(
   amount: BigDecimal,
   reallocationDate: LocalDate,
-  destinationApEndDate: String,
+  destinationApEndDate: Option[LocalDate],
   destinationTaxPayerReference: String,
   transactionType: ReallocationTransactionType
 )
 
-object TransformedReallocationFromAccDetails {
+object ReallocationFromAccDetails {
 
-  implicit val format: OFormat[TransformedReallocationFromAccDetails] =
-    Json.format[TransformedReallocationFromAccDetails]
+  implicit val format: OFormat[ReallocationFromAccDetails] =
+    Json.format[ReallocationFromAccDetails]
 }
