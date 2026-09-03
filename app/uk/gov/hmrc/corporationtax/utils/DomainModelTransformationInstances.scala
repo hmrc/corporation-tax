@@ -64,7 +64,7 @@ object DomainModelTransformationInstances {
           ReallocationToAccPeriodRow(
             amount = value.amount,
             reallocationDate = value.reallocationDate,
-            sourceApEndDate = value.sourceApEndDate, // converting to string and assigning empty string if it's null,
+            sourceApEndDate = value.sourceApEndDate,
             sourceTaxpayerReference = value.sourceTaxpayerReference,
             transactionType = transactionType
           )
