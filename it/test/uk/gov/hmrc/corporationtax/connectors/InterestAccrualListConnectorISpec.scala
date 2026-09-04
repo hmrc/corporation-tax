@@ -23,6 +23,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
 import play.api.libs.json.Json
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.helpers.InterestAccrualListHelper
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.http.HeaderCarrier
@@ -38,6 +39,7 @@ class InterestAccrualListConnectorISpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val connector: InterestAccrualListConnector = app.injector.instanceOf[InterestAccrualListConnector]
 
 
@@ -45,7 +47,7 @@ class InterestAccrualListConnectorISpec
   "getInterestAccrualList" should {
 
     def url(taxRef: Long, accPeriod: Long, interestType: String) =
-      s"/rds-datacache-proxy/corporation-tax/interest-accrual-list/$taxRef/$accPeriod/$interestType"
+      s"${appConfig.rdsDatacacheProxyEndpoint}/interest-accrual-list/$taxRef/$accPeriod/$interestType"
 
     "return Interest Accrual empty list from BE with status code OK" in {
       stubFor(

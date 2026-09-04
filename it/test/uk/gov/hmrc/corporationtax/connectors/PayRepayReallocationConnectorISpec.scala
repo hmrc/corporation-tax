@@ -22,6 +22,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.corporationtax.testdata.PayRepayReallocationHelper
 import uk.gov.hmrc.http.HeaderCarrier
@@ -37,12 +38,13 @@ class PayRepayReallocationConnectorISpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val connector: PayRepayReallocationConnector = app.injector.instanceOf[PayRepayReallocationConnector]
 
   "getTotalAmounts" should {
 
     def url(taxRef: Long, accPeriod: Long) =
-      s"/rds-datacache-proxy/corporation-tax/total-amount-payment-repayment-reallocation/$taxRef/$accPeriod"
+      s"${appConfig.rdsDatacacheProxyEndpoint}/total-amount-payment-repayment-reallocation/$taxRef/$accPeriod"
 
     "return a successful an empty payment repayment reallocation from BE" in {
       stubFor(

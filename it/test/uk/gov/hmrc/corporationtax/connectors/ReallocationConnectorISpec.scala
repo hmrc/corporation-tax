@@ -22,6 +22,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.corporationtax.testdata.ReallocationDataHelper
 import uk.gov.hmrc.http.HeaderCarrier
@@ -37,13 +38,14 @@ class ReallocationConnectorISpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val connector: ReallocationsConnector = app.injector.instanceOf[ReallocationsConnector]
 
   // TODO: add auth stub and relevant cases
   "getPenaltyTransactionList" should {
 
     def url(taxRef: Long, accPeriod: Long) =
-      s"/rds-datacache-proxy/corporation-tax/reallocation-to-accounting-period/$taxRef/$accPeriod"
+      s"${appConfig.rdsDatacacheProxyEndpoint}/reallocation-to-accounting-period/$taxRef/$accPeriod"
 
     "return Reallocation empty list from BE with status code OK" in {
       stubFor(

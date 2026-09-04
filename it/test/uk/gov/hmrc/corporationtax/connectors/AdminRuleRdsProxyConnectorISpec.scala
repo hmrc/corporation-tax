@@ -22,6 +22,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.helpers.AdminRuleHelper
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.http.HeaderCarrier
@@ -39,12 +40,13 @@ class AdminRuleRdsProxyConnectorISpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val connector: AdminRuleRdsProxyConnector = app.injector.instanceOf[AdminRuleRdsProxyConnector]
 
   "getAdminRule" should {
 
     def url(adminRule: String) =
-      s"/rds-datacache-proxy/corporation-tax/administrative-rule/$adminRule"
+      s"${appConfig.rdsDatacacheProxyEndpoint}/administrative-rule/$adminRule"
 
     "return an empty getAdminRule from BE with status code OK" in {
       stubFor(

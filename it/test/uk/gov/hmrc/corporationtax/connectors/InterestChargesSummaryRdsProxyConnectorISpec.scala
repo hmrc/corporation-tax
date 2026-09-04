@@ -23,6 +23,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.corporationtax.testdata.InterestChargesHelper
 import uk.gov.hmrc.http.HeaderCarrier
@@ -37,13 +38,14 @@ class InterestChargesSummaryRdsProxyConnectorISpec extends AnyWordSpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val connector: InterestChargesSummaryRdsProxyConnector = app.injector.instanceOf[InterestChargesSummaryRdsProxyConnector]
 
 
   "getInterestChargesSummary" should {
 
     def url(taxPayerReference:Long) =
-      s"/rds-datacache-proxy/corporation-tax/interest-charge-summary/$taxPayerReference"
+      s"${appConfig.rdsDatacacheProxyEndpoint}/interest-charge-summary/$taxPayerReference"
 
     "return InterestCharges empty list from BE with status code OK" in {
       stubFor(

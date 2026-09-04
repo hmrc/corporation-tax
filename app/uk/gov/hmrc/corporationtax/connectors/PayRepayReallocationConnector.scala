@@ -18,33 +18,25 @@ package uk.gov.hmrc.corporationtax.connectors
 
 import play.api.Logging
 import uk.gov.hmrc.*
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.models.PayRepayReallocations
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PayRepayReallocationConnector @Inject() (http: HttpClientV2, config: ServicesConfig)(implicit
+class PayRepayReallocationConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit
   ec: ExecutionContext
 ) extends Logging {
-
-  val stubEnabled: Boolean = config.getBoolean("features.corporation-tax-stub-enabled")
-
-  private val proxyPath =
-    if (stubEnabled) {
-      config.baseUrl("corporation-tax-stub") + "/corporation-tax-stubs"
-    } else {
-      config.baseUrl("rds-datacache-proxy") + "/rds-datacache-proxy"
-    }
 
   def getTotalAmounts(taxRef: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
   ): Future[PayRepayReallocations] = {
-    val url: URL = url"$proxyPath/corporation-tax/total-amount-payment-repayment-reallocation/$taxRef/$accPeriod"
+    val url: URL =
+      url"${appConfig.rdsDatacacheProxyFullUrl}/total-amount-payment-repayment-reallocation/$taxRef/$accPeriod"
 
     http
       .get(url)

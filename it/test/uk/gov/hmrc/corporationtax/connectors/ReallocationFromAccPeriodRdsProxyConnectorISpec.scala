@@ -22,6 +22,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.corporationtax.testdata.ReallocationFromAccPeriodHelper
 import uk.gov.hmrc.http.HeaderCarrier
@@ -37,13 +38,14 @@ class ReallocationFromAccPeriodRdsProxyConnectorISpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val connector: ReallocationFromAccPeriodRdsProxyConnector =
     app.injector.instanceOf[ReallocationFromAccPeriodRdsProxyConnector]
 
   "getReallocationFromAccPeriod" should {
 
     def url(taxPayerReference: Long, accPeriod: Long) =
-      s"/rds-datacache-proxy/corporation-tax/reallocation-from-accounting-period/$taxPayerReference/$accPeriod"
+      s"${appConfig.rdsDatacacheProxyEndpoint}/reallocation-from-accounting-period/$taxPayerReference/$accPeriod"
 
     "return ReallocationFromAccPeriod empty list from BE with status code OK" in {
       stubFor(
