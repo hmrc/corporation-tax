@@ -34,7 +34,8 @@ class ReallocationFromAccPeriodRdsProxyConnector @Inject() (http: HttpClientV2, 
   def getReallocationFromAccPeriod(taxPayerReference: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
   ): Future[RdsReallocationFromAccPeriodResponse] = {
-    val url: URL = url"${appConfig.rdsDatacacheProxyEndpoint}/reallocation-from-accounting-period/$taxPayerReference/$accPeriod"
+    val url: URL =
+      url"${appConfig.rdsDatacacheProxyFullUrl}/reallocation-from-accounting-period/$taxPayerReference/$accPeriod"
     http
       .get(url)
       .execute[RdsReallocationFromAccPeriodResponse]

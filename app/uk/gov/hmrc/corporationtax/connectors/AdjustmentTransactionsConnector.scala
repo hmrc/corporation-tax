@@ -31,11 +31,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class AdjustmentTransactionsConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit
   ec: ExecutionContext
 ) extends Logging {
-  
+
   def getAdjustmentTransactions(taxRef: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
   ): Future[AdjustmentTransactionsList] = {
-    val url: URL = url"${appConfig.rdsDatacacheProxyEndpoint}/adjustment-transactions/$taxRef/$accPeriod"
+    val url: URL = url"${appConfig.rdsDatacacheProxyFullUrl}/adjustment-transactions/$taxRef/$accPeriod"
 
     http
       .get(url)

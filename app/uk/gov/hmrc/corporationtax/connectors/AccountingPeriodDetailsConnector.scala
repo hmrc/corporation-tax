@@ -35,7 +35,7 @@ class AccountingPeriodDetailsConnector @Inject() (http: HttpClientV2, appConfig:
   def getAccountingPeriodDetails(taxRef: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
   ): Future[APBalancedResponse] = {
-    val url: URL = url"${appConfig.rdsDatacacheProxyEndpoint}/accounting-period-details/$taxRef/$accPeriod"
+    val url: URL = url"${appConfig.rdsDatacacheProxyFullUrl}/accounting-period-details/$taxRef/$accPeriod"
     http
       .get(url)
       .execute[APBalancedResponse]

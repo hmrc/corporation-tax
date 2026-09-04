@@ -34,7 +34,7 @@ class InterestAccrualListConnector @Inject() (http: HttpClientV2, appConfig: App
   def getInterestAccrualList(taxRef: Long, accPeriod: Long, interestType: String)(implicit
     hc: HeaderCarrier
   ): Future[InterestAccrualList] = {
-    val url: URL = url"${appConfig.rdsDatacacheProxyEndpoint}/interest-accrual-list/$taxRef/$accPeriod/$interestType"
+    val url: URL = url"${appConfig.rdsDatacacheProxyFullUrl}/interest-accrual-list/$taxRef/$accPeriod/$interestType"
     http
       .get(url)
       .execute[InterestAccrualList]

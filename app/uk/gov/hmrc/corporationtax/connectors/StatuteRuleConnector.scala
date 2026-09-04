@@ -35,7 +35,7 @@ class StatuteRuleConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(
     hc: HeaderCarrier
   ): Future[Option[StatuteRule]] = {
     val url: URL =
-      url"${appConfig.rdsDatacacheProxyEndpoint}/statute-rule?ruleKey=$ruleRateKey&startDate=$startDateStr&endDate=$endDateStr"
+      url"${appConfig.rdsDatacacheProxyFullUrl}/statute-rule?ruleKey=$ruleRateKey&startDate=$startDateStr&endDate=$endDateStr"
 
     http
       .get(url)

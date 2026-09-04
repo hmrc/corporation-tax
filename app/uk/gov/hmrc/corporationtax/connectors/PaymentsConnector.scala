@@ -30,9 +30,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class PaymentsConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext)
     extends Logging {
-  
+
   def getPayments(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[Payments] = {
-    val url: URL = url"${appConfig.rdsDatacacheProxyEndpoint}/payment-transactions/$taxRef/$accPeriod"
+    val url: URL = url"${appConfig.rdsDatacacheProxyFullUrl}/payment-transactions/$taxRef/$accPeriod"
     http
       .get(url)
       .execute[Payments]

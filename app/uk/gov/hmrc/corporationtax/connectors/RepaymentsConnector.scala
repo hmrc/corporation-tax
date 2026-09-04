@@ -31,11 +31,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class RepaymentsConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit
   ec: ExecutionContext
 ) extends Logging {
-  
+
   def getRepayments(taxRef: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
   ): Future[Repayments] = {
-    val url: URL = url"${appConfig.rdsDatacacheProxyEndpoint}/repayments/$taxRef/$accPeriod"
+    val url: URL = url"${appConfig.rdsDatacacheProxyFullUrl}/repayments/$taxRef/$accPeriod"
 
     http
       .get(url)

@@ -23,6 +23,7 @@ import org.scalatest.matchers.must.Matchers.must
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.corporationtax.testdata.AccountingPeriodsHelper
 import uk.gov.hmrc.http.HeaderCarrier
@@ -38,12 +39,13 @@ class AccountingPeriodsConnectorISpec extends
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val accountingPeriodsConnector: AccountingPeriodsConnector = app.injector.instanceOf[AccountingPeriodsConnector]
 
 
   "AccountingPeriodsConnector.getAccountingPeriods" should {
 
-    def getUrl(taxRef:Long):String = s"/rds-datacache-proxy/corporation-tax/accounting-periods/$taxRef"
+    def getUrl(taxRef:Long):String = s"${appConfig.rdsDatacacheProxyEndpoint}/accounting-periods/$taxRef"
 
     "return a single RdsAccountingPeriod from proxy" in {
       stubFor(

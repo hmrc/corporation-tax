@@ -22,6 +22,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.corporationtax.testdata.AdjustmentTransactionsHelper
 import uk.gov.hmrc.http.HeaderCarrier
@@ -37,12 +38,13 @@ class AdjustmentTransactionsConnectorISpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val adjustmentTransactionsConnector: AdjustmentTransactionsConnector = app.injector.instanceOf[AdjustmentTransactionsConnector]
 
   "getAdjustmentTransactions" should {
 
     def url(taxRef: Long, accPeriod: Long) =
-      s"/rds-datacache-proxy/corporation-tax/adjustment-transactions/$taxRef/$accPeriod"
+      s"${appConfig.rdsDatacacheProxyEndpoint}/adjustment-transactions/$taxRef/$accPeriod"
 
     "return a successful an empty adjustment transactions list from BE" in {
       stubFor(

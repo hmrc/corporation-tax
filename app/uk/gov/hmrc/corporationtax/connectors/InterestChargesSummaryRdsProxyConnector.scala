@@ -30,9 +30,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class InterestChargesSummaryRdsProxyConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit
   ec: ExecutionContext
 ) extends Logging {
-  
+
   def getInterestChargesSummary(taxPayerReference: Long)(implicit hc: HeaderCarrier): Future[InterestCharges] = {
-    val url: URL = url"${appConfig.rdsDatacacheProxyEndpoint}/interest-charge-summary/$taxPayerReference"
+    val url: URL = url"${appConfig.rdsDatacacheProxyFullUrl}/interest-charge-summary/$taxPayerReference"
     http
       .get(url)
       .execute[InterestCharges]

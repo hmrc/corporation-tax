@@ -32,7 +32,7 @@ class TaxTransactionsConnector @Inject() (http: HttpClientV2, appConfig: AppConf
     extends Logging {
 
   def getTaxTransactions(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[TaxTransactions] = {
-    val url: URL = url"${appConfig.rdsDatacacheProxyEndpoint}/tax-transactions/$taxRef/$accPeriod"
+    val url: URL = url"${appConfig.rdsDatacacheProxyFullUrl}/tax-transactions/$taxRef/$accPeriod"
     http
       .get(url)
       .execute[TaxTransactions]

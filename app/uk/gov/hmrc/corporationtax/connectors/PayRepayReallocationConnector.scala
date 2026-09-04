@@ -35,7 +35,8 @@ class PayRepayReallocationConnector @Inject() (http: HttpClientV2, appConfig: Ap
   def getTotalAmounts(taxRef: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
   ): Future[PayRepayReallocations] = {
-    val url: URL = url"${appConfig.rdsDatacacheProxyEndpoint}/total-amount-payment-repayment-reallocation/$taxRef/$accPeriod"
+    val url: URL =
+      url"${appConfig.rdsDatacacheProxyFullUrl}/total-amount-payment-repayment-reallocation/$taxRef/$accPeriod"
 
     http
       .get(url)

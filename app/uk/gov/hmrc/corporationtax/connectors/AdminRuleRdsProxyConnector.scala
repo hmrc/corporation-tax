@@ -32,7 +32,7 @@ class AdminRuleRdsProxyConnector @Inject() (http: HttpClientV2, appConfig: AppCo
 ) extends Logging {
 
   def getAdminRule(adminRule: String)(implicit hc: HeaderCarrier): Future[AdminRule] = {
-    val url: URL = url"${appConfig.rdsDatacacheProxyEndpoint}/administrative-rule/$adminRule"
+    val url: URL = url"${appConfig.rdsDatacacheProxyFullUrl}/administrative-rule/$adminRule"
     http
       .get(url)
       .execute[AdminRule]

@@ -30,9 +30,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ReallocationsConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext)
     extends Logging {
-  
+
   def getByAccountingPeriod(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[Reallocations] = {
-    val url: URL = url"${appConfig.rdsDatacacheProxyEndpoint}/reallocation-to-accounting-period/$taxRef/$accPeriod"
+    val url: URL = url"${appConfig.rdsDatacacheProxyFullUrl}/reallocation-to-accounting-period/$taxRef/$accPeriod"
     http
       .get(url)
       .execute[Reallocations]

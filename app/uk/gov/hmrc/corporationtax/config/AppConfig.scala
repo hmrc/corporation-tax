@@ -27,7 +27,10 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
 
   lazy val rdsDatacacheProxyBaseUrl: String =
     servicesConfig.baseUrl("rds-datacache-proxy")
-    
+
   lazy val rdsDatacacheProxyEndpoint: String =
-    rdsDatacacheProxyBaseUrl +
     servicesConfig.getString("microservice.services.rds-datacache-proxy.path") + "/corporation-tax"
+
+  lazy val rdsDatacacheProxyFullUrl: String =
+    rdsDatacacheProxyBaseUrl +
+      servicesConfig.getString("microservice.services.rds-datacache-proxy.path") + "/corporation-tax"

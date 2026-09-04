@@ -32,7 +32,7 @@ class PenaltiesConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(im
     extends Logging {
 
   def getPenaltyTransactionList(taxRef: Long, accPeriod: Long)(implicit hc: HeaderCarrier): Future[Penalties] = {
-    val url: URL = url"${appConfig.rdsDatacacheProxyEndpoint}/penalty-transactions/$taxRef/$accPeriod"
+    val url: URL = url"${appConfig.rdsDatacacheProxyFullUrl}/penalty-transactions/$taxRef/$accPeriod"
 
     http
       .get(url)
