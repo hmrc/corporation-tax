@@ -18,8 +18,16 @@ package uk.gov.hmrc.corporationtax.config
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class AppConfig @Inject() (config: Configuration):
+class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig):
 
   val appName: String = config.get[String]("appName")
+
+  lazy val rdsDatacacheProxyBaseUrl: String =
+    servicesConfig.baseUrl("rds-datacache-proxy")
+    
+  lazy val rdsDatacacheProxyEndpoint: String =
+    rdsDatacacheProxyBaseUrl +
+    servicesConfig.getString("microservice.services.rds-datacache-proxy.path") + "/corporation-tax"
