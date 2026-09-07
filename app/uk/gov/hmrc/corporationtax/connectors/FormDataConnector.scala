@@ -44,7 +44,7 @@ class FormDataConnector @Inject()(http: HttpClientV2, config: ServicesConfig)(im
 
   def getFormData(taxRef: Long, accPeriod: Long,
                   startDate: LocalDate, endDate: LocalDate)(implicit hc: HeaderCarrier): Future[CT600XmlDataResponse] = {
-    val url: URL = url"$dataProxyPath/corporation-tax/ct-form-data/$taxRef/$accPeriod"
+    val url: URL = url"$dataProxyPath/corporation-tax/ct-form-data/$taxRef/$accPeriod?startDate=${startDate.toString}&endDate=${endDate.toString}"
     http
       .get(url)
       .execute[CT600XmlDataResponse]
