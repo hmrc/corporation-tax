@@ -23,7 +23,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
-import uk.gov.hmrc.corporationtax.testdata.DisplayNeededHelper
+import uk.gov.hmrc.corporationtax.helpers.DisplayNeededHelper
 import uk.gov.hmrc.http.HeaderCarrier
 
 class DisplayNeededConnectorISpec
@@ -45,6 +45,7 @@ class DisplayNeededConnectorISpec
     def url(taxRef: Long, accPeriod: Long) =
       s"/rds-datacache-proxy/corporation-tax/display-needed/$taxRef/$accPeriod"
 
+    // {"taxIsDisplayNeededFlag":"Y","interestIsDisplayNeededFlag":"N","paymentIsDisplayNeededFlag":"Y","repayReallocIsDisplayNeededFlag":"N"}
     "return Display Needed from BE with status code OK, with taxRef: 10L" in {
       stubFor(
         get(urlPathEqualTo(url(10L, 1L)))
@@ -53,18 +54,20 @@ class DisplayNeededConnectorISpec
               .withStatus(OK)
               .withBody(
                 s"""{
-                   |"displayNeeded":
-                   |[
-                   |]}""".stripMargin
+                   |"taxIsDisplayNeededFlag":"N",
+                   |"interestIsDisplayNeededFlag":"N",
+                   |"paymentIsDisplayNeededFlag":"N",
+                   |"repayReallocIsDisplayNeededFlag":"N"
+                   |}""".stripMargin
               )
           )
       )
 
       val result = connector.getDisplayNeeded(10L, 1L).futureValue
-      result mustBe displayNeededAllFalse
+      result mustBe displayNeededResponseAllFalse
     }
 
-    "return Display Needed from BE with status code OK, with taxRef: 10L" in {
+    "return Display Needed from BE with status code OK, with taxRef: 20L" in {
       stubFor(
         get(urlPathEqualTo(url(20L, 1L)))
           .willReturn(
@@ -72,15 +75,17 @@ class DisplayNeededConnectorISpec
               .withStatus(OK)
               .withBody(
                 s"""{
-                   |"displayNeeded":
-                   |[
-                   |]}""".stripMargin
+                   |"taxIsDisplayNeededFlag":"Y",
+                   |"interestIsDisplayNeededFlag":"Y",
+                   |"paymentIsDisplayNeededFlag":"Y",
+                   |"repayReallocIsDisplayNeededFlag":"Y"
+                   |}""".stripMargin
               )
           )
       )
 
       val result = connector.getDisplayNeeded(20L, 1L).futureValue
-      result mustBe displayNeededAllTrue
+      result mustBe displayNeededResponseAllTrue
     }
 
     "return Display Needed from BE with status code OK, with taxRef: 30L" in {
@@ -91,18 +96,20 @@ class DisplayNeededConnectorISpec
               .withStatus(OK)
               .withBody(
                 s"""{
-                   |"displayNeeded":
-                   |[
-                   |]}""".stripMargin
+                   |"taxIsDisplayNeededFlag":"Y",
+                   |"interestIsDisplayNeededFlag":"N",
+                   |"paymentIsDisplayNeededFlag":"Y",
+                   |"repayReallocIsDisplayNeededFlag":"N"
+                   |}""".stripMargin
               )
           )
       )
 
       val result = connector.getDisplayNeeded(30L, 1L).futureValue
-      result mustBe displayNeededMixed
+      result mustBe displayNeededResponseMixed
     }
 
-    "return INTERNAL_ERROR when service failed" in {
+    "return error when service failed" in {
       stubFor(
         get(urlPathEqualTo(url(999L, 1L)))
           .willReturn(
@@ -110,7 +117,8 @@ class DisplayNeededConnectorISpec
               .withStatus(INTERNAL_SERVER_ERROR)
               .withBody(
                 s"""{
-                   |error" : "Failed to retrieve dispaly needed"
+                   |"statusCode" : 500
+                   |"message" : "Error from downstream"
                    |}""".stripMargin
               )
           )
@@ -119,7 +127,7 @@ class DisplayNeededConnectorISpec
       val ex = intercept[Exception] {
         connector.getDisplayNeeded(999L, 1L).futureValue
       }
-      ex.getMessage.toLowerCase must include("error")
+      ex.getMessage.toLowerCase must include("error from downstream")
     }
   }
 }
