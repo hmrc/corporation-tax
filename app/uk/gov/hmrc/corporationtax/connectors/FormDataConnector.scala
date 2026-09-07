@@ -29,8 +29,8 @@ import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FormDataConnector @Inject()(http: HttpClientV2, config: ServicesConfig)(implicit
-                                                                              ec: ExecutionContext
+class FormDataConnector @Inject() (http: HttpClientV2, config: ServicesConfig)(implicit
+  ec: ExecutionContext
 ) extends Logging {
 
   private val stubEnabled: Boolean = config.getBoolean("features.corporation-tax-stub-enabled")
@@ -42,14 +42,18 @@ class FormDataConnector @Inject()(http: HttpClientV2, config: ServicesConfig)(im
       config.baseUrl("rds-datacache-proxy") + "/rds-datacache-proxy"
     }
 
-  def getFormData(taxRef: Long, accPeriod: Long,
-                  startDate: LocalDate, endDate: LocalDate)(implicit hc: HeaderCarrier): Future[CT600XmlDataResponse] = {
-    val url: URL = url"$dataProxyPath/corporation-tax/ct-form-data/$taxRef/$accPeriod?startDate=${startDate.toString}&endDate=${endDate.toString}"
+  def getFormData(taxRef: Long, accPeriod: Long, startDate: LocalDate, endDate: LocalDate)(implicit
+    hc: HeaderCarrier
+  ): Future[CT600XmlDataResponse] = {
+    val url: URL =
+      url"$dataProxyPath/corporation-tax/ct-form-data/$taxRef/$accPeriod?startDate=${startDate.toString}&endDate=${endDate.toString}"
     http
       .get(url)
       .execute[CT600XmlDataResponse]
       .recover { case e: Throwable =>
-        logger.error(s"[FormDataConnector][getFormData]: $taxRef :: $accPeriod :: $startDate :: $endDate - ${e.getMessage}")
+        logger.error(
+          s"[FormDataConnector][getFormData]: $taxRef :: $accPeriod :: $startDate :: $endDate - ${e.getMessage}"
+        )
         throw new RuntimeException(e.getMessage)
       }
   }

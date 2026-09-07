@@ -26,24 +26,22 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class FormDataController @Inject()(
-                                    cc: ControllerComponents,
-                                    connector: FormDataConnector
-                                  )(implicit ec: ExecutionContext)
-  extends BackendController(cc)
+class FormDataController @Inject() (
+  cc: ControllerComponents,
+  connector: FormDataConnector
+)(implicit ec: ExecutionContext)
+    extends BackendController(cc)
     with Logging {
 
-  def getData(taxRef: Long, accPeriod: Long,
-              queryParams: FormDataQueryParams): Action[AnyContent] = Action.async { implicit request =>
-    connector
-      .getFormData(taxRef, accPeriod, queryParams.startDate, queryParams.endDate)
-      .map(response =>
-        Ok(Json.toJson(response))
-      )
-      .recover { case ex: Exception =>
-        logger.error("Error while retrieving ct600XmlDataResponse", ex)
-        InternalServerError(Json.obj("error" -> "Failed to retrieve ct600XmlDataResponse"))
-      }
+  def getData(taxRef: Long, accPeriod: Long, queryParams: FormDataQueryParams): Action[AnyContent] = Action.async {
+    implicit request =>
+      connector
+        .getFormData(taxRef, accPeriod, queryParams.startDate, queryParams.endDate)
+        .map(response => Ok(Json.toJson(response)))
+        .recover { case ex: Exception =>
+          logger.error("Error while retrieving ct600XmlDataResponse", ex)
+          InternalServerError(Json.obj("error" -> "Failed to retrieve ct600XmlDataResponse"))
+        }
   }
 
 }
