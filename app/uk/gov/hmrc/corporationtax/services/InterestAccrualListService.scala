@@ -18,7 +18,8 @@ package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.InterestAccrualListConnector
-import uk.gov.hmrc.corporationtax.models.InterestAccrualList
+import uk.gov.hmrc.corporationtax.models.BusinessConstants.LATE_PAYMENT_INTEREST
+import uk.gov.hmrc.corporationtax.models.{InterestAccrualList, InterestAccrualListWithInterestAccruedDays}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.corporationtax.utils.applyAmountTransformToList
 import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
