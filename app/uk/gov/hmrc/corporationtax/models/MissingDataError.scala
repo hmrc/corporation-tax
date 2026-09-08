@@ -7,5 +7,5 @@ sealed trait MissingDataError {
 sealed trait MissingFieldError extends MissingDataError
 
 case class MissingStatueRule(value: String) extends MissingFieldError {
-  val message = s"Cannot find Accounting Period: $value"
+  val message = s"Cannot find Statue Rule: $value"
 }
