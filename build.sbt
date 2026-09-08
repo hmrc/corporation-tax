@@ -15,6 +15,9 @@ lazy val microservice = Project("corporation-tax", file("."))
   )
   .settings(CodeCoverageSettings.settings: _*)
   .settings(PlayKeys.playDefaultPort := 11202)
+  .settings(
+    ScoverageKeys.coverageExcludedFiles := ".*AppConfig.*,.*models.*,.*FormDataQueryParams.*"
+  )
 
 lazy val it = project
   .enablePlugins(PlayScala)
