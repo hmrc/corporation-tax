@@ -19,5 +19,8 @@ package uk.gov.hmrc.corporationtax.models
 object BusinessConstants {
 
   val OASTransfer: String = "99"
+  val LATE_PAYMENT_INTEREST          = "IDE"
+  val APPEND_DUE_DATE_MONTHS: String = "M"
+  val APPEND_DUE_DATE_DAYS: String   = "A"
 
 }
