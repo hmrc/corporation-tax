@@ -33,8 +33,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FormDataControllerSpec extends AnyWordSpec with Matchers
-  with FormDataHelper {
+class FormDataControllerSpec extends AnyWordSpec with Matchers with FormDataHelper {
 
   private trait Setup {
     val mockFormDataConnector: FormDataConnector = mock[FormDataConnector]
@@ -53,12 +52,12 @@ class FormDataControllerSpec extends AnyWordSpec with Matchers
       when(mockFormDataConnector.getFormData(any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(defaultDataItem))
 
-      val result: Future[Result] = controller.getData(1L, 1L, FormDataQueryParams(startDate, endDate) )(fakeRequest)
+      val result: Future[Result] = controller.getData(1L, 1L, FormDataQueryParams(startDate, endDate))(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson( defaultDataItem )
+      contentAsJson(result) shouldBe Json.toJson(defaultDataItem)
 
-      verify(mockFormDataConnector).getFormData(eqTo(1L), eqTo(1L), eqTo(startDate), eqTo(endDate) )(any[HeaderCarrier])
+      verify(mockFormDataConnector).getFormData(eqTo(1L), eqTo(1L), eqTo(startDate), eqTo(endDate))(any[HeaderCarrier])
     }
 
     "return 500 INTERNAL_SERVER_ERROR" in new Setup {
@@ -70,9 +69,8 @@ class FormDataControllerSpec extends AnyWordSpec with Matchers
 
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve ct600XmlDataResponse"
 
-      verify(mockFormDataConnector).getFormData(eqTo(1L), eqTo(1L), eqTo(startDate), eqTo(endDate) )(any[HeaderCarrier])
+      verify(mockFormDataConnector).getFormData(eqTo(1L), eqTo(1L), eqTo(startDate), eqTo(endDate))(any[HeaderCarrier])
     }
-
 
   }
 }
