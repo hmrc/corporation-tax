@@ -18,8 +18,13 @@ package uk.gov.hmrc.corporationtax.helpers
 
 import uk.gov.hmrc.corporationtax.models.{CT600XmlDataResponse, FormListItem}
 
+import java.time.LocalDate
+
 trait FormDataHelper {
 
+  val startDate: LocalDate = LocalDate.of(2026, 1, 1)
+  val endDate: LocalDate = LocalDate.of(2026, 12, 31)
+  
   val defaultDataItem = CT600XmlDataResponse(
     ct600XmlData = Some("data"),
     formList = List(
