@@ -36,20 +36,22 @@ object InterestAccrual {
   implicit val format: OFormat[InterestAccrual] = Json.format[InterestAccrual]
 }
 
-
 case class InterestAccrualListWithInterestAccruedDays(interestAccruals: List[InterestAccrualWithInterestAccruedDays])
 
-case class InterestAccrualWithInterestAccruedDays(
-                            computationAmount: BigDecimal,
-                            interestAccrualFromDate: LocalDate,
-                            interestAccrualToDate: LocalDate,
-                            interestRate: BigDecimal,
-                            interestAmount: BigDecimal,
-                            apEndDate: LocalDate,
-                            noOfDays: Long
-                          )
-object InterestAccrualWithInterestAccruedDays {
-  implicit val format: OFormat[InterestAccrualWithInterestAccruedDays] = Json.format[InterestAccrualWithInterestAccruedDays]
+object InterestAccrualListWithInterestAccruedDays {
+  implicit val format: OFormat[InterestAccrualListWithInterestAccruedDays] = Json.format[InterestAccrualListWithInterestAccruedDays]
 }
 
-
+case class InterestAccrualWithInterestAccruedDays(
+  computationAmount: BigDecimal,
+  interestAccrualFromDate: LocalDate,
+  interestAccrualToDate: LocalDate,
+  interestRate: BigDecimal,
+  interestAmount: BigDecimal,
+  apEndDate: LocalDate,
+  noOfDays: Long
+)
+object InterestAccrualWithInterestAccruedDays {
+  implicit val format: OFormat[InterestAccrualWithInterestAccruedDays] =
+    Json.format[InterestAccrualWithInterestAccruedDays]
+}
