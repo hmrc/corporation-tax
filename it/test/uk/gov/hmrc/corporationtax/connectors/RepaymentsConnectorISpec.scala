@@ -22,6 +22,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.corporationtax.testdata.RepaymentsHelper
 import uk.gov.hmrc.http.HeaderCarrier
@@ -37,12 +38,13 @@ class RepaymentsConnectorISpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val connector: RepaymentsConnector = app.injector.instanceOf[RepaymentsConnector]
 
   "getRepayments" should {
 
     def url(taxRef: Long, accPeriod: Long) =
-      s"/rds-datacache-proxy/corporation-tax/repayments/$taxRef/$accPeriod"
+      s"${appConfig.rdsDatacacheProxyEndpoint}/repayments/$taxRef/$accPeriod"
 
     "return a successful an empty repayment list from BE" in {
       stubFor(

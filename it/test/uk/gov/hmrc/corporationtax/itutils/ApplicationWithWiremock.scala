@@ -37,7 +37,6 @@ trait ApplicationWithWiremock
       "microservice.services.auth.port"                -> WireMockConstants.stubPort,
       "microservice.services.rds-datacache-proxy.host" -> WireMockConstants.stubHost,
       "microservice.services.rds-datacache-proxy.port" -> WireMockConstants.stubPort,
-      "features.corporation-tax-stub-enabled" -> false
     )
 
   override lazy val app: Application = new GuiceApplicationBuilder()

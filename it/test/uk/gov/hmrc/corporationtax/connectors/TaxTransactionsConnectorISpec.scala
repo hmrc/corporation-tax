@@ -23,6 +23,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
 import play.api.libs.json.Json
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.helpers.TaxTransactionsHelper
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.http.HeaderCarrier
@@ -38,6 +39,7 @@ class TaxTransactionsConnectorISpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val connector: TaxTransactionsConnector = app.injector.instanceOf[TaxTransactionsConnector]
 
 
@@ -45,7 +47,7 @@ class TaxTransactionsConnectorISpec
   "getTaxTransactions" should {
 
     def url(taxRef: Long, accPeriod: Long) =
-      s"/rds-datacache-proxy/corporation-tax/tax-transactions/$taxRef/$accPeriod"
+      s"${appConfig.rdsDatacacheProxyEndpoint}/tax-transactions/$taxRef/$accPeriod"
 
     "return Tax Transactions empty list from BE with status code OK" in {
       stubFor(
