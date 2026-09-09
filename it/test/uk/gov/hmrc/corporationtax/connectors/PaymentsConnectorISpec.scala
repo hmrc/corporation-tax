@@ -23,6 +23,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
 import play.api.libs.json.Json
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.helpers.PaymentsHelper
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.http.HeaderCarrier
@@ -38,6 +39,7 @@ class PaymentsConnectorISpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val connector: PaymentsConnector = app.injector.instanceOf[PaymentsConnector]
 
 
@@ -45,7 +47,7 @@ class PaymentsConnectorISpec
   "getPayments" should {
 
     def url(taxRef: Long, accPeriod: Long) =
-      s"/rds-datacache-proxy/corporation-tax/payment-transactions/$taxRef/$accPeriod"
+      s"${appConfig.rdsDatacacheProxyEndpoint}/payment-transactions/$taxRef/$accPeriod"
 
     "return Payment Transactions empty list from BE with status code OK" in {
       stubFor(

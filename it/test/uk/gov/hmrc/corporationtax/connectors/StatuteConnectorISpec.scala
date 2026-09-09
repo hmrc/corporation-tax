@@ -22,6 +22,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.corporationtax.models.StatuteRule
 import uk.gov.hmrc.corporationtax.testdata.StatuteRuleHelper
@@ -38,12 +39,13 @@ class StatuteConnectorISpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val connector: StatuteRuleConnector = app.injector.instanceOf[StatuteRuleConnector]
 
   "getStatueRule" should {
 
     def url(ruleRateKey: String, startDateStr: String, endDateStr: String) =
-      s"/rds-datacache-proxy/corporation-tax/statute-rule?ruleKey=$ruleRateKey&startDate=$startDateStr&endDate=$endDateStr"
+      s"${appConfig.rdsDatacacheProxyEndpoint}/statute-rule?ruleKey=$ruleRateKey&startDate=$startDateStr&endDate=$endDateStr"
 
     "return no StatuteRule record" in {
       stubFor(
