@@ -22,9 +22,11 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.helpers.FormDataHelper
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.http.HeaderCarrier
+
 import java.time.LocalDate
 
 
@@ -39,22 +41,18 @@ class FormDataConnectorISpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val formDataConnector: FormDataConnector = app.injector.instanceOf[FormDataConnector]
   private val taxRef : Long = 1L
   private val accountingPeriod : Long = 1L
   private val startDate: LocalDate = LocalDate.of(2026, 1, 1)
   private val endDate: LocalDate = LocalDate.of(2026, 12, 31)
 
-  /*
-    /rds-datacache-proxy/corporation-tax/ct-form-data/1/1?startDate=2026-01-01&endDate=2026-12-31
-    /rds-datacache-proxy/corporation-tax/ct-form-data/1/1?startDate=2026-01-01&endDate=2026-12-31
-   */
-
   "getFormData" should {
 
     def url(taxRef: Long, accPeriod: Long,
             startDate: LocalDate, endDate: LocalDate) =
-      s"/rds-datacache-proxy/corporation-tax/ct-form-data/$taxRef/$accPeriod?startDate=${startDate.toString}&endDate=${endDate.toString}"
+      s"/corporation-tax-stubs/corporation-tax/ct-form-data/$taxRef/$accPeriod?startDate=${startDate.toString}&endDate=${endDate.toString}"
 
     "return a record" in {
       stubFor(
