@@ -52,7 +52,7 @@ class FormDataConnectorISpec
 
     def url(taxRef: Long, accPeriod: Long,
             startDate: LocalDate, endDate: LocalDate) =
-      s"/corporation-tax-stubs/corporation-tax/ct-form-data/$taxRef/$accPeriod?startDate=${startDate.toString}&endDate=${endDate.toString}"
+      s"${appConfig.rdsDatacacheProxyEndpoint}/ct-form-data/$taxRef/$accPeriod?startDate=${startDate.toString}&endDate=${endDate.toString}"
 
     "return a record" in {
       stubFor(
