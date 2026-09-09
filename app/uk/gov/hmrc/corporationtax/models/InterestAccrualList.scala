@@ -39,7 +39,8 @@ object InterestAccrual {
 case class InterestAccrualListWithInterestAccruedDays(interestAccruals: List[InterestAccrualWithInterestAccruedDays])
 
 object InterestAccrualListWithInterestAccruedDays {
-  implicit val format: OFormat[InterestAccrualListWithInterestAccruedDays] = Json.format[InterestAccrualListWithInterestAccruedDays]
+  implicit val format: OFormat[InterestAccrualListWithInterestAccruedDays] =
+    Json.format[InterestAccrualListWithInterestAccruedDays]
 }
 
 case class InterestAccrualWithInterestAccruedDays(
