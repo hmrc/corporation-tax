@@ -21,59 +21,42 @@ import uk.gov.hmrc.corporationtax.models.{InterestAccrual, InterestAccrualList, 
 import java.time.LocalDate
 
 trait InterestAccrualListWithNoOfDaysHelper {
-
-  val ruleRecord: StatuteRuleRecord = StatuteRuleRecord(
-    ruleStartDate = Some(LocalDate.of(2011, 1, 1)),
-    ruleEndDate = Some(LocalDate.of(2012, 1, 1)),
-    numberOfDays = 87,
-    ruleAmount = BigDecimal(145.001),
-    ruleRate = BigDecimal(1.47)
+  
+  def statuteRuleResponseGen(numberOfDays: Int): StatuteRuleResponse = StatuteRuleResponse(
+    statuteRule = StatuteRuleRecord(
+      ruleStartDate = Some(LocalDate.of(2011, 1, 1)),
+      ruleEndDate = Some(LocalDate.of(2012, 1, 1)),
+      numberOfDays = numberOfDays,
+      ruleAmount = BigDecimal(145.001),
+      ruleRate = BigDecimal(1.47)
+    )
   )
-  val statuteRuleResponse: StatuteRuleResponse = StatuteRuleResponse(
-    statuteRule = ruleRecord
-  )
-  val interestAccrualList: InterestAccrualList =
+  def interestAccrualListGen(fromDate:LocalDate, toDate:LocalDate, apEndDate:LocalDate): InterestAccrualList                                                        =
     InterestAccrualList(
       List(
         InterestAccrual(
           computationAmount = BigDecimal(1.00),
-          interestAccrualFromDate = LocalDate.of(2021, 3, 7),
-          interestAccrualToDate = LocalDate.of(2021, 5, 7),
+          interestAccrualFromDate = fromDate,
+          interestAccrualToDate = toDate,
           interestRate = BigDecimal(2.00),
           interestAmount = BigDecimal(10.00),
-          apEndDate = LocalDate.of(2021, 6, 7)
-        ),
-        InterestAccrual(
-          computationAmount = BigDecimal(1.00),
-          interestAccrualFromDate = LocalDate.of(2022, 3, 21),
-          interestAccrualToDate = LocalDate.of(2023, 5, 7),
-          interestRate = BigDecimal(2.00),
-          interestAmount = BigDecimal(10.0),
-          apEndDate = LocalDate.of(2023, 6, 7)
+          apEndDate = apEndDate
         )
       )
     )
-  val interestAccrualListWithInterestAccruedDays: InterestAccrualListWithInterestAccruedDays =
+  def interestAccrualListWithInterestAccruedDaysGen(fromDate:LocalDate, toDate:LocalDate, noOfDays:Long, apEndDate:LocalDate): InterestAccrualListWithInterestAccruedDays =
     InterestAccrualListWithInterestAccruedDays(
       List(
         InterestAccrualWithInterestAccruedDays(
           computationAmount = BigDecimal(1.00),
-          interestAccrualFromDate = LocalDate.of(2021, 3, 7),
-          interestAccrualToDate = LocalDate.of(2021, 5, 7),
+          interestAccrualFromDate = fromDate,
+          interestAccrualToDate = toDate,
           interestRate = BigDecimal(2.00),
           interestAmount = BigDecimal(10.00),
-          apEndDate = LocalDate.of(2021, 6, 7),
-          noOfDays = 62L
-        ),
-        InterestAccrualWithInterestAccruedDays(
-          computationAmount = BigDecimal(1.00),
-          interestAccrualFromDate = LocalDate.of(2022, 3, 21),
-          interestAccrualToDate = LocalDate.of(2023, 5, 7),
-          interestRate = BigDecimal(2.00),
-          interestAmount = BigDecimal(10.0),
-          apEndDate = LocalDate.of(2023, 6, 7),
-          noOfDays = 413L
+          apEndDate = apEndDate,
+          noOfDays = noOfDays
         )
       )
     )
+
 }
