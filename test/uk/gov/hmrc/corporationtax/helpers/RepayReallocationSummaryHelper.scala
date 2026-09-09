@@ -16,7 +16,10 @@
 
 package uk.gov.hmrc.corporationtax.helpers
 
-import uk.gov.hmrc.corporationtax.models.{ReallocationFrom, ReallocationFromAccDetails, ReallocationFromAccPeriod, ReallocationTo, ReallocationToAccPeriod, ReallocationToAccPeriodRow, RepayReallocationSummary, RepayReallocationSummaryDetails, Repayments, RepaymentsDetails}
+import uk.gov.hmrc.corporationtax.models.{
+  ReallocationFrom, ReallocationFromAccDetails, ReallocationFromAccPeriod, ReallocationTo, ReallocationToAccPeriod,
+  ReallocationToAccPeriodRow, RepayReallocationSummary, RepayReallocationSummaryDetails, Repayments, RepaymentsDetails
+}
 
 import java.time.LocalDate
 
