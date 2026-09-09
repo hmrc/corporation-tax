@@ -54,7 +54,7 @@ class RepayReallocationSummaryServiceSpec
     )
   }
 
-  "getRepayments" should {
+  "getRepayReallocationSummary" should {
 
     "delegate to services and successfully return repayment reallocation summary with one repayments item" in new Setup {
       when(mockRepaymentsService.getRepayments(any(), any())(any[HeaderCarrier]))
