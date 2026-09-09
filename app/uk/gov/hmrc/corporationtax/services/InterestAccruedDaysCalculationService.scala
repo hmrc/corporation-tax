@@ -44,8 +44,11 @@ class InterestAccruedDaysCalculationService @Inject() (
   )(implicit hc: HeaderCarrier): Future[Either[MissingDataError, InterestAccrualListWithInterestAccruedDays]] =
     interestType match {
       case LATE_PAYMENT_INTEREST =>
+        logger.info("Calculating number of days for interestAccrued for IDE InterestType")
+        getChargeableDaysForIDE(interestAccrualList: InterestAccrualList)
+      case _                     =>
+        logger.info("Calculating number of days for interestAccrued for NON-IDE InterestType")
         Future.successful(Right(getChargeableDaysForNonIDEInterestTypes(interestAccrualList: InterestAccrualList)))
-      case _                     => getChargeableDaysForIDE(interestAccrualList: InterestAccrualList)
     }
 
   private def getChargeableDaysForNonIDEInterestTypes(
@@ -66,7 +69,7 @@ class InterestAccruedDaysCalculationService @Inject() (
     )
 
   private def calculateChargeableDays(fromDate: LocalDate, toDate: LocalDate): Long =
-    ChronoUnit.DAYS.between(toDate, fromDate) + 1L
+    ChronoUnit.DAYS.between(fromDate, toDate) + 1L
 
   private def getChargeableDaysForIDE(
     interestAccrualList: InterestAccrualList
@@ -79,8 +82,12 @@ class InterestAccruedDaysCalculationService @Inject() (
             value.interestAccrualToDate,
             value.interestAccrualFromDate
           ).map {
-            case Left(error) => Left(error)
-            case Right(days) =>
+            case Left(error) =>
+              logger.error(
+                s"Cannot calculate number of days of interestAccrued, GET StatueRule returned invalid response due to:${error.message} "
+              )
+              Left(error)
+            case Right(days)                   =>
               Right(
                 InterestAccrualWithInterestAccruedDays(
                   computationAmount = value.computationAmount,
@@ -99,7 +106,7 @@ class InterestAccruedDaysCalculationService @Inject() (
       .map { results =>
         results
           .collectFirst { case Left(error) =>
-            logger.error(s"Cannot find the statue rule${error.message}")
+            logger.error(s"Cannot retrieve the statue rule due to ${error.message}")
             Left(error)
           }
           .getOrElse {
@@ -119,12 +126,14 @@ class InterestAccruedDaysCalculationService @Inject() (
     fromDate: LocalDate
   )(implicit hc: HeaderCarrier): Future[Either[MissingDataError, Long]] =
     for {
-      configuredValueForMonthsResponse <- statuteRuleService
-                                            .getStatueRule(APPEND_DUE_DATE_MONTHS, apEndDate, apEndDate)
-                                            .map(_.toRight(MissingStatueRule("Cannot find statue rule for ")))
-      configuredValueForDaysResponse   <- statuteRuleService
-                                            .getStatueRule(APPEND_DUE_DATE_DAYS, apEndDate, apEndDate)
-                                            .map(_.toRight(MissingStatueRule("Cannot find data")))
+      configuredValueForMonthsResponse <-
+        statuteRuleService
+          .getStatueRule(APPEND_DUE_DATE_MONTHS, apEndDate, apEndDate)
+          .map(_.toRight(MissingStatueRule(s"Cannot find statue rule for ruleRateKey:$APPEND_DUE_DATE_MONTHS")))
+      configuredValueForDaysResponse   <-
+        statuteRuleService
+          .getStatueRule(APPEND_DUE_DATE_DAYS, apEndDate, apEndDate)
+          .map(_.toRight(MissingStatueRule(s"Cannot find statue rule for ruleRateKey:$APPEND_DUE_DATE_DAYS")))
     } yield for {
       monthsResponse <- configuredValueForMonthsResponse
       daysResponse   <- configuredValueForDaysResponse
@@ -134,8 +143,11 @@ class InterestAccruedDaysCalculationService @Inject() (
         .plusMonths(monthsResponse.statuteRule.numberOfDays.toLong)
         .plusDays(daysResponse.statuteRule.numberOfDays.toLong)
 
-      if (fromDate == normalDueDate) ChronoUnit.DAYS.between(toDate, fromDate)
-      else calculateChargeableDays(toDate, fromDate)
+      if (fromDate == normalDueDate) {
+        ChronoUnit.DAYS.between(fromDate, toDate)
+      } else {
+        calculateChargeableDays(fromDate, toDate)
+      }
 
     }
 
