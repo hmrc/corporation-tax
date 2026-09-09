@@ -52,6 +52,9 @@ trait StatuteRuleHelper {
     ruleAmount = BigDecimal(145.001),
     ruleRate = BigDecimal(1.47)
   )
+  val statuteRuleResponse:StatuteRuleResponse = StatuteRuleResponse(
+    statuteRule = defaultResponseRecord
+  )
 
   val defaultResponseRecordWithData = StatuteRuleRecord(
     ruleStartDate = Some(LocalDate.parse("1999-01-18")),
