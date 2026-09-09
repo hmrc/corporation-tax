@@ -20,21 +20,20 @@ import play.api.libs.json.{Json, OFormat}
 
 import java.time.LocalDate
 
-case class PayReallocationSummary(transactions: List[PayReallocationSummaryDetails])
+case class RepayReallocationSummary(transactions: List[RepayReallocationSummaryDetails])
 
-object PayReallocationSummary {
-  implicit val format: OFormat[PayReallocationSummary] = Json.format[PayReallocationSummary]
+object RepayReallocationSummary {
+  implicit val format: OFormat[RepayReallocationSummary] = Json.format[RepayReallocationSummary]
 }
 
-case class PayReallocationSummaryDetails(
+case class RepayReallocationSummaryDetails(
   transactionDate: Option[LocalDate],
   `type`: Option[String],
   amount: Option[BigDecimal],
   accountingPeriodEndDate: Option[LocalDate],
-  taxpayerReference: Option[String],
-                                        
+  taxpayerReference: Option[String]
 )
 
-object PayReallocationSummaryDetails {
-  implicit val format: OFormat[PayReallocationSummaryDetails] = Json.format[PayReallocationSummaryDetails]
+object RepayReallocationSummaryDetails {
+  implicit val format: OFormat[RepayReallocationSummaryDetails] = Json.format[RepayReallocationSummaryDetails]
 }

@@ -20,29 +20,30 @@ import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.Results.InternalServerError
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
-import uk.gov.hmrc.corporationtax.models.PayReallocationSummary
-import uk.gov.hmrc.corporationtax.services.PayReallocationSummaryService
+import uk.gov.hmrc.corporationtax.models.RepayReallocationSummary
+import uk.gov.hmrc.corporationtax.services.RepayReallocationSummaryService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class PayReallocationSummaryController @Inject()(
-  payReallocationSummaryService: PayReallocationSummaryService,
+class RepayReallocationSummaryController @Inject() (
+  repayReallocationSummaryService: RepayReallocationSummaryService,
   cc: ControllerComponents
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def getPayReallocationSummary(taxRef: Long, accPeriod: Long): Action[AnyContent] = Action.async { implicit request =>
-    payReallocationSummaryService
-      .getPayReallocationSummary(taxRef, accPeriod)
-      .map { payReallocationSummary =>
-        Ok(Json.toJson(payReallocationSummary))
-      }
-      .recover { case ex: Exception =>
-        logger.error("Error while retrieving payment reallocation summary", ex)
-        InternalServerError(Json.obj("error" -> "Failed to retrieve payment reallocation summary"))
-      }
+  def getRepayReallocationSummary(taxRef: Long, accPeriod: Long): Action[AnyContent] = Action.async {
+    implicit request =>
+      repayReallocationSummaryService
+        .getRepayReallocationSummary(taxRef, accPeriod)
+        .map { repayReallocationSummary =>
+          Ok(Json.toJson(repayReallocationSummary))
+        }
+        .recover { case ex: Exception =>
+          logger.error("Error while retrieving repayment reallocation summary", ex)
+          InternalServerError(Json.obj("error" -> "Failed to retrieve repayment reallocation summary"))
+        }
   }
 }
