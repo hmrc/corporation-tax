@@ -105,7 +105,7 @@ object AmountAdjustableInstances {
         (PayRepayReallocations => Option[BigDecimal], (PayRepayReallocations, BigDecimal) => PayRepayReallocations)
       ] =
         List(
-          (item => item.totalAmountReoRfrRto, (item, newValue) => item.copy(totalAmountReoRfrRto = Some(newValue))),
+          (item => item.totalAmountRepRfrRto, (item, newValue) => item.copy(totalAmountRepRfrRto = Some(newValue))),
           (item => item.totalAmountPayments, (item, newValue) => item.copy(totalAmountPayments = Some(newValue)))
         )
     }

@@ -24,7 +24,7 @@ object PayRepayReallocationTransformInstances {
     : TransformToDomainModel[PayRepayReallocations, NonNullPayRepayReallocations] =
     (payRepayReallocations: PayRepayReallocations) =>
       NonNullPayRepayReallocations(
-        totalAmountReoRfrRto = payRepayReallocations.totalAmountReoRfrRto.getOrElse(BigDecimal(0)),
+        totalAmountRepRfrRto = payRepayReallocations.totalAmountRepRfrRto.getOrElse(BigDecimal(0)),
         totalAmountPayments = payRepayReallocations.totalAmountPayments.getOrElse(BigDecimal(0))
       )
 }
