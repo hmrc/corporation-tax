@@ -83,7 +83,7 @@ class DisplayNeededControllerSpec extends AnyWordSpec with Matchers with Display
       verify(mockDisplayNeededService).getDisplayNeeded(eqTo(30L), eqTo(1L))(any[HeaderCarrier])
     }
 
-    "return Eerror message" in new Setup {
+    "return Error message" in new Setup {
       when(mockDisplayNeededService.getDisplayNeeded(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("error")))
 
