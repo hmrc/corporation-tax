@@ -52,7 +52,8 @@ class StatuteRuleService @Inject() (
           Some(
             transform(item)
           )
-        case None                    => None
+        case None                    =>
+          None
       }
 
   }

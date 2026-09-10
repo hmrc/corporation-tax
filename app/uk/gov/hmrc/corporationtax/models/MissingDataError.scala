@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.corporationtax.models
 
-object BusinessConstants {
+sealed trait MissingDataError {
+  def message: String
+}
 
-  val OASTransfer: String            = "99"
-  val LATE_PAYMENT_INTEREST          = "IDE"
-  val APPEND_DUE_DATE_MONTHS: String = "M"
-  val APPEND_DUE_DATE_DAYS: String   = "A"
+sealed trait MissingFieldError extends MissingDataError
 
+case class MissingStatueRule(value: String) extends MissingFieldError {
+  val message = s"Statue Rule not found: $value"
 }

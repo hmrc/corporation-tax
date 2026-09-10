@@ -17,17 +17,18 @@
 package uk.gov.hmrc.corporationtax.controllers
 
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.http.Status
 import play.api.libs.json.Json
-import play.api.mvc.Result
+import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.corporationtax.services.InterestAccrualListService
 import uk.gov.hmrc.corporationtax.helpers.InterestAccrualListHelper
+import uk.gov.hmrc.corporationtax.models.MissingStatueRule
+import uk.gov.hmrc.corporationtax.services.InterestAccrualListService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,29 +42,46 @@ class InterestAccrualListControllerSpec extends AnyWordSpec with Matchers with I
     implicit val ec: ExecutionContext = cc.executionContext
     implicit val hc: HeaderCarrier    = HeaderCarrier()
 
-    val fakeRequest     = FakeRequest("GET", "/")
-    val fakePostRequest = FakeRequest("GET", "/WrongUrl")
-    val controller      =
+    val taxRef: Long    = 1L
+    val accPeriod: Long = 1L
+
+    val ide: String = "IDE"
+
+    val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/")
+    val controller                                       =
       new InterestAccrualListController(Helpers.stubControllerComponents(), mockInterestAccrualListService)
   }
 
   "GET /" should {
 
-    "return 200: OK" in new Fixture {
-      when(mockInterestAccrualListService.getInterestAccrualList(any(), any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(interestAccrualList))
+    "return 200: OK for both IDE and non-IDE interestType" in new Fixture {
+      when(mockInterestAccrualListService.getInterestAccrualList(any(), any(), eqTo(ide))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(interestAccrualListWithInterestAccruedDays)))
 
-      val result: Future[Result] = controller.getInterestAccrualList(1L, 2L, "IDE")(fakeRequest)
-      status(result) shouldBe Status.OK
+      val result: Future[Result] = controller.getInterestAccrualList(taxRef, accPeriod, ide)(fakeRequest)
 
-      contentAsJson(result) shouldBe Json.toJson(interestAccrualList)
+      status(result) shouldBe OK
 
-      verify(mockInterestAccrualListService).getInterestAccrualList(eqTo(1L), eqTo(2L), eqTo("IDE"))(
+      contentAsJson(result) shouldBe Json.toJson(interestAccrualListWithInterestAccruedDays)
+
+      verify(mockInterestAccrualListService, times(1)).getInterestAccrualList(eqTo(taxRef), eqTo(accPeriod), eqTo(ide))(
+        any[HeaderCarrier]
+      )
+    }
+    "return NOT_FOUND when retrieving InterestAccrualListWithInterestAccruedDays fails: for IDE interestType" in new Fixture {
+      when(mockInterestAccrualListService.getInterestAccrualList(any(), any(), eqTo(ide))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Left(MissingStatueRule("Cannot find statue Rule"))))
+
+      val result: Future[Result] = controller.getInterestAccrualList(taxRef, accPeriod, ide)(fakeRequest)
+
+      status(result) shouldBe NOT_FOUND
+
+      verify(mockInterestAccrualListService).getInterestAccrualList(eqTo(taxRef), eqTo(accPeriod), eqTo(ide))(
         any[HeaderCarrier]
       )
     }
 
-    "return 500: INTERNAL_SERVER_ERROR" in new Fixture {
+    "return 500: INTERNAL_SERVER_ERROR when exception is returned from the service " in new Fixture {
       when(mockInterestAccrualListService.getInterestAccrualList(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("unexpected")))
 
