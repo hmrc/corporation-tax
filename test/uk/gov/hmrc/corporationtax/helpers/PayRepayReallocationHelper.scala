@@ -28,13 +28,13 @@ trait PayRepayReallocationHelper {
 
   val transformedPayRepayReallocation: NonNullPayRepayReallocations =
     NonNullPayRepayReallocations(
-      totalAmountReoRfrRto = BigDecimal(-10),
+      totalAmountRepRfrRto = BigDecimal(-10),
       totalAmountPayments = BigDecimal(-20)
     )
 
   val payRepayReallocation: PayRepayReallocations =
     PayRepayReallocations(
-      totalAmountReoRfrRto = Some(BigDecimal(10)),
+      totalAmountRepRfrRto = Some(BigDecimal(10)),
       totalAmountPayments = Some(BigDecimal(20))
     )
 }

@@ -72,7 +72,7 @@ class PayRepayReallocationConnectorISpec
               .withStatus(OK)
               .withBody(
                 s"""{
-                   | "totalAmountReoRfrRto" : 10,
+                   | "totalAmountRepRfrRto" : 10,
                    | "totalAmountPayments" : 20
                    |}""".stripMargin
               )

@@ -19,7 +19,7 @@ package uk.gov.hmrc.corporationtax.models
 import play.api.libs.json.{Json, OFormat}
 
 case class PayRepayReallocations(
-  totalAmountReoRfrRto: Option[BigDecimal],
+  totalAmountRepRfrRto: Option[BigDecimal],
   totalAmountPayments: Option[BigDecimal]
 )
 
@@ -28,7 +28,7 @@ object PayRepayReallocations {
 }
 
 case class NonNullPayRepayReallocations(
-  totalAmountReoRfrRto: BigDecimal,
+  totalAmountRepRfrRto: BigDecimal,
   totalAmountPayments: BigDecimal
 )
 
