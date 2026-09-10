@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.corporationtax.services
 
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -26,7 +26,10 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.test.Helpers
 import uk.gov.hmrc.corporationtax.connectors.InterestAccrualListConnector
 import uk.gov.hmrc.corporationtax.helpers.InterestAccrualListHelper
-import uk.gov.hmrc.corporationtax.models.InterestAccrualList
+import uk.gov.hmrc.corporationtax.models.BusinessConstants.LATE_PAYMENT_INTEREST
+import uk.gov.hmrc.corporationtax.models.{
+  InterestAccrualListWithInterestAccruedDays, MissingDataError, MissingStatueRule
+}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,25 +43,144 @@ class InterestAccrualListServiceSpec
   private trait Fixture {
     val mockAccrualInterestListConnector: InterestAccrualListConnector = mock[InterestAccrualListConnector]
 
+    val mockInterestAccruedDaysCalcService: InterestAccruedDaysCalculationService =
+      mock[InterestAccruedDaysCalculationService]
+
     val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
-    implicit val hc: HeaderCarrier    = HeaderCarrier()
 
-    val service = new InterestAccrualListService(mockAccrualInterestListConnector)
+    val taxRef: Long               = 1L
+    val accPeriod: Long            = 1L
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+
+    val service = new InterestAccrualListService(mockAccrualInterestListConnector, mockInterestAccruedDaysCalcService)
   }
 
-  "getInterestAccrualList returns Interest Accrual List from connector" in new Fixture {
+  "getInterestAccrualList retrieves Interest Accrual List from connector and returns Right(InterestAccrualListWithInterestAccruedDays) for IDE interestType when retrieval of StatueRule is successful" in new Fixture {
+    when(
+      mockAccrualInterestListConnector.getInterestAccrualList(any(), any(), eqTo(LATE_PAYMENT_INTEREST))(
+        any[HeaderCarrier]
+      )
+    )
+      .thenReturn(Future.successful(interestAccrualList))
 
+    when(
+      mockInterestAccruedDaysCalcService.getInterestAccrualListWithInterestAccruedDays(
+        any(),
+        any(),
+        any(),
+        eqTo(LATE_PAYMENT_INTEREST)
+      )(any[HeaderCarrier])
+    )
+      .thenReturn(Future.successful(Right(interestAccrualListWithInterestAccruedDays)))
+
+    val result: Either[MissingDataError, InterestAccrualListWithInterestAccruedDays] =
+      service.getInterestAccrualList(taxRef, accPeriod, LATE_PAYMENT_INTEREST).futureValue
+
+    result shouldBe Right(interestAccrualListWithInterestAccruedDays)
+
+    verify(mockAccrualInterestListConnector, times(1)).getInterestAccrualList(any(), any(), any())(any[HeaderCarrier])
+    verify(mockInterestAccruedDaysCalcService, times(1))
+      .getInterestAccrualListWithInterestAccruedDays(any(), any(), any(), any())(any[HeaderCarrier])
+
+  }
+  "getInterestAccrualList retrieves Interest Accrual List from connector and returns Right(InterestAccrualListWithInterestAccruedDays) for non IDE interestType when retrieval of StatueRule is successful" in new Fixture {
+    when(mockAccrualInterestListConnector.getInterestAccrualList(any(), any(), eqTo("IDB"))(any[HeaderCarrier]))
+      .thenReturn(Future.successful(interestAccrualListForNonIDE))
+
+    when(
+      mockInterestAccruedDaysCalcService
+        .getInterestAccrualListWithInterestAccruedDays(any(), any(), any(), eqTo("IDB"))(any[HeaderCarrier])
+    )
+      .thenReturn(Future.successful(Right(interestAccrualListForNonIDEWithNoOfDays)))
+
+    val result: Either[MissingDataError, InterestAccrualListWithInterestAccruedDays] =
+      service.getInterestAccrualList(taxRef, accPeriod, "IDB").futureValue
+
+    result shouldBe Right(interestAccrualListForNonIDEWithNoOfDays)
+
+    verify(mockAccrualInterestListConnector, times(1)).getInterestAccrualList(any(), any(), any())(any[HeaderCarrier])
+    verify(mockInterestAccruedDaysCalcService, times(1))
+      .getInterestAccrualListWithInterestAccruedDays(any(), any(), any(), any())(any[HeaderCarrier])
+  }
+  "getInterestAccrualList retrieves Interest Accrual List from connector and returns Left(MissingStatueRule) when retrieval of StatueRule is unsuccessful for IDE interestType" in new Fixture {
     when(mockAccrualInterestListConnector.getInterestAccrualList(any[Long], any[Long], any[String])(any[HeaderCarrier]))
       .thenReturn(Future.successful(interestAccrualList))
 
-    val result: InterestAccrualList = service.getInterestAccrualList(1L, 1L, "IDB").futureValue
+    when(
+      mockInterestAccruedDaysCalcService.getInterestAccrualListWithInterestAccruedDays(
+        any(),
+        any(),
+        any(),
+        eqTo(LATE_PAYMENT_INTEREST)
+      )(any[HeaderCarrier])
+    )
+      .thenReturn(Future.successful(Left(MissingStatueRule("Cannot find the statue Rule"))))
 
-    result shouldBe interestAccrualListTransformed
+    val result: Either[MissingDataError, InterestAccrualListWithInterestAccruedDays] =
+      service.getInterestAccrualList(taxRef, accPeriod, "IDE").futureValue
 
-    verify(mockAccrualInterestListConnector).getInterestAccrualList(1L, 1L, "IDB")(hc)
+    result shouldBe Left(MissingStatueRule("Cannot find the statue Rule"))
+
+    verify(mockAccrualInterestListConnector, times(1)).getInterestAccrualList(any(), any(), any())(any[HeaderCarrier])
+    verify(mockInterestAccruedDaysCalcService, times(1))
+      .getInterestAccrualListWithInterestAccruedDays(any(), any(), any(), any())(any[HeaderCarrier])
+
   }
+  "getInterestAccrualList propagates exception from connector" in new Fixture {
+    when(
+      mockAccrualInterestListConnector.getInterestAccrualList(any(), any(), eqTo(LATE_PAYMENT_INTEREST))(
+        any[HeaderCarrier]
+      )
+    )
+      .thenReturn(Future.failed(new RuntimeException("Boom")))
 
-  // TODO: extend testing to cover CTPF scenarios
+    when(
+      mockInterestAccruedDaysCalcService.getInterestAccrualListWithInterestAccruedDays(
+        any(),
+        any(),
+        any(),
+        eqTo(LATE_PAYMENT_INTEREST)
+      )(any[HeaderCarrier])
+    )
+      .thenReturn(Future.successful(Right(interestAccrualListWithInterestAccruedDays)))
+
+    val ex = intercept[Exception] {
+      service.getInterestAccrualList(taxRef, accPeriod, LATE_PAYMENT_INTEREST).futureValue
+    }
+
+    ex.getMessage should include("Boom")
+
+    verify(mockAccrualInterestListConnector, times(1)).getInterestAccrualList(any(), any(), any())(any[HeaderCarrier])
+    verifyNoInteractions(mockInterestAccruedDaysCalcService)
+  }
+  "getInterestAccrualList propagates exception from InterestAccruedDaysCalculationService for IDE interestType" in new Fixture {
+    when(
+      mockAccrualInterestListConnector.getInterestAccrualList(any(), any(), eqTo(LATE_PAYMENT_INTEREST))(
+        any[HeaderCarrier]
+      )
+    )
+      .thenReturn(Future.successful(interestAccrualList))
+
+    when(
+      mockInterestAccruedDaysCalcService.getInterestAccrualListWithInterestAccruedDays(
+        any(),
+        any(),
+        any(),
+        eqTo(LATE_PAYMENT_INTEREST)
+      )(any[HeaderCarrier])
+    )
+      .thenReturn(Future.failed(new RuntimeException("Boom")))
+
+    val ex: Exception = intercept[Exception] {
+      service.getInterestAccrualList(taxRef, accPeriod, LATE_PAYMENT_INTEREST).futureValue
+    }
+
+    ex.getMessage should include("Boom")
+
+    verify(mockAccrualInterestListConnector, times(1)).getInterestAccrualList(any(), any(), any())(any[HeaderCarrier])
+    verify(mockInterestAccruedDaysCalcService, times(1))
+      .getInterestAccrualListWithInterestAccruedDays(any(), any(), any(), any())(any[HeaderCarrier])
+  }
 
 }

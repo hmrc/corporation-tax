@@ -62,19 +62,20 @@ class InterestAccruedDaysCalculationServiceSpec
 
   "InterestAccruedDaysCalculationService.getInterestAccrualListWithInterestAccruedDays" should {
 
-    "NOT-IDE InterestTypes" should {
+    "NON-IDE InterestTypes" should {
       "return Right(InterestAccrualListWithInterestAccruedDays) with calculated interestAccruedDays" in new BaseSetup {
         val statueRuleResponse: StatuteRuleResponse  = statuteRuleResponseGen(21)
         val fromDate: LocalDate                      = LocalDate.of(2021, 3, 7)
         val toDate: LocalDate                        = LocalDate.of(2021, 5, 7)
         val apEndDate: LocalDate                     = LocalDate.of(2021, 6, 7)
         val interestAccrualList: InterestAccrualList = interestAccrualListGen(fromDate, toDate, apEndDate)
+        println(interestAccrualList)
 
         val actualNoOfDays: Long = 62L //  noOfDays = toDate - fromDate + 1
 
         val expectedResult: InterestAccrualListWithInterestAccruedDays =
           interestAccrualListWithInterestAccruedDaysGen(fromDate, toDate, actualNoOfDays, apEndDate)
-
+        println(expectedResult)
         when(mockService.getStatueRule(any(), any(), any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(statueRuleResponse)))
 

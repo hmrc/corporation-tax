@@ -16,13 +16,16 @@
 
 package uk.gov.hmrc.corporationtax.helpers
 
-import uk.gov.hmrc.corporationtax.models.{InterestAccrual, InterestAccrualList, InterestAccrualListWithInterestAccruedDays, InterestAccrualWithInterestAccruedDays, StatuteRuleRecord, StatuteRuleResponse}
+import uk.gov.hmrc.corporationtax.models.{
+  InterestAccrual, InterestAccrualList, InterestAccrualListWithInterestAccruedDays,
+  InterestAccrualWithInterestAccruedDays, StatuteRuleRecord, StatuteRuleResponse
+}
 
 import java.time.LocalDate
 
 trait InterestAccrualListWithNoOfDaysHelper {
-  
-  def statuteRuleResponseGen(numberOfDays: Int): StatuteRuleResponse = StatuteRuleResponse(
+
+  def statuteRuleResponseGen(numberOfDays: Int): StatuteRuleResponse                                            = StatuteRuleResponse(
     statuteRule = StatuteRuleRecord(
       ruleStartDate = Some(LocalDate.of(2011, 1, 1)),
       ruleEndDate = Some(LocalDate.of(2012, 1, 1)),
@@ -31,7 +34,7 @@ trait InterestAccrualListWithNoOfDaysHelper {
       ruleRate = BigDecimal(1.47)
     )
   )
-  def interestAccrualListGen(fromDate:LocalDate, toDate:LocalDate, apEndDate:LocalDate): InterestAccrualList                                                        =
+  def interestAccrualListGen(fromDate: LocalDate, toDate: LocalDate, apEndDate: LocalDate): InterestAccrualList =
     InterestAccrualList(
       List(
         InterestAccrual(
@@ -44,7 +47,12 @@ trait InterestAccrualListWithNoOfDaysHelper {
         )
       )
     )
-  def interestAccrualListWithInterestAccruedDaysGen(fromDate:LocalDate, toDate:LocalDate, noOfDays:Long, apEndDate:LocalDate): InterestAccrualListWithInterestAccruedDays =
+  def interestAccrualListWithInterestAccruedDaysGen(
+    fromDate: LocalDate,
+    toDate: LocalDate,
+    noOfDays: Long,
+    apEndDate: LocalDate
+  ): InterestAccrualListWithInterestAccruedDays =
     InterestAccrualListWithInterestAccruedDays(
       List(
         InterestAccrualWithInterestAccruedDays(
