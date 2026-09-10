@@ -18,7 +18,7 @@ package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.InterestAccrualListConnector
-import uk.gov.hmrc.corporationtax.models.InterestAccrualList
+import uk.gov.hmrc.corporationtax.models.{InterestAccrualListWithInterestAccruedDays, MissingDataError}
 import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
 import uk.gov.hmrc.corporationtax.utils.applyAmountTransformToList
 import uk.gov.hmrc.http.HeaderCarrier
@@ -27,20 +27,29 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class InterestAccrualListService @Inject() (
-  connector: InterestAccrualListConnector
+  connector: InterestAccrualListConnector,
+  interestAccruedDaysService: InterestAccruedDaysCalculationService
 )(implicit ec: ExecutionContext)
     extends Logging {
 
   def getInterestAccrualList(taxRef: Long, accPeriod: Long, interestType: String)(implicit
     hc: HeaderCarrier
-  ): Future[InterestAccrualList] = {
+  ): Future[Either[MissingDataError, InterestAccrualListWithInterestAccruedDays]] = {
     logger.info(
       s"Calling RDS InterestAccrual with params: taxRef: $taxRef, accPeriod: $accPeriod, interestType: $interestType"
     )
-    connector.getInterestAccrualList(taxRef, accPeriod, interestType).map { interestAccruals =>
-      interestAccruals
-        .copy(interestAccruals = applyAmountTransformToList(interestAccruals.interestAccruals))
-    }
+    connector
+      .getInterestAccrualList(taxRef, accPeriod, interestType)
+      .flatMap { interestAccruals =>
+        val transformedList = interestAccruals
+          .copy(interestAccruals = applyAmountTransformToList(interestAccruals.interestAccruals))
+        interestAccruedDaysService.getInterestAccrualListWithInterestAccruedDays(
+          transformedList,
+          taxRef,
+          accPeriod,
+          interestType
+        )
+      }
   }
 
 }

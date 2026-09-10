@@ -45,14 +45,14 @@ trait StatuteRuleHelper {
     ruleRate = None
   )
 
-  val defaultResponseRecord = StatuteRuleRecord(
+  val defaultResponseRecord                    = StatuteRuleRecord(
     ruleStartDate = Some(LocalDate.of(2011, 1, 1)),
     ruleEndDate = Some(LocalDate.of(2012, 1, 1)),
     numberOfDays = 87,
     ruleAmount = BigDecimal(145.001),
     ruleRate = BigDecimal(1.47)
   )
-  val statuteRuleResponse:StatuteRuleResponse = StatuteRuleResponse(
+  val statuteRuleResponse: StatuteRuleResponse = StatuteRuleResponse(
     statuteRule = defaultResponseRecord
   )
 

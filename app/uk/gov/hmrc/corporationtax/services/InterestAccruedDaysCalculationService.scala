@@ -44,10 +44,10 @@ class InterestAccruedDaysCalculationService @Inject() (
   )(implicit hc: HeaderCarrier): Future[Either[MissingDataError, InterestAccrualListWithInterestAccruedDays]] =
     interestType match {
       case LATE_PAYMENT_INTEREST =>
-        logger.info("Calculating number of days for interestAccrued for IDE InterestType")
+        logger.info(s"Calculating number of days for interestAccrued for interestType: $interestType")
         getChargeableDaysForIDE(interestAccrualList: InterestAccrualList)
       case _                     =>
-        logger.info("Calculating number of days for interestAccrued for NON-IDE InterestType")
+        logger.info(s"Calculating number of days for interestAccrued for InterestType :$interestType")
         Future.successful(Right(getChargeableDaysForNonIDEInterestTypes(interestAccrualList: InterestAccrualList)))
     }
 
@@ -87,7 +87,7 @@ class InterestAccruedDaysCalculationService @Inject() (
                 s"Cannot calculate number of days of interestAccrued, GET StatueRule returned invalid response due to:${error.message} "
               )
               Left(error)
-            case Right(days)                   =>
+            case Right(days) =>
               Right(
                 InterestAccrualWithInterestAccruedDays(
                   computationAmount = value.computationAmount,
