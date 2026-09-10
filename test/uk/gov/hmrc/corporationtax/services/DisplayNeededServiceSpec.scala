@@ -17,7 +17,7 @@
 package uk.gov.hmrc.corporationtax.Services
 
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -79,6 +79,21 @@ class DisplayNeededServiceSpec
     result shouldBe displayNeededMixed
 
     verify(mockDisplayNeededConnector).getDisplayNeeded(30L, 1L)(hc)
+  }
+
+  "getPayments returns failure from connector" in new Fixture {
+
+    val ex = new RuntimeException("Failed to retrieve display needed")
+
+    when(mockDisplayNeededConnector.getDisplayNeeded(any(), any())(any[HeaderCarrier])).thenReturn(Future.failed(ex))
+
+    val result: Throwable = service.getDisplayNeeded(999L, 1L).failed.futureValue
+
+    result shouldBe ex
+
+    verify(mockDisplayNeededConnector).getDisplayNeeded(999L, 1L)(hc)
+    verifyNoMoreInteractions(mockDisplayNeededConnector)
+
   }
 
 }

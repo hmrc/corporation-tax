@@ -22,6 +22,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
 import uk.gov.hmrc.corporationtax.helpers.DisplayNeededHelper
 import uk.gov.hmrc.http.HeaderCarrier
@@ -36,17 +37,17 @@ class DisplayNeededConnectorISpec
     with DisplayNeededHelper {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
-
+  
+  implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val connector: DisplayNeededConnector = app.injector.instanceOf[DisplayNeededConnector]
 
   // TODO: add auth stub and relevant cases
   "getDisplayNeeded" should {
 
     def url(taxRef: Long, accPeriod: Long) =
-      s"/rds-datacache-proxy/corporation-tax/display-needed/$taxRef/$accPeriod"
+      s"${appConfig.rdsDatacacheProxyEndpoint}/display-needed/$taxRef/$accPeriod"
 
-    // {"taxIsDisplayNeededFlag":"Y","interestIsDisplayNeededFlag":"N","paymentIsDisplayNeededFlag":"Y","repayReallocIsDisplayNeededFlag":"N"}
-    "return Display Needed from BE with status code OK, with taxRef: 10L" in {
+    "return Display Needed with all flags set as No from BE with status code OK, with taxRef: 10L" in {
       stubFor(
         get(urlPathEqualTo(url(10L, 1L)))
           .willReturn(
@@ -67,7 +68,7 @@ class DisplayNeededConnectorISpec
       result mustBe displayNeededResponseAllFalse
     }
 
-    "return Display Needed from BE with status code OK, with taxRef: 20L" in {
+    "return Display Needed with all flags set as Yes from BE with status code OK, with taxRef: 20L" in {
       stubFor(
         get(urlPathEqualTo(url(20L, 1L)))
           .willReturn(
@@ -88,7 +89,7 @@ class DisplayNeededConnectorISpec
       result mustBe displayNeededResponseAllTrue
     }
 
-    "return Display Needed from BE with status code OK, with taxRef: 30L" in {
+    "return Display Needed with some flags set as No or Yes, from BE with status code OK, with taxRef: 30L" in {
       stubFor(
         get(urlPathEqualTo(url(30L, 1L)))
           .willReturn(
