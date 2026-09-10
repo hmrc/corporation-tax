@@ -173,6 +173,8 @@ class RepayReallocationSummaryServiceSpec
       ex.getMessage should include("error")
 
       verify(mockRepaymentsService).getRepayments(1L, 2L)
+      verifyNoInteractions(mockReallocationsFromService)
+      verifyNoInteractions(mockReallocationsToService)
     }
   }
 
