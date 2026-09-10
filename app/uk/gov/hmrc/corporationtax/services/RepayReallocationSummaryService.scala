@@ -1,0 +1,82 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.corporationtax.services
+
+import play.api.Logging
+import uk.gov.hmrc.corporationtax.models.{RepayReallocationSummary, RepayReallocationSummaryDetails}
+import uk.gov.hmrc.http.HeaderCarrier
+
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+
+class RepayReallocationSummaryService @Inject() (
+  repaymentsService: RepaymentsService,
+  reallocationFromService: ReallocationFromAccPeriodService,
+  reallocationToService: ReallocationService
+)(implicit ec: ExecutionContext)
+    extends Logging {
+
+  def getRepayReallocationSummary(taxRef: Long, accPeriod: Long)(implicit
+    hc: HeaderCarrier
+  ): Future[RepayReallocationSummary] = {
+    logger.info(s"Calling connector for taxRef: $taxRef and accPeriod: $accPeriod")
+
+    for {
+      repayments       <- repaymentsService.getRepayments(taxRef, accPeriod)
+      reallocationFrom <- reallocationFromService.getReallocationFromAccPeriod(taxRef, accPeriod)
+      reallocationTo   <- reallocationToService.getByAccountingPeriod(taxRef, accPeriod)
+    } yield {
+      val repaymentsSummary = repayments.repayments.map { repaymentsDetails =>
+        RepayReallocationSummaryDetails(
+          transactionDate = Some(repaymentsDetails.repaymentDate),
+          `type` = Some(repaymentsDetails.repaymentType),
+          amount = repaymentsDetails.amount,
+          accountingPeriodEndDate = None,
+          taxpayerReference = None
+        )
+      }
+
+      val reallocationFromSummary = reallocationFrom.reallocation.map { reallocFrom =>
+        RepayReallocationSummaryDetails(
+          transactionDate = Some(reallocFrom.reallocationDate),
+          `type` = Some(reallocFrom.transactionType.value),
+          amount = Some(reallocFrom.amount),
+          accountingPeriodEndDate = reallocFrom.destinationApEndDate,
+          taxpayerReference = Some(reallocFrom.destinationTaxPayerReference)
+        )
+      }
+
+      val reallocationToSummary = reallocationTo.reallocation.map { reallocTo =>
+        RepayReallocationSummaryDetails(
+          transactionDate = Some(reallocTo.reallocationDate),
+          `type` = Some(reallocTo.transactionType.value),
+          amount = Some(reallocTo.amount),
+          accountingPeriodEndDate = reallocTo.sourceApEndDate,
+          taxpayerReference = Some(reallocTo.sourceTaxpayerReference)
+        )
+      }
+
+      val rawCombinedSummary = repaymentsSummary ++ reallocationFromSummary ++ reallocationToSummary
+
+      val sortedCombinedSummary = rawCombinedSummary.sortBy(_.transactionDate).reverse
+
+      RepayReallocationSummary(
+        transactions = sortedCombinedSummary
+      )
+    }
+  }
+}
