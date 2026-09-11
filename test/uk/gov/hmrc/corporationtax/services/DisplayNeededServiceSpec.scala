@@ -30,11 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DisplayNeededServiceSpec
-  extends AnyWordSpec
-    with Matchers
-    with DisplayNeededHelper
-    with ScalaFutures {
+class DisplayNeededServiceSpec extends AnyWordSpec with Matchers with DisplayNeededHelper with ScalaFutures {
 
   private trait Fixture {
     val mockDisplayNeededConnector: DisplayNeededConnector = mock[DisplayNeededConnector]
