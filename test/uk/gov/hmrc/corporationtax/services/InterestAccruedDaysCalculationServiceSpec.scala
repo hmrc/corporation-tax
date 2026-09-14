@@ -74,7 +74,7 @@ class InterestAccruedDaysCalculationServiceSpec
 
         val expectedResult: InterestAccrualListWithInterestAccruedDays =
           interestAccrualListWithInterestAccruedDaysGen(fromDate, toDate, actualNoOfDays, apEndDate)
-        
+
         when(mockService.getStatuteRule(any(), any(), any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(statueRuleResponse)))
 
