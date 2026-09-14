@@ -69,13 +69,12 @@ class InterestAccruedDaysCalculationServiceSpec
         val toDate: LocalDate                        = LocalDate.of(2021, 5, 7)
         val apEndDate: LocalDate                     = LocalDate.of(2021, 6, 7)
         val interestAccrualList: InterestAccrualList = interestAccrualListGen(fromDate, toDate, apEndDate)
-        println(interestAccrualList)
 
         val actualNoOfDays: Int = 62 //  noOfDays = toDate - fromDate + 1
 
         val expectedResult: InterestAccrualListWithInterestAccruedDays =
           interestAccrualListWithInterestAccruedDaysGen(fromDate, toDate, actualNoOfDays, apEndDate)
-        println(expectedResult)
+        
         when(mockService.getStatuteRule(any(), any(), any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(statueRuleResponse)))
 

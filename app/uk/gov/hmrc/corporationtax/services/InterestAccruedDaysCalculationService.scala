@@ -125,30 +125,31 @@ class InterestAccruedDaysCalculationService @Inject() (
     toDate: LocalDate,
     fromDate: LocalDate
   )(implicit hc: HeaderCarrier): Future[Either[MissingDataError, Int]] =
+
+    val configuredValueForMonthsResponse =
+      statuteRuleService
+        .getStatuteRule(APPEND_DUE_DATE_MONTHS, apEndDate, apEndDate)
+        .map(_.toRight(MissingStatuteRule(s"Cannot find statute rule for ruleRateKey:$APPEND_DUE_DATE_MONTHS")))
+    val configuredValueForDaysResponse   =
+      statuteRuleService
+        .getStatuteRule(APPEND_DUE_DATE_DAYS, apEndDate, apEndDate)
+        .map(_.toRight(MissingStatuteRule(s"Cannot find statute rule for ruleRateKey:$APPEND_DUE_DATE_DAYS")))
     for {
-      configuredValueForMonthsResponse <-
-        statuteRuleService
-          .getStatuteRule(APPEND_DUE_DATE_MONTHS, apEndDate, apEndDate)
-          .map(_.toRight(MissingStatuteRule(s"Cannot find statute rule for ruleRateKey:$APPEND_DUE_DATE_MONTHS")))
-      configuredValueForDaysResponse   <-
-        statuteRuleService
-          .getStatuteRule(APPEND_DUE_DATE_DAYS, apEndDate, apEndDate)
-          .map(_.toRight(MissingStatuteRule(s"Cannot find statute rule for ruleRateKey:$APPEND_DUE_DATE_DAYS")))
-    } yield for {
       monthsResponse <- configuredValueForMonthsResponse
       daysResponse   <- configuredValueForDaysResponse
+    } yield for {
+      monthsResponseOutput <- monthsResponse
+      daysResponseOutput   <- daysResponse
     } yield {
-
       val normalDueDate = apEndDate
-        .plusMonths(monthsResponse.statuteRule.numberOfDays.toLong)
-        .plusDays(daysResponse.statuteRule.numberOfDays.toLong)
+        .plusMonths(monthsResponseOutput.statuteRule.numberOfDays.toLong)
+        .plusDays(daysResponseOutput.statuteRule.numberOfDays.toLong)
 
       if (fromDate == normalDueDate) {
         ChronoUnit.DAYS.between(fromDate, toDate).toInt
       } else {
         calculateChargeableDays(fromDate, toDate)
       }
-
     }
 
 }
