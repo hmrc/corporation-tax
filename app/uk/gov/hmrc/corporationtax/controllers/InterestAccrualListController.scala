@@ -19,7 +19,7 @@ package uk.gov.hmrc.corporationtax.controllers
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.corporationtax.models.MissingStatueRule
+import uk.gov.hmrc.corporationtax.models.MissingStatuteRule
 import uk.gov.hmrc.corporationtax.services.InterestAccrualListService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -43,7 +43,7 @@ class InterestAccrualListController @Inject() (
               s"Successfully retrieved InterestAccrualListWithInterestAccruedDays for taxRef:$taxRef, accPeriod:$accPeriod, interestType:$interestType"
             )
             Ok(Json.toJson(interestAccrualListWithInterestAccruedDays))
-          case Left(error: MissingStatueRule)                    =>
+          case Left(error: MissingStatuteRule)                   =>
             logger.error(s"Error while retrieving InterestAccrualListWithInterestAccruedDays:${error.message}")
             NotFound(Json.toJson("error" -> error.message))
         }

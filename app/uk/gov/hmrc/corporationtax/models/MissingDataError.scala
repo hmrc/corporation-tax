@@ -22,6 +22,6 @@ sealed trait MissingDataError {
 
 sealed trait MissingFieldError extends MissingDataError
 
-case class MissingStatueRule(value: String) extends MissingFieldError {
-  val message = s"Statue Rule not found: $value"
+case class MissingStatuteRule(value: String) extends MissingFieldError {
+  val message = s"Statute Rule not found: $value"
 }

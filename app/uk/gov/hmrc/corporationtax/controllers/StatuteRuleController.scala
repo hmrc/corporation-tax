@@ -34,9 +34,9 @@ class StatuteRuleController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def getStatueRule(queryParams: StatuteQueryParams): Action[AnyContent] = Action.async { implicit request =>
+  def getStatuteRule(queryParams: StatuteQueryParams): Action[AnyContent] = Action.async { implicit request =>
     service
-      .getStatueRule(queryParams.ruleKey, queryParams.startDate, queryParams.endDate)
+      .getStatuteRule(queryParams.ruleKey, queryParams.startDate, queryParams.endDate)
       .map {
         case Some(responseRecord) =>
           Ok(

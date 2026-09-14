@@ -31,7 +31,7 @@ import uk.gov.hmrc.corporationtax.models.BusinessConstants.{
   APPEND_DUE_DATE_DAYS, APPEND_DUE_DATE_MONTHS, LATE_PAYMENT_INTEREST
 }
 import uk.gov.hmrc.corporationtax.models.{
-  InterestAccrualList, InterestAccrualListWithInterestAccruedDays, MissingDataError, MissingStatueRule,
+  InterestAccrualList, InterestAccrualListWithInterestAccruedDays, MissingDataError, MissingStatuteRule,
   StatuteRuleResponse
 }
 import uk.gov.hmrc.http.HeaderCarrier
@@ -76,7 +76,7 @@ class InterestAccruedDaysCalculationServiceSpec
         val expectedResult: InterestAccrualListWithInterestAccruedDays =
           interestAccrualListWithInterestAccruedDaysGen(fromDate, toDate, actualNoOfDays, apEndDate)
         println(expectedResult)
-        when(mockService.getStatueRule(any(), any(), any())(any[HeaderCarrier]))
+        when(mockService.getStatuteRule(any(), any(), any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(statueRuleResponse)))
 
         val result: Either[MissingDataError, InterestAccrualListWithInterestAccruedDays] = service
@@ -120,11 +120,11 @@ class InterestAccruedDaysCalculationServiceSpec
         interestAccrualListWithInterestAccruedDaysGen(fromDate, toDate, actualNoOfDays, apEndDate)
 
       when(
-        mockService.getStatueRule(eqTo(APPEND_DUE_DATE_MONTHS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
+        mockService.getStatuteRule(eqTo(APPEND_DUE_DATE_MONTHS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
       )
         .thenReturn(Future.successful(Some(statueRuleResponseForMonths)))
 
-      when(mockService.getStatueRule(eqTo(APPEND_DUE_DATE_DAYS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier]))
+      when(mockService.getStatuteRule(eqTo(APPEND_DUE_DATE_DAYS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(statueRuleResponseForDays)))
 
       val result: Either[MissingDataError, InterestAccrualListWithInterestAccruedDays] = service
@@ -140,7 +140,7 @@ class InterestAccruedDaysCalculationServiceSpec
 
       result.value.interestAccruals.head.noOfDays shouldBe actualNoOfDays
 
-      verify(mockService, times(2)).getStatueRule(any(), any(), any())(any[HeaderCarrier])
+      verify(mockService, times(2)).getStatuteRule(any(), any(), any())(any[HeaderCarrier])
       verifyNoMoreInteractions(mockService)
 
     }
@@ -159,11 +159,11 @@ class InterestAccruedDaysCalculationServiceSpec
         interestAccrualListWithInterestAccruedDaysGen(fromDate, toDate, actualNoOfDays, apEndDate)
 
       when(
-        mockService.getStatueRule(eqTo(APPEND_DUE_DATE_MONTHS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
+        mockService.getStatuteRule(eqTo(APPEND_DUE_DATE_MONTHS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
       )
         .thenReturn(Future.successful(Some(statueRuleResponseForMonths)))
 
-      when(mockService.getStatueRule(eqTo(APPEND_DUE_DATE_DAYS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier]))
+      when(mockService.getStatuteRule(eqTo(APPEND_DUE_DATE_DAYS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(statueRuleResponseForDays)))
 
       val result: Either[MissingDataError, InterestAccrualListWithInterestAccruedDays] = service
@@ -179,7 +179,7 @@ class InterestAccruedDaysCalculationServiceSpec
 
       result.value.interestAccruals.head.noOfDays shouldBe actualNoOfDays
 
-      verify(mockService, times(2)).getStatueRule(any(), any(), any())(any[HeaderCarrier])
+      verify(mockService, times(2)).getStatuteRule(any(), any(), any())(any[HeaderCarrier])
       verifyNoMoreInteractions(mockService)
     }
     "Error cases and exception cases " should {
@@ -192,12 +192,12 @@ class InterestAccruedDaysCalculationServiceSpec
 
       "return Left(MissingStatuteRuleError), when retrieving statuteRule returns None for APPEND_DUE_DATE_MONTHS call" in new BaseSetup {
         when(
-          mockService.getStatueRule(eqTo(APPEND_DUE_DATE_MONTHS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
+          mockService.getStatuteRule(eqTo(APPEND_DUE_DATE_MONTHS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
         )
           .thenReturn(Future.successful(None))
 
         when(
-          mockService.getStatueRule(eqTo(APPEND_DUE_DATE_DAYS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
+          mockService.getStatuteRule(eqTo(APPEND_DUE_DATE_DAYS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
         )
           .thenReturn(Future.successful(Some(statueRuleResponseForDays)))
 
@@ -210,18 +210,18 @@ class InterestAccruedDaysCalculationServiceSpec
           )
           .futureValue
 
-        result shouldBe Left(MissingStatueRule(s"Cannot find statue rule for ruleRateKey:$APPEND_DUE_DATE_MONTHS"))
-        verify(mockService, times(2)).getStatueRule(any(), any(), any())(any[HeaderCarrier])
+        result shouldBe Left(MissingStatuteRule(s"Cannot find statute rule for ruleRateKey:$APPEND_DUE_DATE_MONTHS"))
+        verify(mockService, times(2)).getStatuteRule(any(), any(), any())(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)
       }
       "return Left(MissingStatuteRuleError), when retrieving statuteRule returns None for APPEND_DUE_DATE_DAYS call" in new BaseSetup {
         when(
-          mockService.getStatueRule(eqTo(APPEND_DUE_DATE_MONTHS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
+          mockService.getStatuteRule(eqTo(APPEND_DUE_DATE_MONTHS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
         )
           .thenReturn(Future.successful(Some(statueRuleResponseForMonths)))
 
         when(
-          mockService.getStatueRule(eqTo(APPEND_DUE_DATE_DAYS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
+          mockService.getStatuteRule(eqTo(APPEND_DUE_DATE_DAYS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
         )
           .thenReturn(Future.successful(None))
 
@@ -234,18 +234,18 @@ class InterestAccruedDaysCalculationServiceSpec
           )
           .futureValue
 
-        result shouldBe Left(MissingStatueRule(s"Cannot find statue rule for ruleRateKey:$APPEND_DUE_DATE_DAYS"))
-        verify(mockService, times(2)).getStatueRule(any(), any(), any())(any[HeaderCarrier])
+        result shouldBe Left(MissingStatuteRule(s"Cannot find statute rule for ruleRateKey:$APPEND_DUE_DATE_DAYS"))
+        verify(mockService, times(2)).getStatuteRule(any(), any(), any())(any[HeaderCarrier])
         verifyNoMoreInteractions(mockService)
       }
       "propagate Upstream error,when retrieving statuteRule returns an exception" in new BaseSetup {
         when(
-          mockService.getStatueRule(eqTo(APPEND_DUE_DATE_MONTHS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
+          mockService.getStatuteRule(eqTo(APPEND_DUE_DATE_MONTHS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
         )
           .thenReturn(Future.failed(new RuntimeException("Boom")))
 
         when(
-          mockService.getStatueRule(eqTo(APPEND_DUE_DATE_DAYS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
+          mockService.getStatuteRule(eqTo(APPEND_DUE_DATE_DAYS), eqTo(apEndDate), eqTo(apEndDate))(any[HeaderCarrier])
         )
           .thenReturn(Future.failed(new RuntimeException("Boom")))
 

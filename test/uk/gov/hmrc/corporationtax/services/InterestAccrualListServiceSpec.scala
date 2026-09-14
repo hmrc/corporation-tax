@@ -28,7 +28,7 @@ import uk.gov.hmrc.corporationtax.connectors.InterestAccrualListConnector
 import uk.gov.hmrc.corporationtax.helpers.InterestAccrualListHelper
 import uk.gov.hmrc.corporationtax.models.BusinessConstants.LATE_PAYMENT_INTEREST
 import uk.gov.hmrc.corporationtax.models.{
-  InterestAccrualListWithInterestAccruedDays, MissingDataError, MissingStatueRule
+  InterestAccrualListWithInterestAccruedDays, MissingDataError, MissingStatuteRule
 }
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -103,7 +103,7 @@ class InterestAccrualListServiceSpec
     verify(mockInterestAccruedDaysCalcService, times(1))
       .getInterestAccrualListWithInterestAccruedDays(any(), any(), any(), any())(any[HeaderCarrier])
   }
-  "getInterestAccrualList retrieves Interest Accrual List from connector and returns Left(MissingStatueRule) when retrieval of StatueRule is unsuccessful for IDE interestType" in new Fixture {
+  "getInterestAccrualList retrieves Interest Accrual List from connector and returns Left(MissingStatuteRule) when retrieval of StatueRule is unsuccessful for IDE interestType" in new Fixture {
     when(mockAccrualInterestListConnector.getInterestAccrualList(any[Long], any[Long], any[String])(any[HeaderCarrier]))
       .thenReturn(Future.successful(interestAccrualList))
 
@@ -115,12 +115,12 @@ class InterestAccrualListServiceSpec
         eqTo(LATE_PAYMENT_INTEREST)
       )(any[HeaderCarrier])
     )
-      .thenReturn(Future.successful(Left(MissingStatueRule("Cannot find the statue Rule"))))
+      .thenReturn(Future.successful(Left(MissingStatuteRule("Cannot find the statue Rule"))))
 
     val result: Either[MissingDataError, InterestAccrualListWithInterestAccruedDays] =
       service.getInterestAccrualList(taxRef, accPeriod, "IDE").futureValue
 
-    result shouldBe Left(MissingStatueRule("Cannot find the statue Rule"))
+    result shouldBe Left(MissingStatuteRule("Cannot find the statue Rule"))
 
     verify(mockAccrualInterestListConnector, times(1)).getInterestAccrualList(any(), any(), any())(any[HeaderCarrier])
     verify(mockInterestAccruedDaysCalcService, times(1))

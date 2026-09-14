@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class StatuteRuleConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext)
     extends Logging {
 
-  def getStatueRule(ruleRateKey: String, startDateStr: String, endDateStr: String)(implicit
+  def getStatuteRule(ruleRateKey: String, startDateStr: String, endDateStr: String)(implicit
     hc: HeaderCarrier
   ): Future[Option[StatuteRule]] = {
     val url: URL =
@@ -41,7 +41,7 @@ class StatuteRuleConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(
       .get(url)
       .execute[Option[StatuteRule]]
       .recover { case e: Throwable =>
-        logger.error(s"[StatuteRuleConnector][getStatueRule]: $ruleRateKey :: $startDateStr - ${e.getMessage}")
+        logger.error(s"[StatuteRuleConnector][getStatuteRule]: $ruleRateKey :: $startDateStr - ${e.getMessage}")
         throw new RuntimeException(e.getMessage)
       }
   }

@@ -42,7 +42,7 @@ class StatuteConnectorISpec
   implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val connector: StatuteRuleConnector = app.injector.instanceOf[StatuteRuleConnector]
 
-  "getStatueRule" should {
+  "getStatuteRule" should {
 
     def url(ruleRateKey: String, startDateStr: String, endDateStr: String) =
       s"${appConfig.rdsDatacacheProxyEndpoint}/statute-rule?ruleKey=$ruleRateKey&startDate=$startDateStr&endDate=$endDateStr"
@@ -57,7 +57,7 @@ class StatuteConnectorISpec
           )
       )
 
-      val result = connector.getStatueRule("C1", "1999-01-19", "1999-07-20").futureValue
+      val result = connector.getStatuteRule("C1", "1999-01-19", "1999-07-20").futureValue
       result mustBe None
     }
 
@@ -81,7 +81,7 @@ class StatuteConnectorISpec
           )
       )
 
-      val result = connector.getStatueRule("C2", "1999-01-19", "1999-07-20").futureValue
+      val result = connector.getStatuteRule("C2", "1999-01-19", "1999-07-20").futureValue
       result mustBe Some(StatuteRule(defaultRecord))
     }
 
@@ -101,7 +101,7 @@ class StatuteConnectorISpec
           )
       )
 
-      val result = connector.getStatueRule("C1", "1999-01-19", "1999-07-20").futureValue
+      val result = connector.getStatuteRule("C1", "1999-01-19", "1999-07-20").futureValue
       result mustBe Some(StatuteRule(recordWithEmptyFields))
     }
 
@@ -120,7 +120,7 @@ class StatuteConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getStatueRule("C1", "1999-01-19", "1999-07-20").futureValue
+        connector.getStatuteRule("C1", "1999-01-19", "1999-07-20").futureValue
       }
       ex.getMessage.toLowerCase must include("error")
     }

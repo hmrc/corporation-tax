@@ -27,7 +27,7 @@ import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.corporationtax.helpers.InterestAccrualListHelper
-import uk.gov.hmrc.corporationtax.models.MissingStatueRule
+import uk.gov.hmrc.corporationtax.models.MissingStatuteRule
 import uk.gov.hmrc.corporationtax.services.InterestAccrualListService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -70,7 +70,7 @@ class InterestAccrualListControllerSpec extends AnyWordSpec with Matchers with I
     }
     "return NOT_FOUND when retrieving InterestAccrualListWithInterestAccruedDays fails: for IDE interestType" in new Fixture {
       when(mockInterestAccrualListService.getInterestAccrualList(any(), any(), eqTo(ide))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Left(MissingStatueRule("Cannot find statue Rule"))))
+        .thenReturn(Future.successful(Left(MissingStatuteRule("Cannot find statue Rule"))))
 
       val result: Future[Result] = controller.getInterestAccrualList(taxRef, accPeriod, ide)(fakeRequest)
 

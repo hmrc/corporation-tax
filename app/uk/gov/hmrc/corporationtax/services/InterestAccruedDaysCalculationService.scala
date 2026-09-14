@@ -22,7 +22,7 @@ import uk.gov.hmrc.corporationtax.models.BusinessConstants.{
 }
 import uk.gov.hmrc.corporationtax.models.{
   InterestAccrualList, InterestAccrualListWithInterestAccruedDays, InterestAccrualWithInterestAccruedDays,
-  MissingDataError, MissingStatueRule
+  MissingDataError, MissingStatuteRule
 }
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -84,7 +84,7 @@ class InterestAccruedDaysCalculationService @Inject() (
           ).map {
             case Left(error) =>
               logger.error(
-                s"Cannot calculate number of days of interestAccrued, GET StatueRule returned invalid response due to:${error.message} "
+                s"Cannot calculate number of days of interestAccrued, GET StatuteRule returned invalid response due to:${error.message} "
               )
               Left(error)
             case Right(days) =>
@@ -106,7 +106,7 @@ class InterestAccruedDaysCalculationService @Inject() (
       .map { results =>
         results
           .collectFirst { case Left(error) =>
-            logger.error(s"Cannot retrieve the statue rule due to ${error.message}")
+            logger.error(s"Cannot retrieve the statute rule due to ${error.message}")
             Left(error)
           }
           .getOrElse {
@@ -128,12 +128,12 @@ class InterestAccruedDaysCalculationService @Inject() (
     for {
       configuredValueForMonthsResponse <-
         statuteRuleService
-          .getStatueRule(APPEND_DUE_DATE_MONTHS, apEndDate, apEndDate)
-          .map(_.toRight(MissingStatueRule(s"Cannot find statue rule for ruleRateKey:$APPEND_DUE_DATE_MONTHS")))
+          .getStatuteRule(APPEND_DUE_DATE_MONTHS, apEndDate, apEndDate)
+          .map(_.toRight(MissingStatuteRule(s"Cannot find statute rule for ruleRateKey:$APPEND_DUE_DATE_MONTHS")))
       configuredValueForDaysResponse   <-
         statuteRuleService
-          .getStatueRule(APPEND_DUE_DATE_DAYS, apEndDate, apEndDate)
-          .map(_.toRight(MissingStatueRule(s"Cannot find statue rule for ruleRateKey:$APPEND_DUE_DATE_DAYS")))
+          .getStatuteRule(APPEND_DUE_DATE_DAYS, apEndDate, apEndDate)
+          .map(_.toRight(MissingStatuteRule(s"Cannot find statute rule for ruleRateKey:$APPEND_DUE_DATE_DAYS")))
     } yield for {
       monthsResponse <- configuredValueForMonthsResponse
       daysResponse   <- configuredValueForDaysResponse
