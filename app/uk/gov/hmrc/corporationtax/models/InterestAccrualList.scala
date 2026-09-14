@@ -50,7 +50,7 @@ case class InterestAccrualWithInterestAccruedDays(
   interestRate: BigDecimal,
   interestAmount: BigDecimal,
   apEndDate: LocalDate,
-  noOfDays: Long
+  noOfDays: Int
 )
 object InterestAccrualWithInterestAccruedDays {
   implicit val format: OFormat[InterestAccrualWithInterestAccruedDays] =

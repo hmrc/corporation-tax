@@ -68,8 +68,8 @@ class InterestAccruedDaysCalculationService @Inject() (
       }
     )
 
-  private def calculateChargeableDays(fromDate: LocalDate, toDate: LocalDate): Long =
-    ChronoUnit.DAYS.between(fromDate, toDate) + 1L
+  private def calculateChargeableDays(fromDate: LocalDate, toDate: LocalDate): Int =
+    (ChronoUnit.DAYS.between(fromDate, toDate) + 1L).toInt
 
   private def getChargeableDaysForIDE(
     interestAccrualList: InterestAccrualList
@@ -124,7 +124,7 @@ class InterestAccruedDaysCalculationService @Inject() (
     apEndDate: LocalDate,
     toDate: LocalDate,
     fromDate: LocalDate
-  )(implicit hc: HeaderCarrier): Future[Either[MissingDataError, Long]] =
+  )(implicit hc: HeaderCarrier): Future[Either[MissingDataError, Int]] =
     for {
       configuredValueForMonthsResponse <-
         statuteRuleService
@@ -144,7 +144,7 @@ class InterestAccruedDaysCalculationService @Inject() (
         .plusDays(daysResponse.statuteRule.numberOfDays.toLong)
 
       if (fromDate == normalDueDate) {
-        ChronoUnit.DAYS.between(fromDate, toDate)
+        ChronoUnit.DAYS.between(fromDate, toDate).toInt
       } else {
         calculateChargeableDays(fromDate, toDate)
       }

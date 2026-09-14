@@ -71,7 +71,7 @@ class InterestAccruedDaysCalculationServiceSpec
         val interestAccrualList: InterestAccrualList = interestAccrualListGen(fromDate, toDate, apEndDate)
         println(interestAccrualList)
 
-        val actualNoOfDays: Long = 62L //  noOfDays = toDate - fromDate + 1
+        val actualNoOfDays: Int = 62 //  noOfDays = toDate - fromDate + 1
 
         val expectedResult: InterestAccrualListWithInterestAccruedDays =
           interestAccrualListWithInterestAccruedDaysGen(fromDate, toDate, actualNoOfDays, apEndDate)
@@ -114,7 +114,7 @@ class InterestAccruedDaysCalculationServiceSpec
       val fromDate: LocalDate                      = normalDueDate // fromDate = NormalDueDate
       val interestAccrualList: InterestAccrualList = interestAccrualListGen(fromDate, toDate, apEndDate)
 
-      val actualNoOfDays: Long = 879L //  noOfDays = toDate - fromDate
+      val actualNoOfDays: Int = 879 //  noOfDays = toDate - fromDate
 
       val expectedResult: InterestAccrualListWithInterestAccruedDays =
         interestAccrualListWithInterestAccruedDaysGen(fromDate, toDate, actualNoOfDays, apEndDate)
@@ -153,7 +153,7 @@ class InterestAccruedDaysCalculationServiceSpec
       val fromDate: LocalDate                      = LocalDate.of(2025, 12, 3)
       val interestAccrualList: InterestAccrualList = interestAccrualListGen(fromDate, toDate, apEndDate)
 
-      val actualNoOfDays: Long = 1252L //  noOfDays = (toDate - fromDate) +1L
+      val actualNoOfDays: Int = 1252 //  noOfDays = (toDate - fromDate) +1L
 
       val expectedResult: InterestAccrualListWithInterestAccruedDays =
         interestAccrualListWithInterestAccruedDaysGen(fromDate, toDate, actualNoOfDays, apEndDate)

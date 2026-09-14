@@ -50,7 +50,7 @@ trait InterestAccrualListHelper {
           interestRate = BigDecimal(2.00),
           interestAmount = BigDecimal(10.00),
           apEndDate = LocalDate.of(2021, 6, 7),
-          noOfDays = 1462L
+          noOfDays = 1462
         )
       )
     )
@@ -87,7 +87,7 @@ trait InterestAccrualListHelper {
           interestRate = BigDecimal(-2.00),
           interestAmount = BigDecimal(-10.00),
           apEndDate = LocalDate.of(2021, 6, 7),
-          noOfDays = 62L
+          noOfDays = 62
         ),
         InterestAccrualWithInterestAccruedDays(
           computationAmount = BigDecimal(-1.00),
@@ -96,7 +96,7 @@ trait InterestAccrualListHelper {
           interestRate = BigDecimal(-2.00),
           interestAmount = BigDecimal(-10.0),
           apEndDate = LocalDate.of(2023, 6, 7),
-          noOfDays = 412L
+          noOfDays = 412
         )
       )
     )

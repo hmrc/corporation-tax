@@ -50,7 +50,7 @@ trait InterestAccrualListWithNoOfDaysHelper {
   def interestAccrualListWithInterestAccruedDaysGen(
     fromDate: LocalDate,
     toDate: LocalDate,
-    noOfDays: Long,
+    noOfDays: Int,
     apEndDate: LocalDate
   ): InterestAccrualListWithInterestAccruedDays =
     InterestAccrualListWithInterestAccruedDays(
