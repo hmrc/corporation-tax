@@ -46,28 +46,28 @@ class StatuteRuleServiceSpec extends AnyWordSpec with Matchers with StatuteRuleH
 
   }
 
-  "getStatueRule returns transformed default record" in new Fixture {
-    when(mockStatuteRuleConnector.getStatueRule(any[String], any[String], any[String])(any[HeaderCarrier]))
+  "getStatuteRule returns transformed default record" in new Fixture {
+    when(mockStatuteRuleConnector.getStatuteRule(any[String], any[String], any[String])(any[HeaderCarrier]))
       .thenReturn(Future.successful(Some(StatuteRule(defaultRecord))))
 
     val result: Option[StatuteRuleResponse] =
-      service.getStatueRule("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20")).futureValue
+      service.getStatuteRule("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20")).futureValue
 
     result shouldBe Some(StatuteRuleResponse(defaultResponseRecordWithData))
 
-    verify(mockStatuteRuleConnector).getStatueRule("C", "1991-04-19", "1992-06-20")(hc)
+    verify(mockStatuteRuleConnector).getStatuteRule("C", "1991-04-19", "1992-06-20")(hc)
   }
 
-  "getStatueRule returns None result" in new Fixture {
-    when(mockStatuteRuleConnector.getStatueRule(any[String], any[String], any[String])(any[HeaderCarrier]))
+  "getStatuteRule returns None result" in new Fixture {
+    when(mockStatuteRuleConnector.getStatuteRule(any[String], any[String], any[String])(any[HeaderCarrier]))
       .thenReturn(Future.successful(None))
 
     val result: Option[StatuteRuleResponse] =
-      service.getStatueRule("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20")).futureValue
+      service.getStatuteRule("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20")).futureValue
 
     result shouldBe None
 
-    verify(mockStatuteRuleConnector).getStatueRule("C", "1991-04-19", "1992-06-20")(hc)
+    verify(mockStatuteRuleConnector).getStatuteRule("C", "1991-04-19", "1992-06-20")(hc)
   }
 
 }

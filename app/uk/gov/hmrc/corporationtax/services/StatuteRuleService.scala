@@ -41,18 +41,19 @@ class StatuteRuleService @Inject() (
     StatuteRuleResponse(statuteRule = record)
   }
 
-  def getStatueRule(ruleRateKey: String, startDateStr: LocalDate, endDateStr: LocalDate)(implicit
+  def getStatuteRule(ruleRateKey: String, startDateStr: LocalDate, endDateStr: LocalDate)(implicit
     hc: HeaderCarrier
   ): Future[Option[StatuteRuleResponse]] = {
-    logger.info(s"[StatuteRuleConnector][getStatueRule]: $ruleRateKey :: $startDateStr - $endDateStr")
+    logger.info(s"Calling Connector to getStatuteRule: $ruleRateKey :: $startDateStr - $endDateStr")
     connector
-      .getStatueRule(ruleRateKey, startDateStr.toString, endDateStr.toString)
+      .getStatuteRule(ruleRateKey, startDateStr.toString, endDateStr.toString)
       .collect {
         case Some(StatuteRule(item)) =>
           Some(
             transform(item)
           )
-        case None                    => None
+        case None                    =>
+          None
       }
 
   }

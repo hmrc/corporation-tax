@@ -52,11 +52,11 @@ class StatuteRuleControllerSpec extends AnyWordSpec with Matchers with StatuteRu
   "GET /" should {
 
     "return 200: OK" in new Fixture {
-      when(mockStatuteRuleService.getStatueRule(any(), any(), any())(any[HeaderCarrier]))
+      when(mockStatuteRuleService.getStatuteRule(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(StatuteRuleResponse(defaultResponseRecord))))
 
       val result: Future[Result] = controller
-        .getStatueRule(StatuteQueryParams("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20")))(
+        .getStatuteRule(StatuteQueryParams("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20")))(
           fakeRequest
         )
       status(result) shouldBe Status.OK
@@ -64,33 +64,33 @@ class StatuteRuleControllerSpec extends AnyWordSpec with Matchers with StatuteRu
       contentAsJson(result) shouldBe Json.toJson(StatuteRuleResponse(defaultResponseRecord))
 
       verify(mockStatuteRuleService)
-        .getStatueRule(eqTo("C"), eqTo(LocalDate.parse("1991-04-19")), eqTo(LocalDate.parse("1992-06-20")))(
+        .getStatuteRule(eqTo("C"), eqTo(LocalDate.parse("1991-04-19")), eqTo(LocalDate.parse("1992-06-20")))(
           any[HeaderCarrier]
         )
     }
 
     "return 404: NotFound" in new Fixture {
-      when(mockStatuteRuleService.getStatueRule(any(), any(), any())(any[HeaderCarrier]))
+      when(mockStatuteRuleService.getStatuteRule(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(None))
 
       val result: Future[Result] = controller
-        .getStatueRule(StatuteQueryParams("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20")))(
+        .getStatuteRule(StatuteQueryParams("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20")))(
           fakeRequest
         )
       status(result) shouldBe Status.NOT_FOUND
 
       verify(mockStatuteRuleService)
-        .getStatueRule(eqTo("C"), eqTo(LocalDate.parse("1991-04-19")), eqTo(LocalDate.parse("1992-06-20")))(
+        .getStatuteRule(eqTo("C"), eqTo(LocalDate.parse("1991-04-19")), eqTo(LocalDate.parse("1992-06-20")))(
           any[HeaderCarrier]
         )
     }
 
     "return 500: INTERNAL_SERVER_ERROR: server level error handling" in new Fixture {
-      when(mockStatuteRuleService.getStatueRule(any(), any(), any())(any[HeaderCarrier]))
+      when(mockStatuteRuleService.getStatuteRule(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("unexpected")))
 
       val result: Future[Result] = controller
-        .getStatueRule(StatuteQueryParams("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20")))(
+        .getStatuteRule(StatuteQueryParams("C", LocalDate.parse("1991-04-19"), LocalDate.parse("1992-06-20")))(
           fakeRequest
         )
 
@@ -98,7 +98,7 @@ class StatuteRuleControllerSpec extends AnyWordSpec with Matchers with StatuteRu
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve StatueRule"
 
       verify(mockStatuteRuleService)
-        .getStatueRule(eqTo("C"), eqTo(LocalDate.parse("1991-04-19")), eqTo(LocalDate.parse("1992-06-20")))(
+        .getStatuteRule(eqTo("C"), eqTo(LocalDate.parse("1991-04-19")), eqTo(LocalDate.parse("1992-06-20")))(
           any[HeaderCarrier]
         )
     }
