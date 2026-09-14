@@ -26,7 +26,10 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AccountingPeriodsService @Inject (connector: AccountingPeriodsConnector)(implicit
+class AccountingPeriodsService @Inject (
+  connector: AccountingPeriodsConnector,
+  payRepayService: PayRepayReallocationService
+)(implicit
   ec: ExecutionContext
 ) extends Logging {
 
@@ -36,8 +39,10 @@ class AccountingPeriodsService @Inject (connector: AccountingPeriodsConnector)(i
     connector
       .getAccountingPeriods(taxRef)
       .map { rdsAccountingPeriod =>
-        toAccountingPeriods(rdsAccountingPeriod)
+        val accPeriodBeforeBF21 = toAccountingPeriods(rdsAccountingPeriod)
+        alternatePaymentRepayment(accPeriodBeforeBF21, taxRef)
       }
+      .flatten
 
   private def toAccountingPeriods(
     rdsAccountingPeriod: RdsAccountingPeriod
@@ -61,5 +66,38 @@ class AccountingPeriodsService @Inject (connector: AccountingPeriodsConnector)(i
         )
       }
     )
+
+  private def alternatePaymentRepayment(accPeriod: AccountingPeriods, taxRef: Long)(implicit
+    hc: HeaderCarrier
+  ): Future[AccountingPeriods] = {
+    val zeroAmount = BigDecimal(0.00)
+    def processAlternatePaymentRepayment(
+      remaining: List[AccountingPeriodsRowResponse],
+      taxRef: Long,
+      accumulator: List[AccountingPeriodsRowResponse]
+    ): Future[List[AccountingPeriodsRowResponse]] =
+      remaining match {
+        case Nil          => Future.successful(accumulator)
+        case head :: tail =>
+          if (!head.taxChargePresent && (head.interestTotal == zeroAmount) && (head.penaltyTotal == zeroAmount)) {
+            payRepayService.getTotalAmounts(taxRef, head.accountingPeriod.toLong).flatMap { payRepayServiceResponse =>
+              val calcPaySlipTotal   = payRepayServiceResponse.totalAmountPayments
+              val calcRepRfrRtoTotal = payRepayServiceResponse.totalAmountRepRfrRto
+              processAlternatePaymentRepayment(
+                tail,
+                taxRef,
+                accumulator :+ head.copy(payslipTotal = calcPaySlipTotal).copy(repayReallocTotal = calcRepRfrRtoTotal)
+              )
+            }
+
+          } else {
+            processAlternatePaymentRepayment(tail, taxRef, accumulator :+ head)
+          }
+
+      }
+    processAlternatePaymentRepayment(accPeriod.accountingPeriods, taxRef, Nil).map { accPeriods =>
+      accPeriod.copy(accountingPeriods = accPeriods)
+    }
+  }
 
 }
