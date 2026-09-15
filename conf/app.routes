@@ -20,3 +20,5 @@ GET        /accounting-periods/:taxRef                                         u
 GET        /statute-rule                                                       uk.gov.hmrc.corporationtax.controllers.StatuteRuleController.getStatuteRule(queryParams: uk.gov.hmrc.corporationtax.queryParams.StatuteQueryParams)
 GET        /ct-form-data/:taxRef/:accPeriod                                    uk.gov.hmrc.corporationtax.controllers.FormDataController.getData(taxRef: Long, accPeriod: Long, queryParams: uk.gov.hmrc.corporationtax.queryParams.FormDataQueryParams)
 GET        /repayments-and-reallocations/:taxRef/:accPeriod                    uk.gov.hmrc.corporationtax.controllers.RepayReallocationSummaryController.getRepayReallocationSummary(taxRef: Long, accPeriod: Long)
+
+GET        /display-needed/:taxRef/:accPeriod                                   uk.gov.hmrc.corporationtax.controllers.DisplayNeededController.getDisplayNeeded(taxRef: Long, accPeriod: Long)
