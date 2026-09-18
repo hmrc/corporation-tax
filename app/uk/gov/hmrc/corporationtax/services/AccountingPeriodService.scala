@@ -19,7 +19,7 @@ package uk.gov.hmrc.corporationtax.services
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.AccountingPeriodsConnector
 import uk.gov.hmrc.corporationtax.models.{
-  AccountingPeriods, AccountingPeriodsRowResponse, MissingAccountingPeriodError, MissingDataError, RdsAccountingPeriod
+  AccountingPeriods, AccountingPeriodsRowResponse, MissingAccountingPeriodError, RdsAccountingPeriod
 }
 import uk.gov.hmrc.corporationtax.utils.AmountTransformation
 import uk.gov.hmrc.corporationtax.utils.CommonBooleanTransformation.toBool
@@ -28,7 +28,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SingleAccountingPeriodService @Inject(
+class AccountingPeriodService @Inject (
   connector: AccountingPeriodsConnector,
   payRepayService: PayRepayReallocationService
 )(implicit
@@ -38,7 +38,7 @@ class SingleAccountingPeriodService @Inject(
   def getAccountingPeriod(
     taxRef: Long,
     accPeriod: Long
-  )(implicit hc: HeaderCarrier): Future[Either[MissingDataError, AccountingPeriodsRowResponse]] =
+  )(implicit hc: HeaderCarrier): Future[Either[MissingAccountingPeriodError, AccountingPeriodsRowResponse]] =
     connector
       .getAccountingPeriods(taxRef)
       .flatMap { rdsAccountingPeriod =>
@@ -68,11 +68,10 @@ class SingleAccountingPeriodService @Inject(
         )
       }
     )
-  
-  //BF-21
+
   private def alternatePaymentRepayment(accPeriodList: AccountingPeriods, taxRef: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
-  ): Future[Either[MissingDataError, AccountingPeriodsRowResponse]] = {
+  ): Future[Either[MissingAccountingPeriodError, AccountingPeriodsRowResponse]] = {
     val zeroAmount = BigDecimal(0.00)
 
     accPeriodList.accountingPeriods.find(_.accountingPeriod == accPeriod) match {
@@ -90,8 +89,10 @@ class SingleAccountingPeriodService @Inject(
         } else {
           Future.successful(Right(accPeriod))
         }
-      case None                                          => 
-        Future.successful(Left(MissingAccountingPeriodError(s"Cannot find matching AccountingPeriod for the accPeriod::$accPeriod")))
+      case None                                          =>
+        Future.successful(
+          Left(MissingAccountingPeriodError(s"Cannot find AccountingPeriod information for the accPeriod::$accPeriod"))
+        )
     }
 
   }

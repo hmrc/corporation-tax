@@ -19,8 +19,8 @@ package uk.gov.hmrc.corporationtax.controllers
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.corporationtax.models.MissingDataError
-import uk.gov.hmrc.corporationtax.services.{AccountingPeriodsService, SingleAccountingPeriodService}
+import uk.gov.hmrc.corporationtax.models.MissingAccountingPeriodError
+import uk.gov.hmrc.corporationtax.services.{AccountingPeriodService, AccountingPeriodsService}
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -30,12 +30,12 @@ import scala.concurrent.ExecutionContext
 class AccountingPeriodsController @Inject() (
   cc: ControllerComponents,
   service: AccountingPeriodsService,
-  singleAccPeriodService: SingleAccountingPeriodService
+  accountingPeriodService: AccountingPeriodService
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def getAccountingPeriods(taxRef: Long): Action[AnyContent]                       = Action.async { implicit request =>
+  def getAccountingPeriods(taxRef: Long): Action[AnyContent]                 = Action.async { implicit request =>
     service
       .getAccountingPeriod(taxRef)
       .map { response =>
@@ -50,22 +50,22 @@ class AccountingPeriodsController @Inject() (
           InternalServerError(Json.obj("error" -> "Failed to retrieve AccountingPeriods"))
       }
   }
-  def getSingleAccountingPeriod(taxRef: Long, accPeriod: Long): Action[AnyContent] = Action.async { implicit request =>
-    singleAccPeriodService
+  def getAccountingPeriod(taxRef: Long, accPeriod: Long): Action[AnyContent] = Action.async { implicit request =>
+    accountingPeriodService
       .getAccountingPeriod(taxRef, accPeriod)
       .map {
-        case Right(value)                  => Ok(Json.toJson(value))
-        case Left(error: MissingDataError) =>
-          logger.error(s"Error while retrieving accountingPeriod : ${error.message}")
-          NotFound
+        case Right(value)                              => Ok(Json.toJson(value))
+        case Left(error: MissingAccountingPeriodError) =>
+          logger.error(s"Error while retrieving accountingPeriod information : ${error.message}")
+          NotFound(Json.obj("error" -> error.message))
       }
       .recover {
         case u: UpstreamErrorResponse =>
-          logger.error("Error response from Upstream", u)
+          logger.error("Error response from Upstream while retrieving AccountingPeriods", u)
           Status(u.statusCode)(Json.obj("message" -> u.message))
         case t: Throwable             =>
           logger.error("Error while retrieving AccountingPeriods", t)
-          InternalServerError(Json.obj("error" -> "Failed to retrieve AccountingPeriods"))
+          InternalServerError(Json.obj("error" -> "Failed to retrieve accountingPeriod information"))
       }
   }
 

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.corporationtax.models
 
-
 sealed trait MissingDataError {
   def message: String
 }
@@ -27,5 +26,5 @@ case class MissingStatuteRule(value: String) extends MissingFieldError {
   val message = s"Statute Rule not found: $value"
 }
 case class MissingAccountingPeriodError(value: String) extends MissingFieldError {
-  val message = s"Cannot find Accounting Period: $value"
+  val message = s"Accounting Period not found: $value"
 }

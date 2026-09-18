@@ -21,6 +21,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.corporationtax.models.MissingStatuteRule
 import uk.gov.hmrc.corporationtax.services.InterestAccrualListService
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
@@ -45,11 +46,15 @@ class InterestAccrualListController @Inject() (
             Ok(Json.toJson(interestAccrualListWithInterestAccruedDays))
           case Left(error: MissingStatuteRule)                   =>
             logger.error(s"Error while retrieving InterestAccrualListWithInterestAccruedDays:${error.message}")
-            NotFound(Json.toJson("error" -> error.message))
+            NotFound(Json.obj("error" -> error.message))
         }
-        .recover { case ex: Exception =>
-          logger.error("Error while retrieving interest Accrual list", ex)
-          InternalServerError(Json.obj("error" -> "Failed to retrieve interest Accrual list"))
+        .recover {
+          case u: UpstreamErrorResponse =>
+            logger.error("Error response from Upstream", u)
+            Status(u.statusCode)(Json.obj("message" -> u.message))
+          case t: Throwable             =>
+            logger.error("Error while retrieving interest Accrual list", t)
+            InternalServerError(Json.obj("error" -> "Failed to retrieve interest Accrual list"))
         }
   }
 

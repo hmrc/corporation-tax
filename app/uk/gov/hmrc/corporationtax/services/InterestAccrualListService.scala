@@ -18,7 +18,7 @@ package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.InterestAccrualListConnector
-import uk.gov.hmrc.corporationtax.models.{InterestAccrualListWithInterestAccruedDays, MissingDataError}
+import uk.gov.hmrc.corporationtax.models.{InterestAccrualListWithInterestAccruedDays, MissingStatuteRule}
 import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.*
 import uk.gov.hmrc.corporationtax.utils.applyAmountTransformToList
 import uk.gov.hmrc.http.HeaderCarrier
@@ -34,7 +34,7 @@ class InterestAccrualListService @Inject() (
 
   def getInterestAccrualList(taxRef: Long, accPeriod: Long, interestType: String)(implicit
     hc: HeaderCarrier
-  ): Future[Either[MissingDataError, InterestAccrualListWithInterestAccruedDays]] = {
+  ): Future[Either[MissingStatuteRule, InterestAccrualListWithInterestAccruedDays]] = {
     logger.info(
       s"Calling RDS InterestAccrual with params: taxRef: $taxRef, accPeriod: $accPeriod, interestType: $interestType"
     )

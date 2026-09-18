@@ -24,6 +24,8 @@ import java.time.LocalDate
 
 trait AccountingPeriodsHelper {
 
+  val zeroValue: BigDecimal = BigDecimal(0.00)
+
   val emptyRdsAccountingPeriods: RdsAccountingPeriod = RdsAccountingPeriod(accountingPeriods = List.empty)
   val emptyAccountingPeriods: AccountingPeriods      = AccountingPeriods(accountingPeriods = List.empty)
   def rdsAccountingPeriod(
@@ -54,7 +56,7 @@ trait AccountingPeriodsHelper {
         adjustmentTotal = adjustmentTotal
       ),
       RdsAccountingPeriodsRowResponse(
-        accountingPeriod = BigDecimal(20501),
+        accountingPeriod = BigDecimal(8765),
         apStartDate = LocalDate.of(2025, 1, 1),
         apEndDate = LocalDate.of(2025, 12, 31),
         apStatus = "Closed",
@@ -69,7 +71,7 @@ trait AccountingPeriodsHelper {
         adjustmentTotal = adjustmentTotal
       ),
       RdsAccountingPeriodsRowResponse(
-        accountingPeriod = BigDecimal(20201),
+        accountingPeriod = BigDecimal(1123),
         apStartDate = LocalDate.of(2019, 1, 1),
         apEndDate = LocalDate.of(2025, 12, 31),
         apStatus = "Open",
@@ -114,7 +116,7 @@ trait AccountingPeriodsHelper {
         adjustmentTotal = adjustmentTotal
       ),
       AccountingPeriodsRowResponse(
-        accountingPeriod = BigDecimal(20501),
+        accountingPeriod = BigDecimal(8765),
         apStartDate = LocalDate.of(2025, 1, 1),
         apEndDate = LocalDate.of(2025, 12, 31),
         apStatus = "Closed",
@@ -129,7 +131,7 @@ trait AccountingPeriodsHelper {
         adjustmentTotal = adjustmentTotal
       ),
       AccountingPeriodsRowResponse(
-        accountingPeriod = BigDecimal(20201),
+        accountingPeriod = BigDecimal(1123),
         apStartDate = LocalDate.of(2019, 1, 1),
         apEndDate = LocalDate.of(2025, 12, 31),
         apStatus = "Open",
@@ -142,6 +144,56 @@ trait AccountingPeriodsHelper {
         payslipTotal = payslipTotal,
         repayReallocTotal = repayReallocTotal,
         adjustmentTotal = adjustmentTotal
+      )
+    )
+  )
+
+  val accPeriodList: AccountingPeriods = AccountingPeriods(accountingPeriods =
+    List(
+      AccountingPeriodsRowResponse(
+        accountingPeriod = BigDecimal(202501),
+        apStartDate = LocalDate.of(2025, 1, 1),
+        apEndDate = LocalDate.of(2025, 12, 31),
+        apStatus = "Open",
+        taxChargePresent = false,
+        clericalIntSig = false,
+        creditDebitInterestInd = false,
+        taxTotal = zeroValue,
+        interestTotal = zeroValue,
+        penaltyTotal = zeroValue,
+        payslipTotal = BigDecimal(10.00),
+        repayReallocTotal = BigDecimal(30.00),
+        adjustmentTotal = zeroValue
+      ),
+      AccountingPeriodsRowResponse(
+        accountingPeriod = BigDecimal(8765),
+        apStartDate = LocalDate.of(2025, 1, 1),
+        apEndDate = LocalDate.of(2025, 12, 31),
+        apStatus = "Open",
+        taxChargePresent = false,
+        clericalIntSig = false,
+        creditDebitInterestInd = false,
+        taxTotal = zeroValue,
+        interestTotal = zeroValue,
+        penaltyTotal = zeroValue,
+        payslipTotal = BigDecimal(10.00),
+        repayReallocTotal = BigDecimal(30.00),
+        adjustmentTotal = zeroValue
+      ),
+      AccountingPeriodsRowResponse(
+        accountingPeriod = BigDecimal(1123),
+        apStartDate = LocalDate.of(2025, 1, 1),
+        apEndDate = LocalDate.of(2025, 12, 31),
+        apStatus = "Open",
+        taxChargePresent = false,
+        clericalIntSig = false,
+        creditDebitInterestInd = false,
+        taxTotal = zeroValue,
+        interestTotal = zeroValue,
+        penaltyTotal = zeroValue,
+        payslipTotal = BigDecimal(10.00),
+        repayReallocTotal = BigDecimal(30.00),
+        adjustmentTotal = zeroValue
       )
     )
   )

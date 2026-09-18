@@ -27,22 +27,31 @@ import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.corporationtax.helpers.AccountingPeriodsHelper
-import uk.gov.hmrc.corporationtax.models.AccountingPeriods
-import uk.gov.hmrc.corporationtax.services.AccountingPeriodsService
+import uk.gov.hmrc.corporationtax.models.{AccountingPeriods, AccountingPeriodsRowResponse, MissingAccountingPeriodError}
+import uk.gov.hmrc.corporationtax.services.{AccountingPeriodService, AccountingPeriodsService}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class AccountingPeriodsControllerSpec extends AnyWordSpec with Matchers with AccountingPeriodsHelper {
 
   private trait Setup {
     val mockAccountingPeriodsService: AccountingPeriodsService = mock[AccountingPeriodsService]
+    val mockAccountingPeriodService: AccountingPeriodService   = mock[AccountingPeriodService]
 
     val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
 
+    val taxRef: Long    = 1L
+    val accPeriod: Long = 86L
+
     val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/accounting-periods")
-    val controller                                       = new AccountingPeriodsController(Helpers.stubControllerComponents(), mockAccountingPeriodsService)
+    val controller                                       = new AccountingPeriodsController(
+      Helpers.stubControllerComponents(),
+      mockAccountingPeriodsService,
+      mockAccountingPeriodService
+    )
   }
 
   "GET /accounting-periods" should {
@@ -110,6 +119,75 @@ class AccountingPeriodsControllerSpec extends AnyWordSpec with Matchers with Acc
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve AccountingPeriods"
 
       verify(mockAccountingPeriodsService).getAccountingPeriod(eqTo(3L))(any[HeaderCarrier])
+    }
+
+  }
+  "GET /accounting-period" should {
+    "return 200 and a successful response with AccountingPeriodRowResponse when service returns Right(AccountingPeriod)" in new Setup {
+      val accPeriodResponse: AccountingPeriodsRowResponse =
+        AccountingPeriodsRowResponse(
+          accountingPeriod = BigDecimal(accPeriod),
+          apStartDate = LocalDate.of(2025, 1, 1),
+          apEndDate = LocalDate.of(2025, 12, 31),
+          apStatus = "Open",
+          taxChargePresent = false,
+          clericalIntSig = true,
+          creditDebitInterestInd = false,
+          taxTotal = BigDecimal(1000.88),
+          interestTotal = BigDecimal(9875.89),
+          penaltyTotal = BigDecimal(-100058.25),
+          payslipTotal = zeroValue,
+          repayReallocTotal = BigDecimal(34534342.36),
+          adjustmentTotal = BigDecimal(-1200.00)
+        )
+      when(mockAccountingPeriodService.getAccountingPeriod(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(accPeriodResponse)))
+
+      val result: Future[Result] = controller.getAccountingPeriod(taxRef, accPeriod)(fakeRequest)
+      status(result) shouldBe Status.OK
+
+      contentAsJson(result) shouldBe Json.toJson(accPeriodResponse)
+
+      verify(mockAccountingPeriodService).getAccountingPeriod(any(), any())(any[HeaderCarrier])
+    }
+    "return NOT_Found when the service returns Left(MissingAccountingPeriod) " in new Setup {
+
+      when(mockAccountingPeriodService.getAccountingPeriod(any(), any())(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(Left(MissingAccountingPeriodError("Cannot find the accountingPeriod information")))
+        )
+
+      val result: Future[Result] = controller.getAccountingPeriod(taxRef, accPeriod)(fakeRequest)
+
+      status(result) shouldBe Status.NOT_FOUND
+
+      verify(mockAccountingPeriodService).getAccountingPeriod(any(), any())(any[HeaderCarrier])
+    }
+
+    "returns status code BAD_GATEWAY when Upstream error is returned" in new Setup {
+      val err: UpstreamErrorResponse = UpstreamErrorResponse("Rds-cache service unavailable", BAD_GATEWAY, BAD_GATEWAY)
+
+      when(mockAccountingPeriodService.getAccountingPeriod(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.failed(err))
+
+      val result: Future[Result] = controller.getAccountingPeriod(taxRef, accPeriod)(fakeRequest)
+
+      status(result) shouldBe Status.BAD_GATEWAY
+
+      (contentAsJson(result) \ "message").as[String] shouldBe "Rds-cache service unavailable"
+    }
+
+    "return 500 INTERNAL_SERVER_ERROR when there is problem with downstream services " in new Setup {
+      when(mockAccountingPeriodService.getAccountingPeriod(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("error")))
+
+      val result: Future[Result] = controller.getAccountingPeriod(taxRef, accPeriod)(fakeRequest)
+
+      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+
+      (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve accountingPeriod information"
+
+      verify(mockAccountingPeriodService).getAccountingPeriod(any(), any())(any[HeaderCarrier])
     }
 
   }

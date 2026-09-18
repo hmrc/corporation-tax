@@ -27,8 +27,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AccountingPeriodsService @Inject (
-  connector: AccountingPeriodsConnector,
-  payRepayService: PayRepayReallocationService
+  connector: AccountingPeriodsConnector
 )(implicit
   ec: ExecutionContext
 ) extends Logging {
