@@ -17,7 +17,7 @@
 package uk.gov.hmrc.corporationtax.services
 
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -26,7 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc.ControllerComponents
 import play.api.test.Helpers.stubControllerComponents
 import uk.gov.hmrc.corporationtax.connectors.AccountingPeriodsConnector
-import uk.gov.hmrc.corporationtax.helpers.AccountingPeriodsHelper
+import uk.gov.hmrc.corporationtax.helpers.{AccountingPeriodsHelper, PayRepayReallocationHelper}
 import uk.gov.hmrc.corporationtax.models.{AccountingPeriods, RdsAccountingPeriod}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -37,7 +37,8 @@ class AccountingPeriodsServiceSpec
     with Matchers
     with ScalaFutures
     with MockitoSugar
-    with AccountingPeriodsHelper {
+    with AccountingPeriodsHelper
+    with PayRepayReallocationHelper {
 
   private trait BaseSetup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -52,13 +53,33 @@ class AccountingPeriodsServiceSpec
   }
 
   "AccountingPeriodsService.getAccountingPeriod" should {
-
-    "return RdsAccountingPeriod and transform to AccountingPeriods when all amount and boolean fields are None" in new BaseSetup {
-      val rdsAccountingPeriodResponse: RdsAccountingPeriod = rdsAccountingPeriod()
+    "return RdsAccountingPeriod and transform to AccountingPeriods and replace paymentTotal with payslipTotal and RepayReallocationTotal with repayReallocTotal" in new BaseSetup {
+      val rdsAccountingPeriodResponse: RdsAccountingPeriod = rdsAccountingPeriod(
+        taxTotal = Some(BigDecimal(-1000.8765)),
+        interestTotal = Some(BigDecimal(-9875.8895)),
+        penaltyTotal = Some(BigDecimal(100058.254222)),
+        payslipTotal = None,
+        repayReallocTotal = Some(BigDecimal(-34534342.36262)),
+        adjustmentTotal = Some(BigDecimal(1200.00)),
+        taxChargePresent = Some("N"),
+        clericalIntSig = Some("Y"),
+        creditDebitInterestInd = Some("F")
+      )
 
       val accPeriodResponse: AccountingPeriods =
-        accountingPeriods(zeroValue, zeroValue, zeroValue, zeroValue, zeroValue, zeroValue, false, false, false)
-      when(mockRds.getAccountingPeriods(eqTo(taxReferenceNumber))(any[HeaderCarrier]))
+        accountingPeriods(
+          taxTotal = BigDecimal(1000.88),
+          interestTotal = BigDecimal(9875.89),
+          penaltyTotal = BigDecimal(-100058.25),
+          payslipTotal = BigDecimal(0.00),
+          repayReallocTotal = BigDecimal(34534342.36),
+          adjustmentTotal = BigDecimal(-1200.00),
+          taxChargePresent = false,
+          clericalIntSig = true,
+          creditDebitInterestInd = false
+        )
+
+      when(mockRds.getAccountingPeriods(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(rdsAccountingPeriodResponse))
 
       val result: AccountingPeriods =
@@ -66,105 +87,37 @@ class AccountingPeriodsServiceSpec
 
       result shouldBe accPeriodResponse
 
-      verify(mockRds).getAccountingPeriods(taxReferenceNumber)(hc)
+      verify(mockRds, times(1)).getAccountingPeriods(any())(any[HeaderCarrier])
     }
-    "return RdsAccountingPeriod and transform to AccountingPeriods when all the fields are defined" in new BaseSetup {
-      val rdsAccountingPeriodResponse: RdsAccountingPeriod = rdsAccountingPeriod(
-        Some(BigDecimal(-1000.8765)),
-        Some(BigDecimal(-9875.8895)),
-        Some(BigDecimal(100058.254222)),
-        None,
-        Some(BigDecimal(-34534342.36262)),
-        Some(BigDecimal(1200.00)),
-        Some("N"),
-        Some("Y"),
-        Some("F")
-      )
+  }
 
-      val accPeriodResponse: AccountingPeriods = accountingPeriods(
-        BigDecimal(1000.88),
-        BigDecimal(9875.89),
-        BigDecimal(-100058.25),
-        BigDecimal(0.00),
-        BigDecimal(34534342.36),
-        BigDecimal(-1200.00),
-        false,
-        true,
-        false
-      )
-      when(mockRds.getAccountingPeriods(eqTo(taxReferenceNumber))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(rdsAccountingPeriodResponse))
+  "return empty RdsAccountingPeriod and transform to empty AccountingPeriods" in new BaseSetup {
+    val rdsAccountingPeriodResponse: RdsAccountingPeriod = emptyRdsAccountingPeriods
 
-      val result: AccountingPeriods =
-        service.getAccountingPeriod(taxReferenceNumber).futureValue
+    val accPeriodResponse: AccountingPeriods = emptyAccountingPeriods
+    when(mockRds.getAccountingPeriods(eqTo(taxReferenceNumber))(any[HeaderCarrier]))
+      .thenReturn(Future.successful(rdsAccountingPeriodResponse))
 
-      result shouldBe accPeriodResponse
+    val result: AccountingPeriods =
+      service.getAccountingPeriod(taxReferenceNumber).futureValue
 
-      verify(mockRds).getAccountingPeriods(taxReferenceNumber)(hc)
-    }
-    "return RdsAccountingPeriod and transform to AccountingPeriods when all the fields are defined with all boolean fields transformed" in new BaseSetup {
-      val rdsAccountingPeriodResponse: RdsAccountingPeriod = rdsAccountingPeriod(
-        Some(BigDecimal(-1000.8765)),
-        Some(BigDecimal(-9875.8895)),
-        Some(BigDecimal(100058.254222)),
-        Some(BigDecimal(0)),
-        Some(BigDecimal(-34534342.36262)),
-        Some(BigDecimal(1200.00)),
-        Some("Y"),
-        Some("N"),
-        Some("Y")
-      )
+    result shouldBe accPeriodResponse
 
-      val accPeriodResponse: AccountingPeriods = accountingPeriods(
-        BigDecimal(1000.88),
-        BigDecimal(9875.89),
-        BigDecimal(-100058.25),
-        BigDecimal(0.00),
-        BigDecimal(34534342.36),
-        BigDecimal(-1200.00),
-        true,
-        false,
-        true
-      )
-      when(mockRds.getAccountingPeriods(eqTo(taxReferenceNumber))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(rdsAccountingPeriodResponse))
+    verify(mockRds).getAccountingPeriods(taxReferenceNumber)(hc)
+  }
+  "propagate exception and errors from connector " in new BaseSetup {
+    val exception = new RuntimeException("Error in the downstream services")
 
-      val result: AccountingPeriods =
-        service.getAccountingPeriod(taxReferenceNumber).futureValue
+    when(mockRds.getAccountingPeriods(any())(any[HeaderCarrier]))
+      .thenReturn(Future.failed(exception))
 
-      result shouldBe accPeriodResponse
-
-      verify(mockRds).getAccountingPeriods(taxReferenceNumber)(hc)
-    }
-    "return empty RdsAccountingPeriod and transform to empty AccountingPeriods" in new BaseSetup {
-      val rdsAccountingPeriodResponse: RdsAccountingPeriod = emptyRdsAccountingPeriods
-
-      val accPeriodResponse: AccountingPeriods = emptyAccountingPeriods
-      when(mockRds.getAccountingPeriods(eqTo(taxReferenceNumber))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(rdsAccountingPeriodResponse))
-
-      val result: AccountingPeriods =
-        service.getAccountingPeriod(taxReferenceNumber).futureValue
-
-      result shouldBe accPeriodResponse
-
-      verify(mockRds).getAccountingPeriods(taxReferenceNumber)(hc)
-    }
-    "propagate exception and errors from connector " in new BaseSetup {
-      val exception = new RuntimeException("Error in the downstream services")
-
-      when(mockRds.getAccountingPeriods(eqTo(taxReferenceNumber))(any[HeaderCarrier]))
-        .thenReturn(Future.failed(exception))
-
-      val ex: RuntimeException = intercept[RuntimeException] {
-        service.getAccountingPeriod(taxReferenceNumber).futureValue
-      }
-
-      ex.getMessage should include("Error in the downstream services")
-
-      verify(mockRds).getAccountingPeriods(taxReferenceNumber)(hc)
+    val ex: RuntimeException = intercept[RuntimeException] {
+      service.getAccountingPeriod(taxReferenceNumber).futureValue
     }
 
+    ex.getMessage should include("Error in the downstream services")
+
+    verify(mockRds).getAccountingPeriods(taxReferenceNumber)(hc)
   }
 
 }

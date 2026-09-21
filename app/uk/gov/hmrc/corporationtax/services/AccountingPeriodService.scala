@@ -18,7 +18,9 @@ package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.AccountingPeriodsConnector
-import uk.gov.hmrc.corporationtax.models.{AccountingPeriods, AccountingPeriodsRowResponse, RdsAccountingPeriod}
+import uk.gov.hmrc.corporationtax.models.{
+  AccountingPeriods, AccountingPeriodsRowResponse, MissingAccountingPeriodError, RdsAccountingPeriod
+}
 import uk.gov.hmrc.corporationtax.utils.AmountTransformation
 import uk.gov.hmrc.corporationtax.utils.CommonBooleanTransformation.toBool
 import uk.gov.hmrc.http.HeaderCarrier
@@ -26,19 +28,22 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AccountingPeriodsService @Inject (
-  connector: AccountingPeriodsConnector
+class AccountingPeriodService @Inject (
+  connector: AccountingPeriodsConnector,
+  payRepayService: PayRepayReallocationService
 )(implicit
   ec: ExecutionContext
 ) extends Logging {
 
   def getAccountingPeriod(
-    taxRef: Long
-  )(implicit hc: HeaderCarrier): Future[AccountingPeriods] =
+    taxRef: Long,
+    accPeriod: Long
+  )(implicit hc: HeaderCarrier): Future[Either[MissingAccountingPeriodError, AccountingPeriodsRowResponse]] =
     connector
       .getAccountingPeriods(taxRef)
-      .map { rdsAccountingPeriod =>
-        toAccountingPeriods(rdsAccountingPeriod)
+      .flatMap { rdsAccountingPeriod =>
+        val accPeriodList = toAccountingPeriods(rdsAccountingPeriod)
+        alternatePaymentRepayment(accPeriodList, taxRef, accPeriod)
       }
 
   private def toAccountingPeriods(
@@ -63,4 +68,32 @@ class AccountingPeriodsService @Inject (
         )
       }
     )
+
+  private def alternatePaymentRepayment(accPeriodList: AccountingPeriods, taxRef: Long, accPeriod: Long)(implicit
+    hc: HeaderCarrier
+  ): Future[Either[MissingAccountingPeriodError, AccountingPeriodsRowResponse]] = {
+    val zeroAmount = BigDecimal(0.00)
+
+    accPeriodList.accountingPeriods.find(_.accountingPeriod == accPeriod) match {
+      case Some(accPeriod: AccountingPeriodsRowResponse) =>
+        if (
+          !accPeriod.taxChargePresent && (accPeriod.interestTotal == zeroAmount) && (accPeriod.penaltyTotal == zeroAmount)
+        ) {
+          for {
+            payRepayServiceResponse <- payRepayService.getTotalAmounts(taxRef, accPeriod.accountingPeriod.toLong)
+          } yield {
+            val calcPaySlipTotal   = payRepayServiceResponse.totalAmountPayments
+            val calcRepRfrRtoTotal = payRepayServiceResponse.totalAmountRepRfrRto
+            Right(accPeriod.copy(payslipTotal = calcPaySlipTotal, repayReallocTotal = calcRepRfrRtoTotal))
+          }
+        } else {
+          Future.successful(Right(accPeriod))
+        }
+      case None                                          =>
+        Future.successful(
+          Left(MissingAccountingPeriodError(s"Cannot find AccountingPeriod information for the accPeriod::$accPeriod"))
+        )
+    }
+
+  }
 }

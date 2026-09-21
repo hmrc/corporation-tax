@@ -22,7 +22,7 @@ import uk.gov.hmrc.corporationtax.models.BusinessConstants.{
 }
 import uk.gov.hmrc.corporationtax.models.{
   InterestAccrualList, InterestAccrualListWithInterestAccruedDays, InterestAccrualWithInterestAccruedDays,
-  MissingDataError, MissingStatuteRule
+  MissingStatuteRule
 }
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -41,7 +41,7 @@ class InterestAccruedDaysCalculationService @Inject() (
     taxRef: Long,
     accPeriod: Long,
     interestType: String
-  )(implicit hc: HeaderCarrier): Future[Either[MissingDataError, InterestAccrualListWithInterestAccruedDays]] =
+  )(implicit hc: HeaderCarrier): Future[Either[MissingStatuteRule, InterestAccrualListWithInterestAccruedDays]] =
     interestType match {
       case LATE_PAYMENT_INTEREST =>
         logger.info(s"Calculating number of days for interestAccrued for interestType: $interestType")
@@ -73,7 +73,7 @@ class InterestAccruedDaysCalculationService @Inject() (
 
   private def getChargeableDaysForIDE(
     interestAccrualList: InterestAccrualList
-  )(implicit hc: HeaderCarrier): Future[Either[MissingDataError, InterestAccrualListWithInterestAccruedDays]] =
+  )(implicit hc: HeaderCarrier): Future[Either[MissingStatuteRule, InterestAccrualListWithInterestAccruedDays]] =
     Future
       .sequence(
         interestAccrualList.interestAccruals.map { value =>
@@ -124,7 +124,7 @@ class InterestAccruedDaysCalculationService @Inject() (
     apEndDate: LocalDate,
     toDate: LocalDate,
     fromDate: LocalDate
-  )(implicit hc: HeaderCarrier): Future[Either[MissingDataError, Int]] =
+  )(implicit hc: HeaderCarrier): Future[Either[MissingStatuteRule, Int]] =
 
     val configuredValueForMonthsResponse =
       statuteRuleService
