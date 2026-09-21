@@ -72,3 +72,26 @@ case class AccountingPeriodsRowResponse(
 object AccountingPeriodsRowResponse {
   implicit val format: OFormat[AccountingPeriodsRowResponse] = Json.format[AccountingPeriodsRowResponse]
 }
+
+
+case class AccountingPeriodOverview(
+                                     accountingPeriod: BigDecimal,
+                                     apStartDate: LocalDate,
+                                     apEndDate: LocalDate,
+                                     apStatus: String,
+                                     taxChargePresent: Boolean,
+                                     clericalIntSig: Boolean,
+                                     creditDebitInterestInd: Boolean,
+                                     taxTotal: BigDecimal,
+                                     interestTotal: BigDecimal,
+                                     penaltyTotal: BigDecimal,
+                                     payslipTotal: BigDecimal,
+                                     repayReallocTotal: BigDecimal,
+                                     adjustmentTotal: BigDecimal,
+                                     clericalCalculationFlag:Boolean
+                                   )
+
+
+object AccountingPeriodOverview {
+  implicit val format: OFormat[AccountingPeriodOverview] = Json.format[AccountingPeriodOverview]
+}
