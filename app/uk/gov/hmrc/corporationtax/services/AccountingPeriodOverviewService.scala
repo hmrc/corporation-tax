@@ -17,7 +17,9 @@
 package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
-import uk.gov.hmrc.corporationtax.models.{AccountingPeriodOverview, AccountingPeriodsRowResponse, MissingAccountingPeriodError}
+import uk.gov.hmrc.corporationtax.models.{
+  AccountingPeriodOverview, AccountingPeriodsRowResponse, MissingAccountingPeriodError
+}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
