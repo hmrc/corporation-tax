@@ -22,4 +22,5 @@ GET        /statute-rule                                                       u
 GET        /ct-form-data/:taxRef/:accPeriod                                    uk.gov.hmrc.corporationtax.controllers.FormDataController.getData(taxRef: Long, accPeriod: Long, queryParams: uk.gov.hmrc.corporationtax.queryParams.FormDataQueryParams)
 GET        /repayments-and-reallocations/:taxRef/:accPeriod                    uk.gov.hmrc.corporationtax.controllers.RepayReallocationSummaryController.getRepayReallocationSummary(taxRef: Long, accPeriod: Long)
 
-GET        /display-needed/:taxRef/:accPeriod                                   uk.gov.hmrc.corporationtax.controllers.DisplayNeededController.getDisplayNeeded(taxRef: Long, accPeriod: Long)
+GET        /display-needed/:taxRef/:accPeriod                                  uk.gov.hmrc.corporationtax.controllers.DisplayNeededController.getDisplayNeeded(taxRef: Long, accPeriod: Long)
+GET        /is-company-nominator/:gpaUtr/:nominatedCompanyUtr                  uk.gov.hmrc.corporationtax.controllers.CompanyNominatorController.getIsCompanyNominatorOfGPA(gpaUtr: Long, nominatedCompanyUtr: Long)
