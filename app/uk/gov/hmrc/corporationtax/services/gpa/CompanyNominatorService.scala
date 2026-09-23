@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.corporationtax.services
+package uk.gov.hmrc.corporationtax.services.gpa
 
 import play.api.Logging
-import uk.gov.hmrc.corporationtax.connectors.CompanyNominatorConnector
-import uk.gov.hmrc.corporationtax.models.CompanyNominator
+import uk.gov.hmrc.corporationtax.connectors.gpa.CompanyNominatorConnector
+import uk.gov.hmrc.corporationtax.models.gpa.CompanyNominator
 import uk.gov.hmrc.corporationtax.utils.CommonBooleanTransformation.toBool
 import uk.gov.hmrc.http.HeaderCarrier
 

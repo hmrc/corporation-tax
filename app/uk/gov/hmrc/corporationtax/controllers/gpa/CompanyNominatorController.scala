@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.corporationtax.controllers
+package uk.gov.hmrc.corporationtax.controllers.gpa
 
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.Results.InternalServerError
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
-import uk.gov.hmrc.corporationtax.models.CompanyNominator
-import uk.gov.hmrc.corporationtax.services.CompanyNominatorService
+import uk.gov.hmrc.corporationtax.models.gpa.CompanyNominator
+import uk.gov.hmrc.corporationtax.services.gpa.CompanyNominatorService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject

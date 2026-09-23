@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.corporationtax.connectors
+package uk.gov.hmrc.corporationtax.connectors.gpa
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.scalatest.BeforeAndAfterEach
@@ -23,8 +23,9 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
 import uk.gov.hmrc.corporationtax.config.AppConfig
+import uk.gov.hmrc.corporationtax.connectors.gpa.CompanyNominatorConnector
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
-import uk.gov.hmrc.corporationtax.models.RdsCompanyNominator
+import uk.gov.hmrc.corporationtax.models.gpa.RdsCompanyNominator
 import uk.gov.hmrc.http.HeaderCarrier
 
 class CompanyNominatorConnectorISpec

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.corporationtax.connectors
+package uk.gov.hmrc.corporationtax.connectors.gpa
 
 import play.api.Logging
 import uk.gov.hmrc.*
 import uk.gov.hmrc.corporationtax.config.AppConfig
-import uk.gov.hmrc.corporationtax.models.RdsCompanyNominator
+import uk.gov.hmrc.corporationtax.models.gpa.RdsCompanyNominator
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}

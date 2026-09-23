@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.corporationtax.services
+package uk.gov.hmrc.corporationtax.services.gpa
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
@@ -26,8 +26,8 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc.ControllerComponents
 import play.api.test.Helpers.stubControllerComponents
-import uk.gov.hmrc.corporationtax.connectors.CompanyNominatorConnector
-import uk.gov.hmrc.corporationtax.models.{CompanyNominator, RdsCompanyNominator}
+import uk.gov.hmrc.corporationtax.connectors.gpa.CompanyNominatorConnector
+import uk.gov.hmrc.corporationtax.models.gpa.{CompanyNominator, RdsCompanyNominator}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}

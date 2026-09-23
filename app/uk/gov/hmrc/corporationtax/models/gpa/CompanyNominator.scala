@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.corporationtax.models
+package uk.gov.hmrc.corporationtax.models.gpa
 
 import play.api.libs.json.{Json, OFormat}
 

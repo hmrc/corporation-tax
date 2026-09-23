@@ -23,4 +23,4 @@ GET        /ct-form-data/:taxRef/:accPeriod                                    u
 GET        /repayments-and-reallocations/:taxRef/:accPeriod                    uk.gov.hmrc.corporationtax.controllers.RepayReallocationSummaryController.getRepayReallocationSummary(taxRef: Long, accPeriod: Long)
 
 GET        /display-needed/:taxRef/:accPeriod                                  uk.gov.hmrc.corporationtax.controllers.DisplayNeededController.getDisplayNeeded(taxRef: Long, accPeriod: Long)
-GET        /is-company-nominator/:gpaUtr/:nominatedCompanyUtr                  uk.gov.hmrc.corporationtax.controllers.CompanyNominatorController.getIsCompanyNominatorOfGPA(gpaUtr: Long, nominatedCompanyUtr: Long)
+GET        /is-company-nominator/:gpaUtr/:nominatedCompanyUtr                  uk.gov.hmrc.corporationtax.controllers.gpa.CompanyNominatorController.getIsCompanyNominatorOfGPA(gpaUtr: Long, nominatedCompanyUtr: Long)
