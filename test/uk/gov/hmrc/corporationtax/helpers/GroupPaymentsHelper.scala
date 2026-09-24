@@ -32,8 +32,8 @@ trait GroupPaymentsHelper {
 
   val groupSummaryDetRecOne = GroupSummaryDetailsRecord(
     contractEndDate = LocalDate.of(2026, 1, 7),
-    groupTaxCharge = BigDecimal(11.01),
-    groupPayment = BigDecimal(13.02),
+    groupTaxCharge = BigDecimal(-11.01),
+    groupPayment = BigDecimal(-13.02),
     groupPaymentRecordCount = 2,
     contractStatus = "ACTIVE",
     contractVersion = 2

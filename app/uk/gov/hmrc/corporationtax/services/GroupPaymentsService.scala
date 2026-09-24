@@ -17,21 +17,17 @@
 package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
-import play.api.mvc.ControllerComponents
 import uk.gov.hmrc.corporationtax.connectors.GroupPaymentsConnector
 import uk.gov.hmrc.corporationtax.models.{GroupSummaryDetails, GroupSummaryDetailsRecord, GroupSummaryDetailsResponse}
 import uk.gov.hmrc.corporationtax.utils.AmountTransformation
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class GroupPaymentsService @Inject()(
-                                      cc: ControllerComponents, connector: GroupPaymentsConnector)
-                                    (implicit ec: ExecutionContext) extends BackendController(cc)
-  with Logging {
+class GroupPaymentsService @Inject()(connector: GroupPaymentsConnector)
+                                    (implicit ec: ExecutionContext) extends Logging {
 
   private def transform(rec: GroupSummaryDetails): GroupSummaryDetailsResponse = {
     val detailRecs = rec.gpaGrpSummaryDetails
