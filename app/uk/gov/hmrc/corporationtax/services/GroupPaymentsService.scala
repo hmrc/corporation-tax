@@ -16,24 +16,57 @@
 
 package uk.gov.hmrc.corporationtax.services
 
-import play.api.i18n.Lang.logger
+import play.api.Logging
+import play.api.mvc.ControllerComponents
 import uk.gov.hmrc.corporationtax.connectors.GroupPaymentsConnector
-import uk.gov.hmrc.corporationtax.models.GroupSummaryDetails
+import uk.gov.hmrc.corporationtax.models.{GroupSummaryDetails, GroupSummaryDetailsRecord, GroupSummaryDetailsResponse}
+import uk.gov.hmrc.corporationtax.utils.AmountTransformation
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
-import scala.concurrent.{Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 
-class GroupPaymentsService @Inject()(connector: GroupPaymentsConnector) {
-                                    //(implicit ec: ExecutionContext) {
+class GroupPaymentsService @Inject()(
+                                      cc: ControllerComponents, connector: GroupPaymentsConnector)
+                                    (implicit ec: ExecutionContext) extends BackendController(cc)
+  with Logging {
+
+  private def transform(rec: GroupSummaryDetails): GroupSummaryDetailsResponse = {
+    val detailRecs = rec.gpaGrpSummaryDetails
+      .map(rec =>
+        GroupSummaryDetailsRecord(
+          contractEndDate = rec.contractEndDate,
+          groupTaxCharge = AmountTransformation(rec.groupTaxCharge),
+          groupPayment = AmountTransformation(rec.groupPayment),
+          groupPaymentRecordCount = rec.groupPaymentRecordCount,
+          contractStatus = rec.contractStatus,
+          contractVersion = rec.contractVersion
+        )
+      )
+    GroupSummaryDetailsResponse(
+      gpaGrpSummaryDetails = detailRecs,
+      gpaReferenceNumberLst = rec.gpaReferenceNumberLst,
+      nominatedCompanyName = rec.nominatedCompanyName
+    )
+  }
 
   def getGroupSummary(gpaUTR: Long, nomCompanyUTR: Long)(implicit
                                                          hc: HeaderCarrier
-  ): Future[Option[GroupSummaryDetails]] = {
+  ): Future[Option[GroupSummaryDetailsResponse]] = {
     logger.info(s"taxRef: $gpaUTR and accPeriod: $nomCompanyUTR")
-    connector
-      .getGroupSummary(gpaUTR, nomCompanyUTR)
+    {
+      for {
+        rec <- connector
+          .getGroupSummary(gpaUTR, nomCompanyUTR)
+      } yield
+        rec.map(transform)
+    }.recover { case e: Throwable =>
+      logger.error(s"$gpaUTR :: $nomCompanyUTR - ${e.getMessage}")
+      throw new RuntimeException(e.getMessage)
+    }
+
   }
 
 }
