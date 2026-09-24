@@ -45,5 +45,5 @@ trait GroupPaymentsHelper {
     gpaReferenceNumberLst = List.empty,
     nominatedCompanyName = "CompanyName"
   )
-  
+
 }

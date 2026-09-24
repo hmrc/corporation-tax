@@ -25,11 +25,11 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class GroupPaymentsController @Inject()(
-                                         cc: ControllerComponents,
-                                         connector: GroupPaymentsConnector
-                                       )(implicit ec: ExecutionContext)
-  extends BackendController(cc)
+class GroupPaymentsController @Inject() (
+  cc: ControllerComponents,
+  connector: GroupPaymentsConnector
+)(implicit ec: ExecutionContext)
+    extends BackendController(cc)
     with Logging {
 
   def getGroupSummary(gpaUTR: Long, nomCompanyUTR: Long): Action[AnyContent] = Action.async { implicit request =>
@@ -40,7 +40,7 @@ class GroupPaymentsController @Inject()(
           Ok(
             Json.toJson(gpPayment)
           )
-        case None =>
+        case None            =>
           NotFound
       }
       .recover { case ex: Exception =>

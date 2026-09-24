@@ -32,8 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class GroupPaymentsControllerSpec extends AnyWordSpec
-  with Matchers with GroupPaymentsHelper {
+class GroupPaymentsControllerSpec extends AnyWordSpec with Matchers with GroupPaymentsHelper {
 
   private trait Setup {
     val mockGroupPaymentsConnector: GroupPaymentsConnector = mock[GroupPaymentsConnector]
@@ -50,7 +49,7 @@ class GroupPaymentsControllerSpec extends AnyWordSpec
 
     "return 200 and a successful response with one item transformed amounts" in new Setup {
       when(mockGroupPaymentsConnector.getGroupSummary(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful( Some(groupPaymentDetails)))
+        .thenReturn(Future.successful(Some(groupPaymentDetails)))
 
       val result: Future[Result] = controller.getGroupSummary(1L, 2L)(fakeRequest)
       status(result) shouldBe Status.OK
@@ -59,7 +58,6 @@ class GroupPaymentsControllerSpec extends AnyWordSpec
 
       verify(mockGroupPaymentsConnector).getGroupSummary(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }
-
 
     "return 500 INTERNAL_SERVER_ERROR" in new Setup {
       when(mockGroupPaymentsConnector.getGroupSummary(any(), any())(any[HeaderCarrier]))
@@ -72,7 +70,6 @@ class GroupPaymentsControllerSpec extends AnyWordSpec
 
       verify(mockGroupPaymentsConnector).getGroupSummary(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }
-
 
   }
 }

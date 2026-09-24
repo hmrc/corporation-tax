@@ -28,8 +28,7 @@ import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class GroupPaymentsConnector @Inject()(http: HttpClientV2, appConfig: AppConfig)
-                                      (implicit ec: ExecutionContext)
+class GroupPaymentsConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext)
     extends Logging {
 
   def getGroupSummary(gpaUTR: Long, nomCompanyUTR: Long)(implicit
