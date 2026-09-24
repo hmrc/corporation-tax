@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.corporationtax.helpers
 
-import uk.gov.hmrc.corporationtax.models.{GroupReferenceNumberLstItem, GroupSummaryDetails, GroupSummaryDetailsItem}
+import uk.gov.hmrc.corporationtax.models.{GroupReferenceNumberLstItem, GroupSummaryDetails, GroupSummaryDetailsItem, GroupSummaryDetailsRecord, GroupSummaryDetailsResponse}
 
 import java.time.LocalDate
 
@@ -30,9 +30,28 @@ trait GroupPaymentsHelper {
     contractVersion = 2
   )
 
+  val groupSummaryDetRecOne = GroupSummaryDetailsRecord(
+    contractEndDate = LocalDate.of(2026, 1, 7),
+    groupTaxCharge = BigDecimal(11.01),
+    groupPayment = BigDecimal(13.02),
+    groupPaymentRecordCount = 2,
+    contractStatus = "ACTIVE",
+    contractVersion = 2
+  )
+
   val groupPaymentDetails = GroupSummaryDetails(
     gpaGrpSummaryDetails = List(
       groupSummaryDetItemOne
+    ),
+    gpaReferenceNumberLst = List(
+      GroupReferenceNumberLstItem(112)
+    ),
+    nominatedCompanyName = "Some company name"
+  )
+
+  val groupPaymentDetailsResponse = GroupSummaryDetailsResponse(
+    gpaGrpSummaryDetails = List(
+      groupSummaryDetRecOne
     ),
     gpaReferenceNumberLst = List(
       GroupReferenceNumberLstItem(112)

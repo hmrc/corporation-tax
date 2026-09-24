@@ -26,8 +26,8 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.corporationtax.connectors.GroupPaymentsConnector
 import uk.gov.hmrc.corporationtax.helpers.GroupPaymentsHelper
+import uk.gov.hmrc.corporationtax.services.GroupPaymentsService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,32 +35,32 @@ import scala.concurrent.{ExecutionContext, Future}
 class GroupPaymentsControllerSpec extends AnyWordSpec with Matchers with GroupPaymentsHelper {
 
   private trait Setup {
-    val mockGroupPaymentsConnector: GroupPaymentsConnector = mock[GroupPaymentsConnector]
+    val mockGroupPaymentsService: GroupPaymentsService = mock[GroupPaymentsService]
 
     val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
 
     val fakeRequest = FakeRequest("GET", "/group-summary")
     val controller  =
-      new GroupPaymentsController(Helpers.stubControllerComponents(), mockGroupPaymentsConnector)
+      new GroupPaymentsController(Helpers.stubControllerComponents(), mockGroupPaymentsService)
   }
 
   "GET /getGroupSummary" should {
 
     "return 200 and a successful response with one item transformed amounts" in new Setup {
-      when(mockGroupPaymentsConnector.getGroupSummary(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Some(groupPaymentDetails)))
+      when(mockGroupPaymentsService.getGroupSummary(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(groupPaymentDetailsResponse)))
 
       val result: Future[Result] = controller.getGroupSummary(1L, 2L)(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson(groupPaymentDetails)
+      contentAsJson(result) shouldBe Json.toJson(groupPaymentDetailsResponse)
 
-      verify(mockGroupPaymentsConnector).getGroupSummary(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
+      verify(mockGroupPaymentsService).getGroupSummary(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }
 
     "return 500 INTERNAL_SERVER_ERROR" in new Setup {
-      when(mockGroupPaymentsConnector.getGroupSummary(any(), any())(any[HeaderCarrier]))
+      when(mockGroupPaymentsService.getGroupSummary(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("error")))
 
       val result: Future[Result] = controller.getGroupSummary(1L, 2L)(fakeRequest)
@@ -68,7 +68,7 @@ class GroupPaymentsControllerSpec extends AnyWordSpec with Matchers with GroupPa
 
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve groupPayments"
 
-      verify(mockGroupPaymentsConnector).getGroupSummary(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
+      verify(mockGroupPaymentsService).getGroupSummary(eqTo(1L), eqTo(2L))(any[HeaderCarrier])
     }
 
   }
