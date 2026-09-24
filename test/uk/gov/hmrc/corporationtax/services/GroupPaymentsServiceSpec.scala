@@ -30,8 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class GroupPaymentsServiceSpec extends AnyWordSpec with Matchers
-  with GroupPaymentsHelper with ScalaFutures {
+class GroupPaymentsServiceSpec extends AnyWordSpec with Matchers with GroupPaymentsHelper with ScalaFutures {
 
   private trait Fixture {
     val mockGroupPaymentsConnector: GroupPaymentsConnector = mock[GroupPaymentsConnector]
@@ -54,7 +53,6 @@ class GroupPaymentsServiceSpec extends AnyWordSpec with Matchers
 
     verify(mockGroupPaymentsConnector).getGroupSummary(1L, 2L)(hc)
   }
-
 
   "getGroupSummary returns None result" in new Fixture {
     when(mockGroupPaymentsConnector.getGroupSummary(any[Long], any[Long])(any[HeaderCarrier]))

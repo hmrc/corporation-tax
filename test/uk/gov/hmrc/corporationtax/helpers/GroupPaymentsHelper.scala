@@ -16,7 +16,10 @@
 
 package uk.gov.hmrc.corporationtax.helpers
 
-import uk.gov.hmrc.corporationtax.models.{GroupReferenceNumberLstItem, GroupSummaryDetails, GroupSummaryDetailsItem, GroupSummaryDetailsRecord, GroupSummaryDetailsResponse}
+import uk.gov.hmrc.corporationtax.models.{
+  GroupReferenceNumberLstItem, GroupSummaryDetails, GroupSummaryDetailsItem, GroupSummaryDetailsRecord,
+  GroupSummaryDetailsResponse
+}
 
 import java.time.LocalDate
 

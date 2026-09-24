@@ -25,9 +25,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-
-class GroupPaymentsService @Inject()(connector: GroupPaymentsConnector)
-                                    (implicit ec: ExecutionContext) extends Logging {
+class GroupPaymentsService @Inject() (connector: GroupPaymentsConnector)(implicit ec: ExecutionContext)
+    extends Logging {
 
   private def transform(rec: GroupSummaryDetails): GroupSummaryDetailsResponse = {
     val detailRecs = rec.gpaGrpSummaryDetails
@@ -49,15 +48,14 @@ class GroupPaymentsService @Inject()(connector: GroupPaymentsConnector)
   }
 
   def getGroupSummary(gpaUTR: Long, nomCompanyUTR: Long)(implicit
-                                                         hc: HeaderCarrier
+    hc: HeaderCarrier
   ): Future[Option[GroupSummaryDetailsResponse]] = {
     logger.info(s"taxRef: $gpaUTR and accPeriod: $nomCompanyUTR")
     {
       for {
         rec <- connector
-          .getGroupSummary(gpaUTR, nomCompanyUTR)
-      } yield
-        rec.map(transform)
+                 .getGroupSummary(gpaUTR, nomCompanyUTR)
+      } yield rec.map(transform)
     }.recover { case e: Throwable =>
       logger.error(s"$gpaUTR :: $nomCompanyUTR - ${e.getMessage}")
       throw new RuntimeException(e.getMessage)

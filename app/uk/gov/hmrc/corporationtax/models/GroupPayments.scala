@@ -54,24 +54,23 @@ object GroupSummaryDetails {
 
 // BE
 case class GroupSummaryDetailsRecord(
-                                    contractEndDate: LocalDate,
-                                    groupTaxCharge: BigDecimal,
-                                    groupPayment: BigDecimal,
-                                    groupPaymentRecordCount: Int,
-                                    contractStatus: String,
-                                    contractVersion: Int
-                                  )
+  contractEndDate: LocalDate,
+  groupTaxCharge: BigDecimal,
+  groupPayment: BigDecimal,
+  groupPaymentRecordCount: Int,
+  contractStatus: String,
+  contractVersion: Int
+)
 
 object GroupSummaryDetailsRecord {
   implicit val format: OFormat[GroupSummaryDetailsRecord] = Json.format[GroupSummaryDetailsRecord]
 }
 
-
 case class GroupSummaryDetailsResponse(
-                                gpaGrpSummaryDetails: List[GroupSummaryDetailsRecord],
-                                gpaReferenceNumberLst: List[GroupReferenceNumberLstItem],
-                                nominatedCompanyName: String
-                              )
+  gpaGrpSummaryDetails: List[GroupSummaryDetailsRecord],
+  gpaReferenceNumberLst: List[GroupReferenceNumberLstItem],
+  nominatedCompanyName: String
+)
 
 object GroupSummaryDetailsResponse {
   implicit val format: OFormat[GroupSummaryDetailsResponse] = Json.format[GroupSummaryDetailsResponse]
