@@ -40,7 +40,7 @@ class GroupPaymentsConnector @Inject() (http: HttpClientV2, appConfig: AppConfig
       .get(url)
       .execute[Option[GroupSummaryDetails]]
       .recover { case e: Throwable =>
-        logger.error(s"[GroupPaymentsConnector][getGroupSummary]: $gpaUTR :: $nomCompanyUTR - ${e.getMessage}")
+        logger.error(s"$gpaUTR :: $nomCompanyUTR - ${e.getMessage}")
         throw new RuntimeException(e.getMessage)
       }
   }
