@@ -24,116 +24,84 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
 import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
-import uk.gov.hmrc.corporationtax.testdata.ReallocationFromAccPeriodHelper
+import uk.gov.hmrc.corporationtax.testdata.gpa.GpaGroupTaxChargesHelper
 import uk.gov.hmrc.http.HeaderCarrier
 
-class GpaRdsProxyConnectorISpec
+class GpaGroupTaxChargesRdsProxyConnectorISpec
     extends AnyWordSpec
     with Matchers
     with ScalaFutures
     with IntegrationPatience
     with ApplicationWithWiremock
     with BeforeAndAfterEach
-    with ReallocationFromAccPeriodHelper {
+    with GpaGroupTaxChargesHelper {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
-  private val connector: ReallocationFromAccPeriodRdsProxyConnector =
-    app.injector.instanceOf[ReallocationFromAccPeriodRdsProxyConnector]
+  implicit private val appConfig: AppConfig                  = app.injector.instanceOf[AppConfig]
+  private val connector: GpaGroupTaxChargesRdsProxyConnector =
+    app.injector.instanceOf[GpaGroupTaxChargesRdsProxyConnector]
 
-  "getReallocationFromAccPeriod" should {
+  "getGpaGroupTaxCharges" should {
 
-    def url(taxPayerReference: Long, accPeriod: Long) =
-      s"${appConfig.rdsDatacacheProxyEndpoint}/reallocation-from-accounting-period/$taxPayerReference/$accPeriod"
+    def url(pGpaUtr: Long, pGppContractVersion: Long, pStartIndex: Long, pCount: Long) =
+      s"${appConfig.rdsDatacacheProxyEndpoint}/group-tax-charges/$pGpaUtr/$pGppContractVersion/$pStartIndex/$pCount"
 
-    "return ReallocationFromAccPeriod empty list from BE with status code OK" in {
+    "return RdsGpaGroupTaxCharges list (single item) from BE with status code OK" in {
       stubFor(
-        get(urlPathEqualTo(url(1234L, 345L)))
+        get(urlPathEqualTo(url(78965432L, 8745L, 12L, 13L)))
           .willReturn(
             aResponse()
               .withStatus(OK)
               .withBody(
-                s"""{
-                   |"reallocation":
-                   |[]
+                s"""
+                   |{
+                   |  "pGppEndDate": "2023-04-05",
+                   |  "pGppTotalGroupPayment": 15000.50,
+                   |  "pGppTotalGroupTax": 3200.75,
+                   |  "pGppStatus": "SUBMITTED",
+                   |  "pGppCni": "2023-03-01",
+                   |  "pGppApportionmentMethod": "EQUAL",
+                   |  "pGpaUtr2": 200,
+                   |  "pTotalNumOfRecords": 3,
+                   |  "pGroupPaymentRecordCount": 3,
+                   |  "pCurGroupTaxCharges": [
+                   |    {
+                   |      "participatorName": "Company A Ltd",
+                   |      "participatorReference": 1234567890,
+                   |      "participatorApEndDate": "2023-03-31",
+                   |      "participatorTaxCharge": 1066.92,
+                   |      "participatorTaxChargePrsnt": "Y",
+                   |      "participatorAccountingPeriod": 1,
+                   |      "contractVersion": 1,
+                   |      "allocatedPayment": 5000.0,
+                   |      "allocatedPaymentRecordCount": 1
+                   |    },
+                   |    {
+                   |      "participatorName": "Company B Ltd",
+                   |      "participatorReference": 2345678901,
+                   |      "participatorApEndDate": "2023-03-31",
+                   |      "participatorTaxCharge": 1280.11,
+                   |      "participatorTaxChargePrsnt": "Y",
+                   |      "participatorAccountingPeriod": 1,
+                   |      "contractVersion": 1,
+                   |      "allocatedPayment": 6000.5,
+                   |      "allocatedPaymentRecordCount": 1
+                   |    }
+                   |  ]
                    |}
                    |""".stripMargin
               )
           )
       )
 
-      val result = connector.getReallocationFromAccPeriod(1234L, 345L).futureValue
-      result.reallocation must contain allElementsOf emptyListReallocationFromAccPeriod.reallocation
-    }
-
-    "return ReallocationFromAccPeriod list (single item) from BE with status code OK" in {
-      stubFor(
-        get(urlPathEqualTo(url(78965432L, 8745L)))
-          .willReturn(
-            aResponse()
-              .withStatus(OK)
-              .withBody(
-                s"""{
-                   |"reallocation":
-                   |[
-                   |  {
-                   |  "amount" : 12390.67,
-                   |  "reallocationDate": "2026-12-27",
-                   |  "destinationApEndDate": "2024-02-02",
-                   |  "destinationTaxPayerReference": "18969779586"
-                   |  }
-                   |]
-                   |}""".stripMargin
-              )
-          )
-      )
-
-      val result = connector.getReallocationFromAccPeriod(78965432L, 8745L).futureValue
-      result.reallocation must contain allElementsOf reallocationFromAccPeriodWithSingleElement.reallocation
-    }
-
-    "return InterestCharges list (two items) from BE with status code OK" in {
-      stubFor(
-        get(urlPathEqualTo(url(789652L, 8745L)))
-          .willReturn(
-            aResponse()
-              .withStatus(OK)
-              .withBody(
-                s"""{
-                   |"reallocation":
-                   |[
-                   |  {
-                   |  "amount" : 12390.0,
-                   |  "reallocationDate": "2026-12-27",
-                   |  "destinationApEndDate": "2024-02-02",
-                   |  "destinationTaxPayerReference": "18969779586"
-                   |  },
-                   |  {
-                   |  "amount" : 180007.0,
-                   |  "reallocationDate":"2026-12-27",
-                   |  "destinationApEndDate":"2024-02-02",
-                   |  "destinationTaxPayerReference": "18969779586"
-                   |  },
-                   |  {
-                   |  "amount":89075.0,
-                   |  "reallocationDate":"2026-12-27",
-                   |  "destinationApEndDate":"2024-02-02",
-                   |  "destinationTaxPayerReference": "18969779586"
-                   |  }
-                   |]
-                   |}""".stripMargin
-              )
-          )
-      )
-
-      val result = connector.getReallocationFromAccPeriod(789652L, 8745L).futureValue
-      result.reallocation must contain allElementsOf reallocationFromAccPeriodWithThreeElements.reallocation
+      val result = connector.getGpaGroupTaxCharges(78965432L, 8745L, 12L, 13L).futureValue
+      result mustBe gpaWithNonEmptyParticipator
     }
 
     "return INTERNAL_ERROR when service failed" in {
       stubFor(
-        get(urlPathEqualTo(url(123L, 12L)))
+        get(urlPathEqualTo(url(123L, 12L, 1L, 2L)))
           .willReturn(
             aResponse()
               .withStatus(INTERNAL_SERVER_ERROR)
@@ -142,13 +110,13 @@ class GpaRdsProxyConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getReallocationFromAccPeriod(123L, 12L).futureValue
+        connector.getGpaGroupTaxCharges(123L, 12L, 1L, 2L).futureValue
       }
       ex.getMessage.toLowerCase must include("boom")
     }
     "return 400 when BE returns BAD_REQUEST " in {
       stubFor(
-        get(urlPathEqualTo(url(123L, 12L)))
+        get(urlPathEqualTo(url(123L, 12L, 14L, 16L)))
           .willReturn(
             aResponse()
               .withStatus(BAD_REQUEST)
@@ -157,14 +125,14 @@ class GpaRdsProxyConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getReallocationFromAccPeriod(123L, 12L).futureValue
+        connector.getGpaGroupTaxCharges(123L, 12L, 14L, 16L).futureValue
       }
       ex.getMessage must include("Invalid Request")
     }
 
     "return 404 when BE returns NOT_FOUND " in {
       stubFor(
-        get(urlPathEqualTo(url(128L, 12L)))
+        get(urlPathEqualTo(url(128L, 12L, 13L, 16L)))
           .willReturn(
             aResponse()
               .withStatus(NOT_FOUND)
@@ -173,7 +141,7 @@ class GpaRdsProxyConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getReallocationFromAccPeriod(128L, 12L).futureValue
+        connector.getGpaGroupTaxCharges(128L, 12L, 13L, 16L).futureValue
       }
       ex.getMessage must include("Not found")
     }

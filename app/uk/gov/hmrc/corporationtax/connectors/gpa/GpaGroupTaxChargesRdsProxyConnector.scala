@@ -18,7 +18,7 @@ package uk.gov.hmrc.corporationtax.connectors.gpa
 
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.config.AppConfig
-import uk.gov.hmrc.corporationtax.models.RdsReallocationFromAccPeriodResponse
+import uk.gov.hmrc.corporationtax.models.gpa.RdsGpaGroupTaxCharges
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
@@ -27,27 +27,27 @@ import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReallocationFromAccPeriodRdsProxyConnector @Inject()(http: HttpClientV2, appConfig: AppConfig)(implicit
-                                                                                                     ec: ExecutionContext
+class GpaGroupTaxChargesRdsProxyConnector @Inject()(http: HttpClientV2, appConfig: AppConfig)(implicit
+                                                                                              ec: ExecutionContext
 ) extends Logging {
 
-  def getReallocationFromAccPeriod(taxPayerReference: Long, accPeriod: Long)(implicit
+  def getGpaGroupTaxCharges(pGpaUtr: Long, pGppContractVersion: Long, pStartIndex: Long, pCount: Long)(implicit
     hc: HeaderCarrier
-  ): Future[RdsReallocationFromAccPeriodResponse] = {
+  ): Future[RdsGpaGroupTaxCharges] = {
     val url: URL =
-      url"${appConfig.rdsDatacacheProxyFullUrl}/reallocation-from-accounting-period/$taxPayerReference/$accPeriod"
+      url"${appConfig.rdsDatacacheProxyFullUrl}/group-tax-charges/$pGpaUtr/$pGppContractVersion/$pStartIndex/$pCount"
     http
       .get(url)
-      .execute[RdsReallocationFromAccPeriodResponse]
+      .execute[RdsGpaGroupTaxCharges]
       .recover {
         case e: UpstreamErrorResponse =>
           logger.error(
-            s"[ReallocationFromAccPeriodRdsProxyConnector][getReallocationFromAccPeriod]: Upstream error - ${e.getMessage}"
+            s"Error from Upstream: Upstream error - ${e.getMessage}"
           )
           throw e
         case e: Throwable             =>
           logger.error(
-            s"[ReallocationFromAccPeriodRdsProxyConnector][getReallocationFromAccPeriod]: ${e.getMessage}"
+            s"Failed to retrieve RdsGpaGroupTaxCharges due to exception: ${e.getMessage}"
           )
           throw new RuntimeException(e.getMessage)
       }
