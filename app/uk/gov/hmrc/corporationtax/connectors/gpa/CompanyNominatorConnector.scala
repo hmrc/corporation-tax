@@ -42,7 +42,7 @@ class CompanyNominatorConnector @Inject() (http: HttpClientV2, appConfig: AppCon
       .execute[RdsCompanyNominator]
       .recover { case ex: Throwable =>
         logger.error(
-          s"[CompanyNominatorConnector][getIsCompanyNominatorOfGPA]: $gpaUtr :: $nominatedCompanyUtr - ${ex.getMessage}"
+          s"Error: $gpaUtr :: $nominatedCompanyUtr - ${ex.getMessage}"
         )
         throw new RuntimeException(ex.getMessage)
       }
