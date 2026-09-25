@@ -25,3 +25,5 @@ GET        /repayments-and-reallocations/:taxRef/:accPeriod                    u
 
 GET        /display-needed/:taxRef/:accPeriod                                  uk.gov.hmrc.corporationtax.controllers.DisplayNeededController.getDisplayNeeded(taxRef: Long, accPeriod: Long)
 GET        /is-company-nominator/:gpaUtr/:nominatedCompanyUtr                  uk.gov.hmrc.corporationtax.controllers.gpa.CompanyNominatorController.getIsCompanyNominatorOfGPA(gpaUtr: Long, nominatedCompanyUtr: Long)
+
+GET        /group-payment-periods-in-range/:gpaUTR/:nominatedCompanyUTR/:pPeriod/:pMonthRestriction                              uk.gov.hmrc.corporationtax.controllers.gpa.GroupPaymentPeriodsInRangeController.getGroupPaymentPeriodsInRange(gpaUTR: Long, nominatedCompanyUTR: Long, pPeriod: Long, pMonthRestriction: Long)
