@@ -27,13 +27,13 @@ import scala.concurrent.ExecutionContext
 
 class GroupPaymentsController @Inject() (
   cc: ControllerComponents,
-  connector: GroupPaymentsService
+  service: GroupPaymentsService
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
   def getGroupSummary(gpaUTR: Long, nomCompanyUTR: Long): Action[AnyContent] = Action.async { implicit request =>
-    connector
+    service
       .getGroupSummary(gpaUTR, nomCompanyUTR)
       .map {
         case Some(gpPayment) =>
