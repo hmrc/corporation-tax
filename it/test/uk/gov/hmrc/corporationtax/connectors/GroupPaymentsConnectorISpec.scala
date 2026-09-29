@@ -112,4 +112,77 @@ class GroupPaymentsConnectorISpec
 
 
   }
+
+  "getPaymentDetails" should {
+
+    def url(gpaUTR: Long,
+            contractVersion: Int, startIndex: Int, count: Int) =
+      s"${appConfig.rdsDatacacheProxyEndpoint}/group-summary/$gpaUTR?contractVersion=$contractVersion&startIndex=$startIndex&count=$count"
+
+    "return no PaymentDetails record" in {
+      stubFor(
+        get(urlEqualTo(url(1L, 2, 3, 4)))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+              .withBody(s"""{}""".stripMargin)
+          )
+      )
+
+      val result = connector.getPaymentDetails(1L, 2, 3, 4).futureValue
+      result mustBe None
+    }
+
+    /*
+    "return GroupSummaryDetails default record" in {
+      stubFor(
+        get(urlEqualTo(url(2L, 1L)))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                s"""
+                   |{"gpaGrpSummaryDetails":[{
+                   |   "contractEndDate":"2026-01-07",
+                   |   "groupTaxCharge":11.01,
+                   |   "groupPayment":13.02,
+                   |   "groupPaymentRecordCount":2,
+                   |   "contractStatus":"ACTIVE",
+                   |   "contractVersion":2}],
+                   |   "gpaReferenceNumberLst":[{
+                   |   "taxpayerReference":112}],
+                   |   "nominatedCompanyName":"Some company name"}
+                   |""".stripMargin
+              )
+          )
+      )
+
+      val result = connector.getGroupSummary(2L, 1L).futureValue
+      result mustBe Some(groupPaymentDetails)
+    }
+
+    "return INTERNAL_ERROR when service failed" in {
+      stubFor(
+        get(urlEqualTo(url(1L, 2L)))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody(
+                s"""{
+                   |error" : "Failed to retrieve penalties"
+                   |}""".stripMargin
+              )
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getGroupSummary(1L, 2L).futureValue
+      }
+      ex.getMessage.toLowerCase must include("error")
+    }
+    */
+
+  }
+
+
 }
