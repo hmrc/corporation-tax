@@ -38,15 +38,16 @@ object GpaPaymentsItem {
   implicit val format: OFormat[GpaPaymentsItem] = Json.format[GpaPaymentsItem]
 }
 
-case class GpaPaymentsDetails(gpaPayments: List[GpaPaymentsItem],
-                              totalNumOfRecords: Option[Long],
-                              gppEndDate: Option[LocalDate],
-                              gppTotalGroupPayment: Option[BigDecimal],
-                              gppTotalGroupTax: Option[BigDecimal],
-                              gppStatus: String,
-                              gppCni: Option[LocalDate],
-                              gppApportionmentMethod: String
-                             )
+case class GpaPaymentsDetails(
+  gpaPayments: List[GpaPaymentsItem],
+  totalNumOfRecords: Option[Long],
+  gppEndDate: Option[LocalDate],
+  gppTotalGroupPayment: Option[BigDecimal],
+  gppTotalGroupTax: Option[BigDecimal],
+  gppStatus: String,
+  gppCni: Option[LocalDate],
+  gppApportionmentMethod: String
+)
 
 object GpaPaymentsDetails {
   implicit val format: OFormat[GpaPaymentsDetails] = Json.format[GpaPaymentsDetails]
@@ -54,31 +55,32 @@ object GpaPaymentsDetails {
 
 // BE
 case class GpaPaymentsRecord(
-                            displayDate: Option[LocalDate],
-                            total: BigDecimal,
-                            tablename: Option[String],
-                            paymentType: Option[String],
-                            repaymentType: Option[String],
-                            targetTaxpayerReference: Option[String],
-                            targetApNo: Option[Int],
-                            targetApEndDate: Option[LocalDate],
-                            contractEndDate: Option[LocalDate],
-                            participatorPresent: Option[Boolean]
-                          )
+  displayDate: Option[LocalDate],
+  total: BigDecimal,
+  tablename: Option[String],
+  paymentType: Option[String],
+  repaymentType: Option[String],
+  targetTaxpayerReference: Option[String],
+  targetApNo: Option[Int],
+  targetApEndDate: Option[LocalDate],
+  contractEndDate: Option[LocalDate],
+  participatorPresent: Option[Boolean]
+)
 
 object GpaPaymentsRecord {
   implicit val format: OFormat[GpaPaymentsRecord] = Json.format[GpaPaymentsRecord]
 }
 
-case class GpaPaymentsDetailsResponse(gpaPayments: List[GpaPaymentsItem],
-                              totalNumOfRecords: Option[Long],
-                              gppEndDate: Option[LocalDate],
-                              gppTotalGroupPayment: BigDecimal,
-                              gppTotalGroupTax: BigDecimal,
-                              gppStatus: String,
-                              gppCni: Option[LocalDate],
-                              gppApportionmentMethod: String
-                             )
+case class GpaPaymentsDetailsResponse(
+  gpaPayments: List[GpaPaymentsRecord],
+  totalNumOfRecords: Option[Long],
+  gppEndDate: Option[LocalDate],
+  gppTotalGroupPayment: BigDecimal,
+  gppTotalGroupTax: BigDecimal,
+  gppStatus: String,
+  gppCni: Option[LocalDate],
+  gppApportionmentMethod: String
+)
 
 object GpaPaymentsDetailsResponse {
   implicit val format: OFormat[GpaPaymentsDetailsResponse] = Json.format[GpaPaymentsDetailsResponse]

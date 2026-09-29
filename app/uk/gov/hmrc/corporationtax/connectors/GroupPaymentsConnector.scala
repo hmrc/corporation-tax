@@ -45,11 +45,11 @@ class GroupPaymentsConnector @Inject() (http: HttpClientV2, appConfig: AppConfig
       }
   }
 
-  def getPaymentDetails(gpaUTR: Long,
-                        contractVersion: Int, startIndex: Int, count: Int)(implicit
-                                                         hc: HeaderCarrier
+  def getPaymentDetails(gpaUTR: Long, contractVersion: Int, startIndex: Int, count: Int)(implicit
+    hc: HeaderCarrier
   ): Future[Option[GpaPaymentsDetails]] = {
-    val url: URL = url"${appConfig.rdsDatacacheProxyFullUrl}/gpa-payment-details/$gpaUTR?contractVersion=$contractVersion&startInde=$startIndex&count=$count"
+    val url: URL =
+      url"${appConfig.rdsDatacacheProxyFullUrl}/gpa-payment-details/$gpaUTR?contractVersion=$contractVersion&startIndex=$startIndex&count=$count"
     http
       .get(url)
       .execute[Option[GpaPaymentsDetails]]

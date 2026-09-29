@@ -24,25 +24,24 @@ object GpaPaymentDetailsQueryParams {
 
   given QueryStringBindable[GpaPaymentDetailsQueryParams] with {
 
-    override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, GpaPaymentDetailsQueryParams]] = {
+    override def bind(
+      key: String,
+      params: Map[String, Seq[String]]
+    ): Option[Either[String, GpaPaymentDetailsQueryParams]] =
       for {
         contractVersionE <- summon[QueryStringBindable[Int]].bind("contractVersion", params)
         startIndexE      <- summon[QueryStringBindable[Int]].bind("startIndex", params)
         countE           <- summon[QueryStringBindable[Int]].bind("count", params)
-      } yield {
-        (contractVersionE, startIndexE, countE) match
-          case (Right(contractVersion), Right(startIndex), Right(count)) =>
-            Right(GpaPaymentDetailsQueryParams(contractVersion, startIndex, count))
-          case (_, _, _) =>
-            Left("Unable to bind GpaPaymentDetailsQueryParams: missing params")
-      }
-    }
+      } yield (contractVersionE, startIndexE, countE) match
+        case (Right(contractVersion), Right(startIndex), Right(count)) =>
+          Right(GpaPaymentDetailsQueryParams(contractVersion, startIndex, count))
+        case (_, _, _)                                                 =>
+          Left("Unable to bind GpaPaymentDetailsQueryParams: missing params")
 
-    override def unbind(key: String, value: GpaPaymentDetailsQueryParams): String = {
+    override def unbind(key: String, value: GpaPaymentDetailsQueryParams): String =
       "contractVersion=" + value.contractVersion.toString + "&" +
         "startIndex=" + value.startIndex.toString + "&" +
         "count=" + value.count.toString
-    }
 
   }
 
