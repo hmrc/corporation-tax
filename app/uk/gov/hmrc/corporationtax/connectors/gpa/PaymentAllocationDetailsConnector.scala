@@ -43,14 +43,14 @@ class PaymentAllocationDetailsConnector @Inject() (http: HttpClientV2, appConfig
     hc: HeaderCarrier
   ): Future[RdsPaymentAllocationDetails] = {
     val url: URL =
-      url"${appConfig.rdsDatacacheProxyFullUrl}/gpa-payment-allocation-details/$gpaUtr/$gppContractVersion/$participatorUtr/$participatorAp?startIndex=${startIndex.toString}&count=${count.toString}"
+      url"${appConfig.rdsDatacacheProxyFullUrl}/gpa-payment-allocation-details/$gpaUtr/$gppContractVersion/$participatorUtr/$participatorAp?startIndex=$startIndex&count=$count"
 
     http
       .get(url)
       .execute[RdsPaymentAllocationDetails]
       .recover { case ex: Throwable =>
         logger.error(
-          s"[PaymentAllocationDetailsConnector][getGPAPaymentAllocationDetail]: $gpaUtr :: $gppContractVersion :: $participatorUtr :: $participatorAp :: ${startIndex.toString} :: ${count.toString}- ${ex.getMessage}"
+          s"Error receiving payment allocation details for: $gpaUtr :: $gppContractVersion :: $participatorUtr :: $participatorAp :: ${startIndex.toString} :: ${count.toString}- ${ex.getMessage}"
         )
         throw new RuntimeException(ex.getMessage)
       }
