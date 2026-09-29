@@ -21,20 +21,20 @@ import play.api.libs.json.{Json, OFormat}
 import java.time.LocalDate
 
 case class PaymentAllocationDetails(
-                                     gppEndDate: LocalDate,
-                                     gppTotalGroupPayment: Option[BigDecimal],
-                                     gppTotalGroupTax: Option[BigDecimal],
-                                     gppStatus: String,
-                                     gppApportionmentMethod: String,
-                                     participatingCompanyDesc: String,
-                                     participatorAccPeriodEnd: LocalDate,
-                                     participatorTaxCharge: BigDecimal,
-                                     participatorAllocPayments: BigDecimal,
-                                     gpaUtr: BigDecimal,
-                                     gppContractVersionOut: BigDecimal,
-                                     allocationDetails: List[AllocationDetails],
-                                     totalNumOfRecords: BigDecimal
-                                   )
+  gppEndDate: LocalDate,
+  gppTotalGroupPayment: BigDecimal,
+  gppTotalGroupTax: BigDecimal,
+  gppStatus: String,
+  gppApportionmentMethod: String,
+  participatingCompanyDesc: String,
+  participatorAccPeriodEnd: LocalDate,
+  participatorTaxCharge: BigDecimal,
+  participatorAllocPayments: BigDecimal,
+  gpaUtr: BigDecimal,
+  gppContractVersionOut: BigDecimal,
+  allocationDetails: List[AllocationDetails],
+  totalNumOfRecords: BigDecimal
+)
 
 object PaymentAllocationDetails {
   implicit val format: OFormat[PaymentAllocationDetails] = Json.format[PaymentAllocationDetails]

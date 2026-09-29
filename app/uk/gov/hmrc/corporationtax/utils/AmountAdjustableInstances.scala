@@ -16,7 +16,10 @@
 
 package uk.gov.hmrc.corporationtax.utils
 
-import uk.gov.hmrc.corporationtax.models.{AccountingPeriodDetails, AdjustmentTransactions, InterestAccrual, PayRepayReallocations, PaymentTransaction, PenaltyTransactionItem, RdsReallocationFromAccDetails, ReallocationRow, RepaymentsDetails, TaxTransactionsItem}
+import uk.gov.hmrc.corporationtax.models.{
+  AccountingPeriodDetails, AdjustmentTransactions, InterestAccrual, PayRepayReallocations, PaymentTransaction,
+  PenaltyTransactionItem, RdsReallocationFromAccDetails, ReallocationRow, RepaymentsDetails, TaxTransactionsItem
+}
 import uk.gov.hmrc.corporationtax.models.gpa.{AllocationDetails, RdsPaymentAllocationDetails}
 
 object AmountAdjustableInstances {
@@ -141,7 +144,10 @@ object AmountAdjustableInstances {
   implicit val paymentAllocationDetailsAdjustable: AmountAdjustable[RdsPaymentAllocationDetails] =
     new AmountAdjustable[RdsPaymentAllocationDetails] {
       def amountFields: List[
-        (RdsPaymentAllocationDetails => Option[BigDecimal], (RdsPaymentAllocationDetails, BigDecimal) => RdsPaymentAllocationDetails)
+        (
+          RdsPaymentAllocationDetails => Option[BigDecimal],
+          (RdsPaymentAllocationDetails, BigDecimal) => RdsPaymentAllocationDetails
+        )
       ] =
         List(
           (item => Some(item.participatorTaxCharge), (item, newValue) => item.copy(participatorTaxCharge = newValue))

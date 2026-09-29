@@ -18,8 +18,10 @@ package uk.gov.hmrc.corporationtax.services.gpa
 
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.gpa.PaymentAllocationDetailsConnector
-import uk.gov.hmrc.corporationtax.models.gpa.{AllocationDetails, PaymentAllocationDetails}
-import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.{allocationDetailsAdjustable, paymentAllocationDetailsAdjustable}
+import uk.gov.hmrc.corporationtax.models.gpa.PaymentAllocationDetails
+import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances.{
+  allocationDetailsAdjustable, paymentAllocationDetailsAdjustable
+}
 import uk.gov.hmrc.corporationtax.utils.applyAmountTransform
 import uk.gov.hmrc.corporationtax.utils.applyAmountTransformToList
 import uk.gov.hmrc.http.HeaderCarrier
@@ -27,42 +29,46 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PaymentAllocationDetailsService @Inject()(paymentAllocationDetailsConnector: PaymentAllocationDetailsConnector)(implicit ec: ExecutionContext)
-    extends Logging {
+class PaymentAllocationDetailsService @Inject() (paymentAllocationDetailsConnector: PaymentAllocationDetailsConnector)(
+  implicit ec: ExecutionContext
+) extends Logging {
 
-  def getGPAPaymentAllocationDetail
-  (gpaUtr: Long, gppContractVersion: Long, participatorUtr: Long, participatorAp: Long, startIndex: Long, count: Long)(implicit
+  def getGPAPaymentAllocationDetail(
+    gpaUtr: Long,
+    gppContractVersion: Long,
+    participatorUtr: Long,
+    participatorAp: Long,
+    startIndex: Long,
+    count: Long
+  )(implicit
     hc: HeaderCarrier
   ): Future[PaymentAllocationDetails] = {
-    logger.info(s"Calling connector for gpaUtr: $gpaUtr, gppContractVersion: $gppContractVersion, participatorUtr: $participatorUtr, participatorAp: $participatorAp, startIndex: $startIndex and count: $count")
+    logger.info(
+      s"Calling connector for gpaUtr: $gpaUtr, gppContractVersion: $gppContractVersion, participatorUtr: $participatorUtr, participatorAp: $participatorAp, startIndex: $startIndex and count: $count"
+    )
 
-    paymentAllocationDetailsConnector.getGPAPaymentAllocationDetail(gpaUtr, gppContractVersion, participatorUtr, participatorAp, startIndex, count)
+    paymentAllocationDetailsConnector
+      .getGPAPaymentAllocationDetail(gpaUtr, gppContractVersion, participatorUtr, participatorAp, startIndex, count)
       .map { rdsPaymentAllocationDetails =>
-      val transPaymentAllocationDetails = applyAmountTransform(rdsPaymentAllocationDetails)
-      val transAllocationDetails = applyAmountTransformToList(rdsPaymentAllocationDetails.allocationDetails)
-      val transApportionmentMethod = transPaymentAllocationDetails.gppApportionmentMethod.map(_.trim)
+        val transPaymentAllocationDetails = applyAmountTransform(rdsPaymentAllocationDetails)
+        val transAllocationDetails        = applyAmountTransformToList(rdsPaymentAllocationDetails.allocationDetails)
+        val transApportionmentMethod      = transPaymentAllocationDetails.gppApportionmentMethod.map(_.trim)
 
-
-      PaymentAllocationDetails(
-        gppEndDate = transPaymentAllocationDetails.gppEndDate,
-        gppTotalGroupPayment = transPaymentAllocationDetails.gppTotalGroupPayment,
-        gppTotalGroupTax = transPaymentAllocationDetails.gppTotalGroupTax,
-        gppStatus = transPaymentAllocationDetails.gppStatus,
-        gppApportionmentMethod = transApportionmentMethod.getOrElse(""),
-        participatingCompanyDesc = transPaymentAllocationDetails.participatingCompanyDesc,
-        participatorAccPeriodEnd = transPaymentAllocationDetails.participatorAccPeriodEnd,
-        participatorTaxCharge = transPaymentAllocationDetails.participatorTaxCharge,
-        participatorAllocPayments = transPaymentAllocationDetails.participatorAllocPayments,
-        gpaUtr = transPaymentAllocationDetails.gpaUtr,
-        gppContractVersionOut = transPaymentAllocationDetails.gppContractVersionOut,
-        allocationDetails = transPaymentAllocationDetails.allocationDetails.map( (allocations: AllocationDetails) =>
-          AllocationDetails(
-            effectivePaymentDate = allocations.effectivePaymentDate,
-            paymentAmount = allocations.paymentAmount
-          )
-        ),
-        totalNumOfRecords = transPaymentAllocationDetails.totalNumOfRecords
-      )
-    }
+        PaymentAllocationDetails(
+          gppEndDate = transPaymentAllocationDetails.gppEndDate,
+          gppTotalGroupPayment = transPaymentAllocationDetails.gppTotalGroupPayment.getOrElse(BigDecimal(0)),
+          gppTotalGroupTax = transPaymentAllocationDetails.gppTotalGroupTax.getOrElse(BigDecimal(0)),
+          gppStatus = transPaymentAllocationDetails.gppStatus,
+          gppApportionmentMethod = transApportionmentMethod.getOrElse(""),
+          participatingCompanyDesc = transPaymentAllocationDetails.participatingCompanyDesc,
+          participatorAccPeriodEnd = transPaymentAllocationDetails.participatorAccPeriodEnd,
+          participatorTaxCharge = transPaymentAllocationDetails.participatorTaxCharge,
+          participatorAllocPayments = transPaymentAllocationDetails.participatorAllocPayments,
+          gpaUtr = transPaymentAllocationDetails.gpaUtr,
+          gppContractVersionOut = transPaymentAllocationDetails.gppContractVersionOut,
+          allocationDetails = transAllocationDetails,
+          totalNumOfRecords = transPaymentAllocationDetails.totalNumOfRecords
+        )
+      }
   }
 }

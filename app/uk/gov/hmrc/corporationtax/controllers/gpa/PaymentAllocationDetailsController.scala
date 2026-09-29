@@ -20,22 +20,36 @@ import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.Results.InternalServerError
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
+import uk.gov.hmrc.corporationtax.queryParams.gpa.PaymentAllocationDetailsQueryParams
 import uk.gov.hmrc.corporationtax.services.gpa.PaymentAllocationDetailsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class PaymentAllocationDetailsController @Inject()(
+class PaymentAllocationDetailsController @Inject() (
   paymentAllocationDetailsService: PaymentAllocationDetailsService,
   cc: ControllerComponents
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def getGPAPaymentAllocationDetail(gpaUtr: Long, gppContractVersion: Long, participatorUtr: Long, participatorAp: Long, startIndex: Long, count: Long): Action[AnyContent] = Action.async { implicit request =>
+  def getGPAPaymentAllocationDetail(
+    gpaUtr: Long,
+    gppContractVersion: Long,
+    participatorUtr: Long,
+    participatorAp: Long,
+    queryParams: PaymentAllocationDetailsQueryParams
+  ): Action[AnyContent] = Action.async { implicit request =>
     paymentAllocationDetailsService
-      .getGPAPaymentAllocationDetail(gpaUtr, gppContractVersion, participatorUtr, participatorAp, startIndex, count)
+      .getGPAPaymentAllocationDetail(
+        gpaUtr,
+        gppContractVersion,
+        participatorUtr,
+        participatorAp,
+        queryParams.startIndex,
+        queryParams.count
+      )
       .map { paymentAllocationDetails =>
         Ok(Json.toJson(paymentAllocationDetails))
       }

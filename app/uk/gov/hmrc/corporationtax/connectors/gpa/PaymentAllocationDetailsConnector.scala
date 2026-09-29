@@ -28,21 +28,29 @@ import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PaymentAllocationDetailsConnector @Inject()(http: HttpClientV2, appConfig: AppConfig)(implicit
-                                                                                            ec: ExecutionContext
+class PaymentAllocationDetailsConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit
+  ec: ExecutionContext
 ) extends Logging {
 
-  def getGPAPaymentAllocationDetail(gpaUtr: Long, gppContractVersion: Long, participatorUtr: Long, participatorAp: Long, startIndex: Long, count: Long)(implicit
+  def getGPAPaymentAllocationDetail(
+    gpaUtr: Long,
+    gppContractVersion: Long,
+    participatorUtr: Long,
+    participatorAp: Long,
+    startIndex: Long,
+    count: Long
+  )(implicit
     hc: HeaderCarrier
   ): Future[RdsPaymentAllocationDetails] = {
-    val url: URL = url"${appConfig.rdsDatacacheProxyFullUrl}/repayments/$gpaUtr/$gppContractVersion/$participatorUtr/$participatorAp/$startIndex/$count"
+    val url: URL =
+      url"${appConfig.rdsDatacacheProxyFullUrl}/gpa-payment-allocation-details/$gpaUtr/$gppContractVersion/$participatorUtr/$participatorAp?startIndex=${startIndex.toString}&count=${count.toString}"
 
     http
       .get(url)
       .execute[RdsPaymentAllocationDetails]
       .recover { case ex: Throwable =>
         logger.error(
-          s"[PaymentAllocationDetailsConnector][getGPAPaymentAllocationDetail]: $gpaUtr :: $gppContractVersion :: $participatorUtr :: $participatorAp :: $startIndex :: $count- ${ex.getMessage}"
+          s"[PaymentAllocationDetailsConnector][getGPAPaymentAllocationDetail]: $gpaUtr :: $gppContractVersion :: $participatorUtr :: $participatorAp :: ${startIndex.toString} :: ${count.toString}- ${ex.getMessage}"
         )
         throw new RuntimeException(ex.getMessage)
       }
