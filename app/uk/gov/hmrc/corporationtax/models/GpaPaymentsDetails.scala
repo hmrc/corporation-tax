@@ -20,6 +20,7 @@ import play.api.libs.json.{Json, OFormat}
 
 import java.time.LocalDate
 
+// RDS
 case class GpaPaymentsItem(
   displayDate: Option[LocalDate],
   total: Option[BigDecimal],
@@ -49,4 +50,36 @@ case class GpaPaymentsDetails(gpaPayments: List[GpaPaymentsItem],
 
 object GpaPaymentsDetails {
   implicit val format: OFormat[GpaPaymentsDetails] = Json.format[GpaPaymentsDetails]
+}
+
+// BE
+case class GpaPaymentsRecord(
+                            displayDate: Option[LocalDate],
+                            total: BigDecimal,
+                            tablename: Option[String],
+                            paymentType: Option[String],
+                            repaymentType: Option[String],
+                            targetTaxpayerReference: Option[String],
+                            targetApNo: Option[Int],
+                            targetApEndDate: Option[LocalDate],
+                            contractEndDate: Option[LocalDate],
+                            participatorPresent: Option[Boolean]
+                          )
+
+object GpaPaymentsRecord {
+  implicit val format: OFormat[GpaPaymentsRecord] = Json.format[GpaPaymentsRecord]
+}
+
+case class GpaPaymentsDetailsResponse(gpaPayments: List[GpaPaymentsItem],
+                              totalNumOfRecords: Option[Long],
+                              gppEndDate: Option[LocalDate],
+                              gppTotalGroupPayment: BigDecimal,
+                              gppTotalGroupTax: BigDecimal,
+                              gppStatus: String,
+                              gppCni: Option[LocalDate],
+                              gppApportionmentMethod: String
+                             )
+
+object GpaPaymentsDetailsResponse {
+  implicit val format: OFormat[GpaPaymentsDetailsResponse] = Json.format[GpaPaymentsDetailsResponse]
 }

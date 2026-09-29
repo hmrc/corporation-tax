@@ -18,17 +18,17 @@ package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.GroupPaymentsConnector
-import uk.gov.hmrc.corporationtax.models.{GroupSummaryDetails, GroupSummaryDetailsRecord, GroupSummaryDetailsResponse}
+import uk.gov.hmrc.corporationtax.models.{GpaPaymentsDetails, GpaPaymentsDetailsResponse, GroupSummaryDetails, GroupSummaryDetailsRecord, GroupSummaryDetailsResponse}
 import uk.gov.hmrc.corporationtax.utils.AmountTransformation
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class GroupPaymentsService @Inject() (connector: GroupPaymentsConnector)(implicit ec: ExecutionContext)
-    extends Logging {
+class GroupPaymentsService @Inject()(connector: GroupPaymentsConnector)(implicit ec: ExecutionContext)
+  extends Logging {
 
-  private def transform(rec: GroupSummaryDetails): GroupSummaryDetailsResponse = {
+  private def transformSummaryDetails(rec: GroupSummaryDetails): GroupSummaryDetailsResponse = {
     val detailRecs = rec.gpaGrpSummaryDetails
       .map(rec =>
         GroupSummaryDetailsRecord(
@@ -47,20 +47,40 @@ class GroupPaymentsService @Inject() (connector: GroupPaymentsConnector)(implici
     )
   }
 
+
+  private def transformPaymentDetails(rec: GpaPaymentsDetails): GpaPaymentsDetailsResponse = ???
+
   def getGroupSummary(gpaUTR: Long, nomCompanyUTR: Long)(implicit
-    hc: HeaderCarrier
+                                                         hc: HeaderCarrier
   ): Future[Option[GroupSummaryDetailsResponse]] = {
     logger.info(s"taxRef: $gpaUTR and accPeriod: $nomCompanyUTR")
     {
       for {
         rec <- connector
-                 .getGroupSummary(gpaUTR, nomCompanyUTR)
-      } yield rec.map(transform)
+          .getGroupSummary(gpaUTR, nomCompanyUTR)
+      } yield rec.map(transformSummaryDetails)
     }.recover { case e: Throwable =>
       logger.error(s"$gpaUTR :: $nomCompanyUTR - ${e.getMessage}")
       throw new RuntimeException(e.getMessage)
     }
-
   }
 
+  def getPaymentDetails(gpaUTR: Long,
+                        contractVersion: Int, startIndex: Int, count: Int)(implicit
+                                                                           hc: HeaderCarrier
+                       ): Future[Option[GpaPaymentsDetailsResponse]] = {
+    logger.info(s"taxRef: $gpaUTR and contractVersion: $contractVersion " +
+      s"and startIndex: $startIndex and count: $count")
+    {
+      for {
+        rec <- connector
+          .getPaymentDetails(gpaUTR, contractVersion: Int, startIndex: Int, count: Int)
+      } yield rec.map(transformPaymentDetails)
+    }.recover { case e: Throwable =>
+      logger.error(s"$gpaUTR :: $contractVersion :: $startIndex :: $count - ${e.getMessage}")
+      throw new RuntimeException(e.getMessage)
+    }
+
+  }
+  
 }

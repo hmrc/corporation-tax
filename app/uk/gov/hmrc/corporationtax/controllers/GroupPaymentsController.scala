@@ -19,6 +19,7 @@ package uk.gov.hmrc.corporationtax.controllers
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import uk.gov.hmrc.corporationtax.queryParams.GpaPaymentDetailsQueryParams
 import uk.gov.hmrc.corporationtax.services.GroupPaymentsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -47,6 +48,10 @@ class GroupPaymentsController @Inject() (
         logger.error("Error while retrieving groupPayments", ex)
         InternalServerError(Json.obj("error" -> "Failed to retrieve groupPayments"))
       }
+  }
+
+  def getPaymentDetails(gpaUTR: Long, queryParams: GpaPaymentDetailsQueryParams): Action[AnyContent] = {
+    ???
   }
 
 }
