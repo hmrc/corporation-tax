@@ -38,11 +38,11 @@ class GroupPaymentsControllerSpec extends AnyWordSpec with Matchers with GroupPa
   private trait Setup {
     val mockGroupPaymentsService: GroupPaymentsService = mock[GroupPaymentsService]
 
-    val cc = Helpers.stubControllerComponents()
+    val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
 
     val fakeRequest = FakeRequest("GET", "/group-summary")
-    val controller =
+    val controller  =
       new GroupPaymentsController(Helpers.stubControllerComponents(), mockGroupPaymentsService)
   }
 
@@ -88,7 +88,6 @@ class GroupPaymentsControllerSpec extends AnyWordSpec with Matchers with GroupPa
       verify(mockGroupPaymentsService).getPaymentDetails(eqTo(1L), eqTo(2), eqTo(3), eqTo(4))(any[HeaderCarrier])
     }
 
-
     "return 500 INTERNAL_SERVER_ERROR" in new Setup {
       when(mockGroupPaymentsService.getPaymentDetails(any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("error")))
@@ -102,4 +101,5 @@ class GroupPaymentsControllerSpec extends AnyWordSpec with Matchers with GroupPa
     }
 
   }
+
 }

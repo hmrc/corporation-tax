@@ -43,6 +43,7 @@ class GroupPaymentsServiceSpec extends AnyWordSpec with Matchers with GroupPayme
       new GroupPaymentsService(mockGroupPaymentsConnector)
 
   }
+
   "getGroupSummary returns transformed default record" in new Fixture {
     when(mockGroupPaymentsConnector.getGroupSummary(any[Long], any[Long])(any[HeaderCarrier]))
       .thenReturn(Future.successful(Some(groupPaymentDetails)))
@@ -63,6 +64,21 @@ class GroupPaymentsServiceSpec extends AnyWordSpec with Matchers with GroupPayme
     result shouldBe None
 
     verify(mockGroupPaymentsConnector).getGroupSummary(1L, 2L)(hc)
+  }
+
+  /*
+  Some(GpaPaymentsDetailsResponse(List(GpaPaymentsRecord(Some(2008-04-14), -6250.00, Some("Payslip"), Some("BGP"), None, None, Some(0), None, None, Some(false))), Some(1), Some(2007-12-31), -25000.00, 250000.00, "L", None, "METHOD"))
+  Some(GpaPaymentsDetailsResponse(List(GpaPaymentsRecord(Some(2008-04-14), 6250, Some("Payslip"), Some("BGP"), None, None, Some(0), None, None, Some(false))), Some(1), Some(2007-12-31), 25000, -250000, "L", None, "METHOD"))
+   */
+  "getPaymentDetails returns transformed default record" in new Fixture {
+    when(mockGroupPaymentsConnector.getPaymentDetails(any[Long], any[Int], any[Int], any[Int])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(Some(defaultPaymentDetails)))
+
+    val result = service.getPaymentDetails(1L, 2, 3, 4).futureValue
+
+    result shouldBe Some(defaultPaymentDetailsResponse)
+
+    verify(mockGroupPaymentsConnector).getPaymentDetails(1L, 2, 3, 4)(hc)
   }
 
 }
