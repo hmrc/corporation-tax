@@ -20,7 +20,6 @@ import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.Results.InternalServerError
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
-import uk.gov.hmrc.corporationtax.queryParams.gpa.PaymentAllocationDetailsQueryParams
 import uk.gov.hmrc.corporationtax.services.gpa.PaymentAllocationDetailsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -39,7 +38,8 @@ class PaymentAllocationDetailsController @Inject() (
     gppContractVersion: Long,
     participatorUtr: Long,
     participatorAp: Long,
-    queryParams: PaymentAllocationDetailsQueryParams
+    startIndex: Int,
+    count: Int
   ): Action[AnyContent] = Action.async { implicit request =>
     paymentAllocationDetailsService
       .getGPAPaymentAllocationDetail(
@@ -47,8 +47,8 @@ class PaymentAllocationDetailsController @Inject() (
         gppContractVersion,
         participatorUtr,
         participatorAp,
-        queryParams.startIndex,
-        queryParams.count
+        startIndex,
+        count
       )
       .map { paymentAllocationDetails =>
         Ok(Json.toJson(paymentAllocationDetails))

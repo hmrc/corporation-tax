@@ -37,8 +37,8 @@ class PaymentAllocationDetailsConnector @Inject() (http: HttpClientV2, appConfig
     gppContractVersion: Long,
     participatorUtr: Long,
     participatorAp: Long,
-    startIndex: Long,
-    count: Long
+    startIndex: Int,
+    count: Int
   )(implicit
     hc: HeaderCarrier
   ): Future[RdsPaymentAllocationDetails] = {

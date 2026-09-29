@@ -38,8 +38,8 @@ class PaymentAllocationDetailsService @Inject() (paymentAllocationDetailsConnect
     gppContractVersion: Long,
     participatorUtr: Long,
     participatorAp: Long,
-    startIndex: Long,
-    count: Long
+    startIndex: Int,
+    count: Int
   )(implicit
     hc: HeaderCarrier
   ): Future[PaymentAllocationDetails] = {
@@ -56,8 +56,8 @@ class PaymentAllocationDetailsService @Inject() (paymentAllocationDetailsConnect
 
         PaymentAllocationDetails(
           gppEndDate = transPaymentAllocationDetails.gppEndDate,
-          gppTotalGroupPayment = transPaymentAllocationDetails.gppTotalGroupPayment.getOrElse(BigDecimal(0)),
-          gppTotalGroupTax = transPaymentAllocationDetails.gppTotalGroupTax.getOrElse(BigDecimal(0)),
+          gppTotalGroupPayment = transPaymentAllocationDetails.gppTotalGroupPayment.getOrElse(BigDecimal(0.00)),
+          gppTotalGroupTax = transPaymentAllocationDetails.gppTotalGroupTax.getOrElse(BigDecimal(0.00)),
           gppStatus = transPaymentAllocationDetails.gppStatus,
           gppApportionmentMethod = transApportionmentMethod.getOrElse(""),
           participatingCompanyDesc = transPaymentAllocationDetails.participatingCompanyDesc,

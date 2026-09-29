@@ -43,12 +43,12 @@ class PaymentAllocationDetailsConnectorISpec
 
   "getGPAPaymentAllocationDetail" should {
 
-    def url(gpaUtr: Long, gppContractVersion: Long, participatorUtr: Long, participatorAp: Long, startIndex: Long, count: Long) =
+    def url(gpaUtr: Long, gppContractVersion: Long, participatorUtr: Long, participatorAp: Long, startIndex: Int, count: Int) =
       s"${appConfig.rdsDatacacheProxyEndpoint}/gpa-payment-allocation-details/$gpaUtr/$gppContractVersion/$participatorUtr/$participatorAp?startIndex=${startIndex.toString}&count=${count.toString}"
 
     "return a successful payment allocation details" in {
       stubFor(
-        get(urlEqualTo(url(1L, 2L, 3L, 4L, 5L, 6L)))
+        get(urlEqualTo(url(1L, 2L, 3L, 4L, 5, 6)))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -78,13 +78,13 @@ class PaymentAllocationDetailsConnectorISpec
           )
       )
 
-      val result = connector.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5L, 6L).futureValue
+      val result = connector.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5, 6).futureValue
       result mustBe rdsFullPaymentAllocationDetails
     }
 
     "return a payment allocation details with multiple allocation details" in {
       stubFor(
-        get(urlEqualTo(url(1L, 2L, 3L, 4L, 5L, 6L)))
+        get(urlEqualTo(url(1L, 2L, 3L, 4L, 5, 6)))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -117,13 +117,13 @@ class PaymentAllocationDetailsConnectorISpec
           )
       )
 
-      val result = connector.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5L, 6L).futureValue
+      val result = connector.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5, 6).futureValue
       result mustBe rdsPaymentAllocationDetailsWithMultipleAllocationDetails
     }
 
     "return a payment allocation details with minimal details" in {
       stubFor(
-        get(urlEqualTo(url(1L, 2L, 3L, 4L, 5L, 6L)))
+        get(urlEqualTo(url(1L, 2L, 3L, 4L, 5, 6)))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -149,13 +149,13 @@ class PaymentAllocationDetailsConnectorISpec
           )
       )
 
-      val result = connector.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5L, 6L).futureValue
+      val result = connector.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5, 6).futureValue
       result mustBe rdsMinimalPaymentAllocationDetails
     }
 
     "return INTERNAL_ERROR when service failed" in {
       stubFor(
-        get(urlEqualTo(url(1L, 2L, 3L, 4L, 5L, 6L)))
+        get(urlEqualTo(url(1L, 2L, 3L, 4L, 5, 6)))
           .willReturn(
             aResponse()
               .withStatus(INTERNAL_SERVER_ERROR)
@@ -168,7 +168,7 @@ class PaymentAllocationDetailsConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5L, 6L).futureValue
+        connector.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5, 6).futureValue
       }
       ex.getMessage.toLowerCase must include("error")
     }

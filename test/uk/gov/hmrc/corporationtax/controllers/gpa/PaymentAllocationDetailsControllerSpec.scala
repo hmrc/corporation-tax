@@ -28,7 +28,6 @@ import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.corporationtax.helpers.gpa.PaymentAllocationDetailsHelper
 import uk.gov.hmrc.corporationtax.services.gpa.PaymentAllocationDetailsService
-import uk.gov.hmrc.corporationtax.queryParams.gpa.PaymentAllocationDetailsQueryParams
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -44,9 +43,6 @@ class PaymentAllocationDetailsControllerSpec extends AnyWordSpec with Matchers w
     val fakeRequest = FakeRequest("GET", "/gpa-payment-allocation-details")
     val controller  =
       new PaymentAllocationDetailsController(mockService, Helpers.stubControllerComponents())
-
-    val startIndex = 5L
-    val count      = 6L
   }
 
   "GET /gpa-payment-allocation-details" should {
@@ -56,17 +52,13 @@ class PaymentAllocationDetailsControllerSpec extends AnyWordSpec with Matchers w
         .thenReturn(Future.successful(fullPaymentAllocationDetails))
 
       val result: Future[Result] = controller.getGPAPaymentAllocationDetail(
-        1L,
-        2L,
-        3L,
-        4L,
-        PaymentAllocationDetailsQueryParams(startIndex, count)
+        1L, 2L, 3L, 4L, 5, 6
       )(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(fullPaymentAllocationDetails)
 
-      verify(mockService).getGPAPaymentAllocationDetail(eqTo(1L), eqTo(2L), eqTo(3L), eqTo(4L), eqTo(5L), eqTo(6L))(
+      verify(mockService).getGPAPaymentAllocationDetail(eqTo(1L), eqTo(2L), eqTo(3L), eqTo(4L), eqTo(5), eqTo(6))(
         any[HeaderCarrier]
       )
     }
@@ -76,17 +68,13 @@ class PaymentAllocationDetailsControllerSpec extends AnyWordSpec with Matchers w
         .thenReturn(Future.successful(paymentAllocationDetailsWithMultipleAllocationDetails))
 
       val result: Future[Result] = controller.getGPAPaymentAllocationDetail(
-        1L,
-        2L,
-        3L,
-        4L,
-        PaymentAllocationDetailsQueryParams(startIndex, count)
+        1L, 2L, 3L, 4L, 5, 6
       )(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(paymentAllocationDetailsWithMultipleAllocationDetails)
 
-      verify(mockService).getGPAPaymentAllocationDetail(eqTo(1L), eqTo(2L), eqTo(3L), eqTo(4L), eqTo(5L), eqTo(6L))(
+      verify(mockService).getGPAPaymentAllocationDetail(eqTo(1L), eqTo(2L), eqTo(3L), eqTo(4L), eqTo(5), eqTo(6))(
         any[HeaderCarrier]
       )
     }
@@ -96,17 +84,13 @@ class PaymentAllocationDetailsControllerSpec extends AnyWordSpec with Matchers w
         .thenReturn(Future.successful(minimalPaymentAllocationDetails))
 
       val result: Future[Result] = controller.getGPAPaymentAllocationDetail(
-        1L,
-        2L,
-        3L,
-        4L,
-        PaymentAllocationDetailsQueryParams(startIndex, count)
+        1L, 2L, 3L, 4L, 5, 6
       )(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(minimalPaymentAllocationDetails)
 
-      verify(mockService).getGPAPaymentAllocationDetail(eqTo(1L), eqTo(2L), eqTo(3L), eqTo(4L), eqTo(5L), eqTo(6L))(
+      verify(mockService).getGPAPaymentAllocationDetail(eqTo(1L), eqTo(2L), eqTo(3L), eqTo(4L), eqTo(5), eqTo(6))(
         any[HeaderCarrier]
       )
     }
@@ -116,17 +100,13 @@ class PaymentAllocationDetailsControllerSpec extends AnyWordSpec with Matchers w
         .thenReturn(Future.failed(new RuntimeException("error")))
 
       val result: Future[Result] = controller.getGPAPaymentAllocationDetail(
-        1L,
-        2L,
-        3L,
-        4L,
-        PaymentAllocationDetailsQueryParams(startIndex, count)
+        1L, 2L, 3L, 4L, 5, 6
       )(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
 
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve payment allocation details"
 
-      verify(mockService).getGPAPaymentAllocationDetail(eqTo(1L), eqTo(2L), eqTo(3L), eqTo(4L), eqTo(5L), eqTo(6L))(
+      verify(mockService).getGPAPaymentAllocationDetail(eqTo(1L), eqTo(2L), eqTo(3L), eqTo(4L), eqTo(5), eqTo(6))(
         any[HeaderCarrier]
       )
     }

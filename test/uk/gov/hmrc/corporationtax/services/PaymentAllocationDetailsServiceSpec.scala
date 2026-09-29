@@ -56,33 +56,33 @@ class PaymentAllocationDetailsServiceSpec
       when(mockConnector.getGPAPaymentAllocationDetail(any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(rdsFullPaymentAllocationDetails))
 
-      val result = service.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5L, 6L).futureValue
+      val result = service.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5, 6).futureValue
 
       result shouldBe fullPaymentAllocationDetails
 
-      verify(mockConnector).getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5L, 6L)
+      verify(mockConnector).getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5, 6)
     }
 
     "delegate to connector and successfully return transformed payment allocation details with multiple allocation details" in new Setup {
       when(mockConnector.getGPAPaymentAllocationDetail(any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(rdsPaymentAllocationDetailsWithMultipleAllocationDetails))
 
-      val result = service.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5L, 6L).futureValue
+      val result = service.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5, 6).futureValue
 
       result shouldBe paymentAllocationDetailsWithMultipleAllocationDetails
 
-      verify(mockConnector).getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5L, 6L)
+      verify(mockConnector).getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5, 6)
     }
 
     "delegate to connector and successfully return transformed payment allocation details with mandatory fields" in new Setup {
       when(mockConnector.getGPAPaymentAllocationDetail(any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(rdsMinimalPaymentAllocationDetails))
 
-      val result = service.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5L, 6L).futureValue
+      val result = service.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5, 6).futureValue
 
       result shouldBe minimalPaymentAllocationDetails
 
-      verify(mockConnector).getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5L, 6L)
+      verify(mockConnector).getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5, 6)
     }
 
     "propagate any errors or exceptions from connector" in new Setup {
@@ -90,12 +90,12 @@ class PaymentAllocationDetailsServiceSpec
         .thenReturn(Future.failed(new RuntimeException("error")))
 
       val ex = intercept[RuntimeException] {
-        service.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5L, 6L).futureValue
+        service.getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5, 6).futureValue
       }
 
       ex.getMessage should include("error")
 
-      verify(mockConnector).getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5L, 6L)
+      verify(mockConnector).getGPAPaymentAllocationDetail(1L, 2L, 3L, 4L, 5, 6)
     }
   }
 
