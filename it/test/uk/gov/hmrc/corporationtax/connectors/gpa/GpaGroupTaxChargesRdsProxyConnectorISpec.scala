@@ -44,12 +44,12 @@ class GpaGroupTaxChargesRdsProxyConnectorISpec
 
   "getGpaGroupTaxCharges" should {
 
-    def url(pGpaUtr: Long, pGppContractVersion: Long, pStartIndex: Long, pCount: Long) =
-      s"${appConfig.rdsDatacacheProxyEndpoint}/group-tax-charges/$pGpaUtr/$pGppContractVersion/$pStartIndex/$pCount"
+    def url(pGpaUtr: Long, pGppContractVersion: Int, pStartIndex: Int, pCount: Int) =
+      s"${appConfig.rdsDatacacheProxyEndpoint}/group-tax-charges/$pGpaUtr/$pGppContractVersion?pStartIndex=$pStartIndex&pCount=$pCount"
 
     "return RdsGpaGroupTaxCharges list (single item) from BE with status code OK" in {
       stubFor(
-        get(urlPathEqualTo(url(78965432L, 8745L, 12L, 13L)))
+        get(urlEqualTo(url(78965432L, 8745, 12, 13)))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -95,13 +95,13 @@ class GpaGroupTaxChargesRdsProxyConnectorISpec
           )
       )
 
-      val result = connector.getGpaGroupTaxCharges(78965432L, 8745L, 12L, 13L).futureValue
+      val result = connector.getGpaGroupTaxCharges(78965432L, 8745, 12, 13).futureValue
       result mustBe gpaWithNonEmptyParticipator
     }
 
     "return INTERNAL_ERROR when service failed" in {
       stubFor(
-        get(urlPathEqualTo(url(123L, 12L, 1L, 2L)))
+        get(urlEqualTo(url(123L, 12, 1, 2)))
           .willReturn(
             aResponse()
               .withStatus(INTERNAL_SERVER_ERROR)
@@ -110,13 +110,13 @@ class GpaGroupTaxChargesRdsProxyConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getGpaGroupTaxCharges(123L, 12L, 1L, 2L).futureValue
+        connector.getGpaGroupTaxCharges(123L, 12, 1, 2).futureValue
       }
       ex.getMessage.toLowerCase must include("boom")
     }
     "return 400 when BE returns BAD_REQUEST " in {
       stubFor(
-        get(urlPathEqualTo(url(123L, 12L, 14L, 16L)))
+        get(urlEqualTo(url(123L, 12, 14, 16)))
           .willReturn(
             aResponse()
               .withStatus(BAD_REQUEST)
@@ -125,14 +125,14 @@ class GpaGroupTaxChargesRdsProxyConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getGpaGroupTaxCharges(123L, 12L, 14L, 16L).futureValue
+        connector.getGpaGroupTaxCharges(123L, 12, 14, 16).futureValue
       }
       ex.getMessage must include("Invalid Request")
     }
 
     "return 404 when BE returns NOT_FOUND " in {
       stubFor(
-        get(urlPathEqualTo(url(128L, 12L, 13L, 16L)))
+        get(urlEqualTo(url(128, 12, 14, 16)))
           .willReturn(
             aResponse()
               .withStatus(NOT_FOUND)
@@ -141,7 +141,7 @@ class GpaGroupTaxChargesRdsProxyConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getGpaGroupTaxCharges(128L, 12L, 13L, 16L).futureValue
+        connector.getGpaGroupTaxCharges(128L, 12, 14, 16).futureValue
       }
       ex.getMessage must include("Not found")
     }

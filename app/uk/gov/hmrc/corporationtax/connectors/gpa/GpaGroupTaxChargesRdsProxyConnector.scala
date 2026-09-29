@@ -27,15 +27,15 @@ import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class GpaGroupTaxChargesRdsProxyConnector @Inject()(http: HttpClientV2, appConfig: AppConfig)(implicit
-                                                                                              ec: ExecutionContext
+class GpaGroupTaxChargesRdsProxyConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit
+  ec: ExecutionContext
 ) extends Logging {
 
-  def getGpaGroupTaxCharges(pGpaUtr: Long, pGppContractVersion: Long, pStartIndex: Long, pCount: Long)(implicit
+  def getGpaGroupTaxCharges(pGpaUtr: Long, pGppContractVersion: Int, pStartIndex: Int, pCount: Int)(implicit
     hc: HeaderCarrier
   ): Future[RdsGpaGroupTaxCharges] = {
     val url: URL =
-      url"${appConfig.rdsDatacacheProxyFullUrl}/group-tax-charges/$pGpaUtr/$pGppContractVersion/$pStartIndex/$pCount"
+      url"${appConfig.rdsDatacacheProxyFullUrl}/group-tax-charges/$pGpaUtr/$pGppContractVersion?pStartIndex=$pStartIndex&pCount=$pCount"
     http
       .get(url)
       .execute[RdsGpaGroupTaxCharges]
