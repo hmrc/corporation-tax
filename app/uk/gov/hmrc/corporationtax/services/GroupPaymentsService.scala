@@ -98,7 +98,7 @@ class GroupPaymentsService @Inject() (connector: GroupPaymentsConnector)(implici
     hc: HeaderCarrier
   ): Future[Option[GpaPaymentsDetailsResponse]] = {
     logger.info(
-      s"taxRef: $gpaUTR and contractVersion: $contractVersion " +
+      s"gpaUTR: $gpaUTR and contractVersion: $contractVersion " +
         s"and startIndex: $startIndex and count: $count"
     )
     {
