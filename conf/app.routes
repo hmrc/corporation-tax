@@ -28,3 +28,4 @@ GET        /display-needed/:taxRef/:accPeriod                                  u
 GET        /is-company-nominator/:gpaUtr/:nominatedCompanyUtr                  uk.gov.hmrc.corporationtax.controllers.gpa.CompanyNominatorController.getIsCompanyNominatorOfGPA(gpaUtr: Long, nominatedCompanyUtr: Long)
 GET        /group-summary/:gpaUTR/:nomCompanyUTR                               uk.gov.hmrc.corporationtax.controllers.GroupPaymentsController.getGroupSummary(gpaUTR: Long, nomCompanyUTR: Long)
 GET        /group-tax-charges/:pGpaUtr/:pGppContractVersion                    uk.gov.hmrc.corporationtax.controllers.gpa.GpaGroupTaxChargesController.getGpaGroupTaxCharges(pGpaUtr:Long, pGppContractVersion: Int, pStartIndex:Int ?=0, pCount:Int ?=10)
+GET        /gpa-payment-details/:gpaUTR                                        uk.gov.hmrc.corporationtax.controllers.GroupPaymentsController.getPaymentDetails(gpaUTR: Long, contractVersion: Int, startIndex: Int ?= 0, count: Int ?= 10)

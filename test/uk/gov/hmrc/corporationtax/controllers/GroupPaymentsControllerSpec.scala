@@ -72,4 +72,33 @@ class GroupPaymentsControllerSpec extends AnyWordSpec with Matchers with GroupPa
     }
 
   }
+
+  "GET /getPaymentDetails" should {
+
+    "return 200 and a successful response with one item transformed amounts" in new Setup {
+      when(mockGroupPaymentsService.getPaymentDetails(any(), any(), any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(defaultPaymentDetailsResponse)))
+
+      val result: Future[Result] = controller.getPaymentDetails(1L, 2, 3, 4)(fakeRequest)
+      status(result) shouldBe Status.OK
+
+      contentAsJson(result) shouldBe Json.toJson(defaultPaymentDetailsResponse)
+
+      verify(mockGroupPaymentsService).getPaymentDetails(eqTo(1L), eqTo(2), eqTo(3), eqTo(4))(any[HeaderCarrier])
+    }
+
+    "return 500 INTERNAL_SERVER_ERROR" in new Setup {
+      when(mockGroupPaymentsService.getPaymentDetails(any(), any(), any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("error")))
+
+      val result: Future[Result] = controller.getPaymentDetails(1L, 2, 3, 4)(fakeRequest)
+      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+
+      (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve groupPayments"
+
+      verify(mockGroupPaymentsService).getPaymentDetails(eqTo(1L), eqTo(2), eqTo(3), eqTo(4))(any[HeaderCarrier])
+    }
+
+  }
+
 }
