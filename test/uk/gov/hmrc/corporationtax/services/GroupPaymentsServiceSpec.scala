@@ -77,4 +77,17 @@ class GroupPaymentsServiceSpec extends AnyWordSpec with Matchers with GroupPayme
     verify(mockGroupPaymentsConnector).getPaymentDetails(1L, 2, 3, 4)(hc)
   }
 
+  "getPaymentDetails handle errors" in new Fixture {
+    when(mockGroupPaymentsConnector.getPaymentDetails(any[Long], any[Int], any[Int], any[Int])(any[HeaderCarrier]))
+      .thenReturn(Future.failed(new RuntimeException("error")))
+
+    val ex = intercept[RuntimeException] {
+      service.getPaymentDetails(1L, 2, 3, 4).futureValue
+    }
+
+    ex.getMessage should include("error")
+
+    verify(mockGroupPaymentsConnector).getPaymentDetails(1L, 2, 3, 4)(hc)
+  }
+
 }
