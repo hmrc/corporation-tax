@@ -41,11 +41,11 @@ case class RdsParticipatorDetails(
   participatorName: String,
   participatorReference: Long,
   participatorApEndDate: LocalDate,
-  participatorTaxCharge: BigDecimal,
+  participatorTaxCharge: Option[BigDecimal],
   participatorTaxChargePrsnt: String,
   participatorAccountingPeriod: Long,
   contractVersion: Long,
-  allocatedPayment: BigDecimal,
+  allocatedPayment: Option[BigDecimal],
   allocatedPaymentRecordCount: Int
 )
 

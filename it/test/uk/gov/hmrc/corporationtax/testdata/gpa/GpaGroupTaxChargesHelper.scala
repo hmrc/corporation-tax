@@ -26,9 +26,9 @@ trait GpaGroupTaxChargesHelper {
     pGppEndDate = Some(LocalDate.of(2023, 4, 5)),
     pGppTotalGroupPayment = Some(BigDecimal(15000.50)),
     pGppTotalGroupTax = Some(BigDecimal(3200.75)),
-    pGppStatus = Some("SUBMITTED"),
+    pGppStatus = Some("S"),
     pGppCni = Some(LocalDate.of(2023, 3, 1)),
-    pGppApportionmentMethod = Some("EQUAL"),
+    pGppApportionmentMethod = Some("E"),
     pGpaUtr2 = 200L,
     pTotalNumOfRecords = Some(3),
     pGroupPaymentRecordCount = Some(3),
@@ -37,22 +37,22 @@ trait GpaGroupTaxChargesHelper {
         participatorName = "Company A Ltd",
         participatorReference = 1234567890L,
         participatorApEndDate = LocalDate.of(2023, 3, 31),
-        participatorTaxCharge = BigDecimal(1066.92),
+        participatorTaxCharge = Some(BigDecimal(1066.92)),
         participatorTaxChargePrsnt = "Y",
         participatorAccountingPeriod = 1L,
         contractVersion = 1L,
-        allocatedPayment = BigDecimal(5000.00),
+        allocatedPayment = Some(BigDecimal(5000.00)),
         allocatedPaymentRecordCount = 1
       ),
       RdsParticipatorDetails(
         participatorName = "Company B Ltd",
         participatorReference = 2345678901L,
         participatorApEndDate = LocalDate.of(2023, 3, 31),
-        participatorTaxCharge = BigDecimal(1280.11),
+        participatorTaxCharge = Some(BigDecimal(1280.11)),
         participatorTaxChargePrsnt = "Y",
         participatorAccountingPeriod = 1L,
         contractVersion = 1L,
-        allocatedPayment = BigDecimal(6000.50),
+        allocatedPayment = Some(BigDecimal(6000.50)),
         allocatedPaymentRecordCount = 1
       )
     )

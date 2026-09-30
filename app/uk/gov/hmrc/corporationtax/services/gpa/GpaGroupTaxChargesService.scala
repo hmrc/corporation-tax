@@ -53,11 +53,11 @@ class GpaGroupTaxChargesService @Inject() (
             participatorName = value.participatorName.trim,
             participatorReference = value.participatorReference,
             participatorApEndDate = value.participatorApEndDate,
-            participatorTaxCharge = value.participatorTaxCharge,
+            participatorTaxCharge = AmountTransformation(value.participatorTaxCharge),
             participatorTaxChargePrsnt = value.participatorTaxChargePrsnt.trim,
             participatorAccountingPeriod = value.participatorAccountingPeriod,
             contractVersion = value.contractVersion,
-            allocatedPayment = value.allocatedPayment,
+            allocatedPayment = AmountTransformation(value.allocatedPayment),
             allocatedPaymentRecordCount = value.allocatedPaymentRecordCount
           )
 

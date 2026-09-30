@@ -56,7 +56,7 @@ class GpaGroupTaxChargesServiceSpec
 
   "GpaGroupTaxChargesService.getGpaGroupTaxCharges" should {
 
-    "delegate to connector and successfully return GpaGroupTaxCharges" in new BaseSetup {
+    "delegate to connector and successfully return GpaGroupTaxCharges by transforming all amount fields" in new BaseSetup {
       when(mockRds.getGpaGroupTaxCharges(any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(rdsGpaWithNonEmptyParticipator))
 
@@ -64,6 +64,20 @@ class GpaGroupTaxChargesServiceSpec
         service.getGpaGroupTaxCharges(pGpaUtr, pGppContractVersion, pStartIndex, pCount).futureValue
 
       result shouldBe gpaWithNonEmptyParticipator
+
+      verify(mockRds).getGpaGroupTaxCharges(any(), any(), any(), any())(any[HeaderCarrier])
+
+      verify(mockRds, times(1)).getGpaGroupTaxCharges(any(), any(), any(), any())(any[HeaderCarrier])
+
+    }
+    "delegate to connector and successfully return GpaGroupTaxCharges by transforming all null amount fields to zero and None values as emptyString" in new BaseSetup {
+      when(mockRds.getGpaGroupTaxCharges(any(), any(), any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(rdsGpaWithNullAmountFields))
+
+      val result: GpaGroupTaxCharges =
+        service.getGpaGroupTaxCharges(pGpaUtr, pGppContractVersion, pStartIndex, pCount).futureValue
+
+      result shouldBe gpaWithTransformationOfAmountFields
 
       verify(mockRds).getGpaGroupTaxCharges(any(), any(), any(), any())(any[HeaderCarrier])
 
