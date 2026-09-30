@@ -27,7 +27,6 @@ import play.api.mvc.Result
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.corporationtax.helpers.GroupPaymentsHelper
-import uk.gov.hmrc.corporationtax.queryParams.GpaPaymentDetailsQueryParams
 import uk.gov.hmrc.corporationtax.services.GroupPaymentsService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -80,7 +79,7 @@ class GroupPaymentsControllerSpec extends AnyWordSpec with Matchers with GroupPa
       when(mockGroupPaymentsService.getPaymentDetails(any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(defaultPaymentDetailsResponse)))
 
-      val result: Future[Result] = controller.getPaymentDetails(1L, GpaPaymentDetailsQueryParams(2, 3, 4))(fakeRequest)
+      val result: Future[Result] = controller.getPaymentDetails(1L, 2, 3, 4)(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(defaultPaymentDetailsResponse)
@@ -92,7 +91,7 @@ class GroupPaymentsControllerSpec extends AnyWordSpec with Matchers with GroupPa
       when(mockGroupPaymentsService.getPaymentDetails(any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("error")))
 
-      val result: Future[Result] = controller.getPaymentDetails(1L, GpaPaymentDetailsQueryParams(2, 3, 4))(fakeRequest)
+      val result: Future[Result] = controller.getPaymentDetails(1L, 2, 3, 4)(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
 
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve groupPayments"
