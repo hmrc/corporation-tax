@@ -19,7 +19,6 @@ package uk.gov.hmrc.corporationtax.controllers
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.corporationtax.queryParams.GpaPaymentDetailsQueryParams
 import uk.gov.hmrc.corporationtax.services.GroupPaymentsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -50,10 +49,11 @@ class GroupPaymentsController @Inject() (
       }
   }
 
-  def getPaymentDetails(gpaUTR: Long, queryParams: GpaPaymentDetailsQueryParams): Action[AnyContent] = Action.async {
+  def getPaymentDetails(gpaUTR: Long,
+                        contractVersion: Int, startIndex: Int, count: Int): Action[AnyContent] = Action.async {
     implicit request =>
       service
-        .getPaymentDetails(gpaUTR, queryParams.contractVersion, queryParams.startIndex, queryParams.count)
+        .getPaymentDetails(gpaUTR, contractVersion, startIndex, count)
         .map {
           case Some(gpPayment) =>
             Ok(
