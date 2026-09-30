@@ -46,7 +46,7 @@ case class GpaPaymentsDetails(
   gppTotalGroupTax: Option[BigDecimal],
   gppStatus: String,
   gppCni: Option[LocalDate],
-  gppApportionmentMethod: String
+  gppApportionmentMethod: Option[String]
 )
 
 object GpaPaymentsDetails {
@@ -79,7 +79,7 @@ case class GpaPaymentsDetailsResponse(
   gppTotalGroupTax: BigDecimal,
   gppStatus: String,
   gppCni: Option[LocalDate],
-  gppApportionmentMethod: String
+  gppApportionmentMethod: Option[String]
 )
 
 object GpaPaymentsDetailsResponse {

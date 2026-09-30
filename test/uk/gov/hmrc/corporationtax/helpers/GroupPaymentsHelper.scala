@@ -90,7 +90,7 @@ trait GroupPaymentsHelper {
     gppTotalGroupTax = Some(BigDecimal(-250000)),
     gppStatus = "L",
     gppCni = None,
-    gppApportionmentMethod = "METHOD"
+    gppApportionmentMethod = Some("METHOD")
   )
 
   val defaultPaymentDetailsResponse = GpaPaymentsDetailsResponse(
@@ -114,6 +114,6 @@ trait GroupPaymentsHelper {
     gppTotalGroupTax = BigDecimal(250000),
     gppStatus = "L",
     gppCni = None,
-    gppApportionmentMethod = "METHOD"
+    gppApportionmentMethod = Some("METHOD")
   )
 }
