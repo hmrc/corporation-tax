@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.corporationtax.utils
 
-object EmptyString {
+object EmptyAndZeroConstants {
 
   val emptyString = ""
+  val zeroValue   = 0
 
 }
