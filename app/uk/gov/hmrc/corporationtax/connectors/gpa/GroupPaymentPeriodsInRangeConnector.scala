@@ -32,7 +32,7 @@ class GroupPaymentPeriodsInRangeConnector @Inject() (http: HttpClientV2, appConf
   ec: ExecutionContext
 ) extends Logging {
 
-  def getGroupPaymentPeriodsInRange(gpaUTR: Long, nominatedCompanyUTR: Long, pPeriod: Long, pMonthRestriction: Long)(
+  def getGroupPaymentPeriodsInRange(gpaUTR: Long, nominatedCompanyUTR: Long, pPeriod: Int, pMonthRestriction: Int)(
     implicit hc: HeaderCarrier
   ): Future[PeriodWithinRangeResponse] = {
     val url: URL =

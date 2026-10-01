@@ -45,12 +45,12 @@ class GroupPaymentPeriodsInRangeConnectorISpec
   // TODO: add auth stub and relevant cases
   "getGroupPaymentPeriodsInRange" should {
 
-    def url(gpaUTR: Long, nominatedCompanyUTR: Long, pPeriod: Long, pMonthRestriction: Long) =
+    def url(gpaUTR: Long, nominatedCompanyUTR: Long, pPeriod: Int, pMonthRestriction: Int) =
       s"${appConfig.rdsDatacacheProxyEndpoint}/group-payment-periods-in-range/$gpaUTR/$nominatedCompanyUTR/$pPeriod/$pMonthRestriction"
 
     "returns 200 with PeriodWithinRange with field set to false" in {
       stubFor(
-        get(urlPathEqualTo(url(10L, 1000L, 1L, 1L)))
+        get(urlPathEqualTo(url(10L, 1000L, 1, 1)))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -62,13 +62,13 @@ class GroupPaymentPeriodsInRangeConnectorISpec
           )
       )
 
-      val result = connector.getGroupPaymentPeriodsInRange(10L, 1000L, 1L, 1L).futureValue
+      val result = connector.getGroupPaymentPeriodsInRange(10L, 1000L, 1, 1).futureValue
       result mustBe periodWithinRangeResponseFalse
     }
 
     "returns 200 with PeriodWithinRange with field set to true" in {
       stubFor(
-        get(urlPathEqualTo(url(20L, 1000L, 1L, 1L)))
+        get(urlPathEqualTo(url(20L, 1000L, 1, 1)))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -80,13 +80,13 @@ class GroupPaymentPeriodsInRangeConnectorISpec
           )
       )
 
-      val result = connector.getGroupPaymentPeriodsInRange(20L, 1000L, 1L, 1L).futureValue
+      val result = connector.getGroupPaymentPeriodsInRange(20L, 1000L, 1, 1).futureValue
       result mustBe periodWithinRangeResponseTrue
     }
 
     "return error when service failed" in {
       stubFor(
-        get(urlPathEqualTo(url(999L, 1000L, 1L, 1L)))
+        get(urlPathEqualTo(url(999L, 1000L, 1, 1)))
           .willReturn(
             aResponse()
               .withStatus(INTERNAL_SERVER_ERROR)
@@ -100,7 +100,7 @@ class GroupPaymentPeriodsInRangeConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getGroupPaymentPeriodsInRange(999L, 1000L, 1L, 1L).futureValue
+        connector.getGroupPaymentPeriodsInRange(999L, 1000L, 1, 1).futureValue
       }
       ex.getMessage.toLowerCase must include("error from downstream")
     }
