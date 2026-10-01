@@ -59,13 +59,13 @@ class GroupPaymentPeriodsInRangeControllerSpec extends AnyWordSpec with Matchers
       )
         .thenReturn(Future.successful(periodWithinRangeFalse))
 
-      val result: Future[Result] = controller.getGroupPaymentPeriodsInRange(10L, 1000L, 1L, 1L)(fakeRequest)
+      val result: Future[Result] = controller.getGroupPaymentPeriodsInRange(10L, 1000L, 1, 1)(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(periodWithinRangeFalse)
 
       verify(mockGroupPaymentPeriodsInRangeService)
-        .getGroupPaymentPeriodsInRange(eqTo(10L), eqTo(1000L), eqTo(1L), eqTo(1L))(any[HeaderCarrier])
+        .getGroupPaymentPeriodsInRange(eqTo(10L), eqTo(1000L), eqTo(1), eqTo(1))(any[HeaderCarrier])
     }
 
     "return 200 and Period Within Range set to True" in new Setup {
@@ -76,13 +76,13 @@ class GroupPaymentPeriodsInRangeControllerSpec extends AnyWordSpec with Matchers
       )
         .thenReturn(Future.successful(periodWithinRangeTrue))
 
-      val result: Future[Result] = controller.getGroupPaymentPeriodsInRange(20L, 1000L, 1L, 1L)(fakeRequest)
+      val result: Future[Result] = controller.getGroupPaymentPeriodsInRange(20L, 1000L, 1, 1)(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(periodWithinRangeTrue)
 
       verify(mockGroupPaymentPeriodsInRangeService)
-        .getGroupPaymentPeriodsInRange(eqTo(20L), eqTo(1000L), eqTo(1L), eqTo(1L))(any[HeaderCarrier])
+        .getGroupPaymentPeriodsInRange(eqTo(20L), eqTo(1000L), eqTo(1), eqTo(1))(any[HeaderCarrier])
     }
 
     "return Error message" in new Setup {
@@ -93,13 +93,13 @@ class GroupPaymentPeriodsInRangeControllerSpec extends AnyWordSpec with Matchers
       )
         .thenReturn(Future.failed(new RuntimeException("Failed to retrieve period within range")))
 
-      val result: Future[Result] = controller.getGroupPaymentPeriodsInRange(999L, 1000L, 1L, 1L)(fakeRequest)
+      val result: Future[Result] = controller.getGroupPaymentPeriodsInRange(999L, 1000L, 1, 1)(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
 
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve period within range"
 
       verify(mockGroupPaymentPeriodsInRangeService)
-        .getGroupPaymentPeriodsInRange(eqTo(999L), eqTo(1000L), eqTo(1L), eqTo(1L))(any[HeaderCarrier])
+        .getGroupPaymentPeriodsInRange(eqTo(999L), eqTo(1000L), eqTo(1), eqTo(1))(any[HeaderCarrier])
     }
 
   }

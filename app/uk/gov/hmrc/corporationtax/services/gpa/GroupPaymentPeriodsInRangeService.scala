@@ -34,7 +34,7 @@ class GroupPaymentPeriodsInRangeService @Inject() (
       isPeriodWithinRange = CommonBooleanTransformation.toBool(e.isPeriodWithinRange)
     )
 
-  def getGroupPaymentPeriodsInRange(gpaUTR: Long, nominatedCompanyUTR: Long, pPeriod: Long, pMonthRestriction: Long)(
+  def getGroupPaymentPeriodsInRange(gpaUTR: Long, nominatedCompanyUTR: Long, pPeriod: Int, pMonthRestriction: Int)(
     implicit hc: HeaderCarrier
   ): Future[PeriodWithinRange] = {
     logger.info(

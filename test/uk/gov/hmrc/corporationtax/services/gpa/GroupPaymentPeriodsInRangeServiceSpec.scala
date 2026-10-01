@@ -52,32 +52,32 @@ class GroupPaymentPeriodsInRangeServiceSpec
 
   "getGroupPaymentPeriodsInRange returns Period Within Range set to No" in new Fixture {
     when(
-      mockGroupPaymentPeriodsInRangeConnector.getGroupPaymentPeriodsInRange(any[Long], any[Long], any[Long], any[Long])(
+      mockGroupPaymentPeriodsInRangeConnector.getGroupPaymentPeriodsInRange(any[Long], any[Long], any[Int], any[Int])(
         any[HeaderCarrier]
       )
     )
       .thenReturn(Future.successful(periodWithinRangeResponseFalse))
 
-    val result: PeriodWithinRange = service.getGroupPaymentPeriodsInRange(10L, 1000L, 1L, 1L).futureValue
+    val result: PeriodWithinRange = service.getGroupPaymentPeriodsInRange(10L, 1000L, 1, 1).futureValue
 
     result shouldBe periodWithinRangeFalse
 
-    verify(mockGroupPaymentPeriodsInRangeConnector).getGroupPaymentPeriodsInRange(10L, 1000L, 1L, 1L)(hc)
+    verify(mockGroupPaymentPeriodsInRangeConnector).getGroupPaymentPeriodsInRange(10L, 1000L, 1, 1)(hc)
   }
 
   "getGroupPaymentPeriodsInRange returns Period Within Range set to Yes" in new Fixture {
     when(
-      mockGroupPaymentPeriodsInRangeConnector.getGroupPaymentPeriodsInRange(any[Long], any[Long], any[Long], any[Long])(
+      mockGroupPaymentPeriodsInRangeConnector.getGroupPaymentPeriodsInRange(any[Long], any[Long], any[Int], any[Int])(
         any[HeaderCarrier]
       )
     )
       .thenReturn(Future.successful(periodWithinRangeResponseTrue))
 
-    val result: PeriodWithinRange = service.getGroupPaymentPeriodsInRange(20L, 1000L, 1L, 1L).futureValue
+    val result: PeriodWithinRange = service.getGroupPaymentPeriodsInRange(20L, 1000L, 1, 1).futureValue
 
     result shouldBe periodWithinRangeTrue
 
-    verify(mockGroupPaymentPeriodsInRangeConnector).getGroupPaymentPeriodsInRange(20L, 1000L, 1L, 1L)(hc)
+    verify(mockGroupPaymentPeriodsInRangeConnector).getGroupPaymentPeriodsInRange(20L, 1000L, 1, 1)(hc)
   }
 
   "getPayments returns failure from connector" in new Fixture {
@@ -90,11 +90,11 @@ class GroupPaymentPeriodsInRangeServiceSpec
       )
     ).thenReturn(Future.failed(ex))
 
-    val result: Throwable = service.getGroupPaymentPeriodsInRange(999L, 1000L, 1L, 1L).failed.futureValue
+    val result: Throwable = service.getGroupPaymentPeriodsInRange(999L, 1000L, 1, 1).failed.futureValue
 
     result shouldBe ex
 
-    verify(mockGroupPaymentPeriodsInRangeConnector).getGroupPaymentPeriodsInRange(999L, 1000L, 1L, 1L)(hc)
+    verify(mockGroupPaymentPeriodsInRangeConnector).getGroupPaymentPeriodsInRange(999L, 1000L, 1, 1)(hc)
     verifyNoMoreInteractions(mockGroupPaymentPeriodsInRangeConnector)
 
   }

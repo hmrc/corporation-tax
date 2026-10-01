@@ -35,8 +35,8 @@ class GroupPaymentPeriodsInRangeController @Inject() (
   def getGroupPaymentPeriodsInRange(
     gpaUTR: Long,
     nominatedCompanyUTR: Long,
-    pPeriod: Long,
-    pMonthRestriction: Long
+    pPeriod: Int,
+    pMonthRestriction: Int
   ): Action[AnyContent] = Action.async { implicit request =>
     service
       .getGroupPaymentPeriodsInRange(gpaUTR, nominatedCompanyUTR, pPeriod, pMonthRestriction)
