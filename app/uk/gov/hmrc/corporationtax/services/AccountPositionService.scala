@@ -26,13 +26,13 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AccountPositionService @Inject (
-                                         connector: AccountPositionConnector
-                                       )(implicit
-                                         ec: ExecutionContext
-                                       ) extends Logging {
+  connector: AccountPositionConnector
+)(implicit
+  ec: ExecutionContext
+) extends Logging {
   import uk.gov.hmrc.corporationtax.utils.CommonBooleanTransformation.*
 
-  private def transform(rec: AccountPosition) : AccountPositionResponse = {
+  private def transform(rec: AccountPosition): AccountPositionResponse = {
     val apAmounts = rec.apAmounts.map(r =>
       ApAmountRecord(
         accountingPeriod = r.accountingPeriod,
@@ -52,7 +52,7 @@ class AccountPositionService @Inject (
     )
   }
 
-  def getAccountPosition(taxRef: Long)(implicit hc: HeaderCarrier) : Future[AccountPositionResponse] = {
+  def getAccountPosition(taxRef: Long)(implicit hc: HeaderCarrier): Future[AccountPositionResponse] = {
     logger.info(s"taxRef: $taxRef")
     connector
       .getAccountPosition(taxRef)

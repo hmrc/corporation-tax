@@ -32,7 +32,7 @@ object ApAmountItem {
   implicit val format: OFormat[ApAmountItem] = Json.format[ApAmountItem]
 }
 
-case class AccountPosition (
+case class AccountPosition(
   amountDue: Option[BigDecimal],
   asOnDate: Option[LocalDate],
   gpaLinkFlag: Option[String],
@@ -47,25 +47,24 @@ object AccountPosition {
 
 // BE
 case class ApAmountRecord(
-                         accountingPeriod: Long,
-                         apEndDate: Option[LocalDate],
-                         amountDueForAp: BigDecimal,
-                         apStatus: Option[String]
-                       )
+  accountingPeriod: Long,
+  apEndDate: Option[LocalDate],
+  amountDueForAp: BigDecimal,
+  apStatus: Option[String]
+)
 
 object ApAmountRecord {
   implicit val format: OFormat[ApAmountRecord] = Json.format[ApAmountRecord]
 }
 
-
 case class AccountPositionResponse(
-                             amountDue: BigDecimal,
-                             asOnDate: Option[LocalDate],
-                             gpaLinkFlag: Boolean,
-                             taxpayerList: List[String],
-                             apAmounts: List[ApAmountRecord],
-                             doesCompanyExist: Boolean
-                           )
+  amountDue: BigDecimal,
+  asOnDate: Option[LocalDate],
+  gpaLinkFlag: Boolean,
+  taxpayerList: List[String],
+  apAmounts: List[ApAmountRecord],
+  doesCompanyExist: Boolean
+)
 
 object AccountPositionResponse {
   implicit val format: OFormat[AccountPositionResponse] = Json.format[AccountPositionResponse]

@@ -28,8 +28,8 @@ import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AccountPositionConnector @Inject()(http: HttpClientV2, appConfig: AppConfig)(implicit
-                                                                                   ec: ExecutionContext
+class AccountPositionConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit
+  ec: ExecutionContext
 ) extends Logging {
 
   def getAccountPosition(taxRef: Long)(implicit

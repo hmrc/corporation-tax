@@ -24,8 +24,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-
-class AccountPositionController @Inject()(
+class AccountPositionController @Inject() (
   cc: ControllerComponents,
   service: AccountPositionService
 )(implicit ec: ExecutionContext)
