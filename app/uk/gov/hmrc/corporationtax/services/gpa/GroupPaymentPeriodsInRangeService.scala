@@ -43,7 +43,6 @@ class GroupPaymentPeriodsInRangeService @Inject() (
     connector
       .getGroupPaymentPeriodsInRange(gpaUTR, nominatedCompanyUTR, pPeriod, pMonthRestriction)
       .map(transform)
-      .map(record => record)
   }
 
 }
