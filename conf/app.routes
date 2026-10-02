@@ -28,3 +28,5 @@ GET        /display-needed/:taxRef/:accPeriod                                  u
 GET        /is-company-nominator/:gpaUtr/:nominatedCompanyUtr                  uk.gov.hmrc.corporationtax.controllers.gpa.CompanyNominatorController.getIsCompanyNominatorOfGPA(gpaUtr: Long, nominatedCompanyUtr: Long)
 GET        /group-summary/:gpaUTR/:nomCompanyUTR                               uk.gov.hmrc.corporationtax.controllers.GroupPaymentsController.getGroupSummary(gpaUTR: Long, nomCompanyUTR: Long)
 GET        /group-tax-charges/:pGpaUtr/:pGppContractVersion                    uk.gov.hmrc.corporationtax.controllers.gpa.GpaGroupTaxChargesController.getGpaGroupTaxCharges(pGpaUtr:Long, pGppContractVersion: Int, pStartIndex:Int ?=0, pCount:Int ?=10)
+
+GET        /group-payment-periods-in-range/:gpaUTR/:nominatedCompanyUTR/:pPeriod/:pMonthRestriction                              uk.gov.hmrc.corporationtax.controllers.gpa.GroupPaymentPeriodsInRangeController.getGroupPaymentPeriodsInRange(gpaUTR: Long, nominatedCompanyUTR: Long, pPeriod: Int, pMonthRestriction: Int)
