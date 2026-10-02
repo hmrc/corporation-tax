@@ -38,7 +38,7 @@ class GroupPaymentPeriodsInRangeService @Inject() (
     implicit hc: HeaderCarrier
   ): Future[PeriodWithinRange] = {
     logger.info(
-      "Calling repository for gpaUTR: $gpaUTR, nominatedCompanyUTR: $nominatedCompanyUTR, pPeriod: $pPeriod, pMonthRestriction: $pMonthRestriction"
+      s"Calling repository for gpaUTR: $gpaUTR, nominatedCompanyUTR: $nominatedCompanyUTR, pPeriod: $pPeriod, pMonthRestriction: $pMonthRestriction"
     )
     connector
       .getGroupPaymentPeriodsInRange(gpaUTR, nominatedCompanyUTR, pPeriod, pMonthRestriction)
