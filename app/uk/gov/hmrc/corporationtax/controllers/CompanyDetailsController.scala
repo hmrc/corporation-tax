@@ -19,34 +19,33 @@ package uk.gov.hmrc.corporationtax.controllers
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.corporationtax.services.ReallocationFromAccPeriodService
+import uk.gov.hmrc.corporationtax.services.CompanyDetailsService
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class CompanyDetailsController @Inject()(
+class CompanyDetailsController @Inject() (
   cc: ControllerComponents,
-  service: ReallocationFromAccPeriodService
+  service: CompanyDetailsService
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def getReallocationFromAccPeriod(taxPayerReference: Long, accPeriod: Long): Action[AnyContent] = Action.async {
-    implicit request =>
-      service
-        .getReallocationFromAccPeriod(taxPayerReference, accPeriod)
-        .map { reallocationFromAccPeriod =>
-          Ok(Json.toJson(reallocationFromAccPeriod))
-        }
-        .recover {
-          case u: UpstreamErrorResponse =>
-            Status(u.statusCode)(Json.obj("message" -> u.message))
-          case t: Throwable             =>
-            logger.error("Error while retrieving reallocationFromAccPeriod", t)
-            InternalServerError(Json.obj("error" -> "Failed to retrieve reallocationFromAccPeriod"))
-        }
+  def getCompanyDetails(taxPayerReference: Long): Action[AnyContent] = Action.async { implicit request =>
+    service
+      .getCompanyDetails(taxPayerReference)
+      .map { companyDetailsResponse =>
+        Ok(Json.toJson(companyDetailsResponse))
+      }
+      .recover {
+        case u: UpstreamErrorResponse =>
+          Status(u.statusCode)(Json.obj("message" -> u.message))
+        case t: Throwable             =>
+          logger.error("Error while retrieving Company Details", t)
+          InternalServerError(Json.obj("error" -> "Failed to retrieve CompanyDetails"))
+      }
   }
 
 }

@@ -26,71 +26,58 @@ import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, ControllerComponents, Result}
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.corporationtax.helpers.ReallocationFromAccPeriodHelper
-import uk.gov.hmrc.corporationtax.models.{MiscellaneousTransfer, ReallocationFromAccPeriod}
-import uk.gov.hmrc.corporationtax.services.ReallocationFromAccPeriodService
+import uk.gov.hmrc.corporationtax.helpers.CompanyDetailsHelper
+import uk.gov.hmrc.corporationtax.services.CompanyDetailsService
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
-import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
-class CompanyDetailsControllerSpec
-    extends AnyWordSpec
-    with Matchers
-    with ReallocationFromAccPeriodHelper {
+class CompanyDetailsControllerSpec extends AnyWordSpec with Matchers with CompanyDetailsHelper {
 
   private trait Fixture {
-    val mockService: ReallocationFromAccPeriodService = mock[ReallocationFromAccPeriodService]
-    private val cc: ControllerComponents              = stubControllerComponents()
+    val mockService: CompanyDetailsService = mock[CompanyDetailsService]
+    private val cc: ControllerComponents   = stubControllerComponents()
 
     implicit val ec: ExecutionContext                    = cc.executionContext
-    val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/reallocation-from-accounting-period")
-    val controller                                       = new ReallocationFromAccPeriodController(cc, mockService)
+    val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/company-details")
+    val controller                                       = new CompanyDetailsController(cc, mockService)
     val taxReferenceNumber: Long                         = 1234567L
-    val accPeriod: Long                                  = 3456L
 
   }
 
-  "GET /reallocationFromAccPeriod " should {
+  "GET /company-details " should {
 
-    "return 200: OK" in new Fixture {
+    "return 200: OK with multiple elements in CompanyDetails List" in new Fixture {
 
-      val response: ReallocationFromAccPeriod =
-        transformedReallocationFromAccPeriod(
-          BigDecimal(45876.87),
-          Some(LocalDate.of(2026, 12, 3)),
-          "99",
-          MiscellaneousTransfer
-        )
-      when(mockService.getReallocationFromAccPeriod(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(response))
+      when(mockService.getCompanyDetails(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(twoCompanies))
 
-      val result: Future[Result] = controller.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)(fakeRequest)
+      val result: Future[Result] = controller.getCompanyDetails(taxReferenceNumber)(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson(response)
+      contentAsJson(result) shouldBe Json.toJson(twoCompanies)
 
-      verify(mockService).getReallocationFromAccPeriod(any(), any())(any[HeaderCarrier])
+      verify(mockService).getCompanyDetails(any())(any[HeaderCarrier])
     }
-    "return 200: OK for empty response " in new Fixture {
-      when(mockService.getReallocationFromAccPeriod(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(emptyTransformedListReallocationFromAccPeriod))
+    "return 200: OK for empty response in CompanyDetails" in new Fixture {
+      when(mockService.getCompanyDetails(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(emptyCompanyDetails))
 
-      val result: Future[Result] = controller.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)(fakeRequest)
+      val result: Future[Result] = controller.getCompanyDetails(taxReferenceNumber)(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson(emptyTransformedListReallocationFromAccPeriod)
+      contentAsJson(result) shouldBe Json.toJson(emptyCompanyDetails)
 
-      verify(mockService).getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier])
+      verify(mockService).getCompanyDetails(any())(any[HeaderCarrier])
     }
 
     "returns status code BAD_GATEWAY when Upstream error is returned" in new Fixture {
       val err: UpstreamErrorResponse = UpstreamErrorResponse("Rds-cache service unavailable", BAD_GATEWAY, BAD_GATEWAY)
 
-      when(mockService.getReallocationFromAccPeriod(any(), any())(any[HeaderCarrier]))
+      when(mockService.getCompanyDetails(any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(err))
 
-      val result: Future[Result] = controller.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)(fakeRequest)
+      val result: Future[Result] = controller.getCompanyDetails(taxReferenceNumber)(fakeRequest)
 
       status(result) shouldBe BAD_GATEWAY
 
@@ -98,15 +85,15 @@ class CompanyDetailsControllerSpec
     }
 
     "return 500: INTERNAL_SERVER_ERROR" in new Fixture {
-      when(mockService.getReallocationFromAccPeriod(any(), any())(any[HeaderCarrier]))
+      when(mockService.getCompanyDetails(any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("unexpected")))
 
-      val result: Future[Result] = controller.getReallocationFromAccPeriod(taxReferenceNumber, accPeriod)(fakeRequest)
+      val result: Future[Result] = controller.getCompanyDetails(taxReferenceNumber)(fakeRequest)
 
       status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
-      (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve reallocationFromAccPeriod"
+      (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve CompanyDetails"
 
-      verify(mockService).getReallocationFromAccPeriod(eqTo(taxReferenceNumber), eqTo(accPeriod))(any[HeaderCarrier])
+      verify(mockService).getCompanyDetails(eqTo(taxReferenceNumber))(any[HeaderCarrier])
     }
 
   }
