@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.corporationtax.Services.gpa
+package uk.gov.hmrc.corporationtax.services.gpa
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
@@ -26,7 +26,6 @@ import play.api.test.Helpers
 import uk.gov.hmrc.corporationtax.connectors.gpa.GroupPaymentPeriodsInRangeConnector
 import uk.gov.hmrc.corporationtax.helpers.gpa.PeriodWithinRangeHelper
 import uk.gov.hmrc.corporationtax.models.gpa.PeriodWithinRange
-import uk.gov.hmrc.corporationtax.services.gpa.GroupPaymentPeriodsInRangeService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}

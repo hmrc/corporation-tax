@@ -42,7 +42,6 @@ class GroupPaymentPeriodsInRangeConnectorISpec
   implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val connector: GroupPaymentPeriodsInRangeConnector = app.injector.instanceOf[GroupPaymentPeriodsInRangeConnector]
 
-  // TODO: add auth stub and relevant cases
   "getGroupPaymentPeriodsInRange" should {
 
     def url(gpaUTR: Long, nominatedCompanyUTR: Long, pPeriod: Int, pMonthRestriction: Int) =
