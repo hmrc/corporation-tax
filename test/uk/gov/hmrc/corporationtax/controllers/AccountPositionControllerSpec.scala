@@ -32,8 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AccountPositionControllerSpec extends AnyWordSpec with Matchers
-  with AccountPositionHelper {
+class AccountPositionControllerSpec extends AnyWordSpec with Matchers with AccountPositionHelper {
 
   private trait Setup {
     val mockAccountPositionService: AccountPositionService = mock[AccountPositionService]
@@ -48,7 +47,6 @@ class AccountPositionControllerSpec extends AnyWordSpec with Matchers
 
   "GET /accounting-period-details" should {
 
-
     "return 200 and a successful response with one item transformed amounts" in new Setup {
       when(mockAccountPositionService.getAccountPosition(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(defaultResponse))
@@ -56,7 +54,7 @@ class AccountPositionControllerSpec extends AnyWordSpec with Matchers
       val result: Future[Result] = controller.getAccountPosition(1L)(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson( defaultResponse )
+      contentAsJson(result) shouldBe Json.toJson(defaultResponse)
 
       verify(mockAccountPositionService).getAccountPosition(eqTo(1L))(any[HeaderCarrier])
     }
