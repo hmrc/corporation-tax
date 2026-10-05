@@ -29,8 +29,8 @@ import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.corporationtax.helpers.AccountPositionHelper
 import uk.gov.hmrc.corporationtax.services.AccountPositionService
 import uk.gov.hmrc.http.HeaderCarrier
-
 import scala.concurrent.{ExecutionContext, Future}
+
 
 class AccountPositionControllerSpec extends AnyWordSpec with Matchers with AccountPositionHelper {
 
@@ -59,20 +59,18 @@ class AccountPositionControllerSpec extends AnyWordSpec with Matchers with Accou
       verify(mockAccountPositionService).getAccountPosition(eqTo(1L))(any[HeaderCarrier])
     }
 
-    /*
+
     "return 500 INTERNAL_SERVER_ERROR" in new Setup {
-      when(mockAccountingPeriodDetailsService.getAccountingDetails(any(), any())(any[HeaderCarrier]))
+      when(mockAccountPositionService.getAccountPosition(any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("error")))
 
-      val result: Future[Result] = controller.getAccountingPeriodDetails(3L, 4L)(fakeRequest)
+      val result: Future[Result] = controller.getAccountPosition(3L)(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
 
-      (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve accounting period details"
+      (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve account position"
 
-      verify(mockAccountingPeriodDetailsService).getAccountingDetails(eqTo(3L), eqTo(4L))(any[HeaderCarrier])
+      verify(mockAccountPositionService).getAccountPosition(eqTo(3L))(any[HeaderCarrier])
     }
-
-     */
 
   }
 }
