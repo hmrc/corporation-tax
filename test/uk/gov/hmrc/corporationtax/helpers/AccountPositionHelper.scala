@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.corporationtax.helpers
 
-import uk.gov.hmrc.corporationtax.models.{AccountPosition, ApAmountItem}
+import uk.gov.hmrc.corporationtax.models.{AccountPosition, AccountPositionResponse, ApAmountItem, ApAmountRecord}
 
 import java.time.LocalDate
 
@@ -51,6 +51,31 @@ trait AccountPositionHelper {
   )
 
   // BE
+  val apRecordOne = ApAmountRecord(
+    accountingPeriod = 51L,
+    apEndDate = Some(LocalDate.of(2024, 2, 3)),
+    amountDueForAp = BigDecimal(-4.33),
+    apStatus = Some("N")
+  )
 
+  val defaultResponse = AccountPositionResponse(
+    amountDue = BigDecimal(-15.18),
+    asOnDate = Some(LocalDate.of(2026, 1, 1)),
+    gpaLinkFlag = false,
+    taxpayerList = List("1002"),
+    apAmounts = List(
+      apRecordOne
+    ),
+    doesCompanyExist = true
+  )
+
+  val emptyResponse = AccountPositionResponse(
+    amountDue = BigDecimal(0),
+    asOnDate = None,
+    gpaLinkFlag = false,
+    taxpayerList = List.empty,
+    apAmounts = List.empty,
+    doesCompanyExist = false
+  )
 
 }
