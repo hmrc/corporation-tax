@@ -26,9 +26,8 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.corporationtax.helpers.{AccountPositionHelper, AccountingPeriodDetailsHelper}
-import uk.gov.hmrc.corporationtax.models.AccountingPeriodDetailsResponse
-import uk.gov.hmrc.corporationtax.services.{AccountPositionService, AccountingPeriodDetailsService}
+import uk.gov.hmrc.corporationtax.helpers.AccountPositionHelper
+import uk.gov.hmrc.corporationtax.services.AccountPositionService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
