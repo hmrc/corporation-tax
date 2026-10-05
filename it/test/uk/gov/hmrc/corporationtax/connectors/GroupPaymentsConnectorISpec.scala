@@ -112,4 +112,81 @@ class GroupPaymentsConnectorISpec
 
 
   }
+
+  "getPaymentDetails" should {
+
+    def url(gpaUTR: Long,
+            contractVersion: Int, startIndex: Int, count: Int) =
+      s"${appConfig.rdsDatacacheProxyEndpoint}/gpa-payment-details/$gpaUTR?contractVersion=$contractVersion&startIndex=$startIndex&count=$count"
+
+    "return no PaymentDetails record" in {
+      stubFor(
+        get(urlEqualTo(url(1L, 2, 3, 4)))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+              .withBody(s"""{}""".stripMargin)
+          )
+      )
+
+      val result = connector.getPaymentDetails(1L, 2, 3, 4).futureValue
+      result mustBe None
+    }
+
+    "return PaymentDetails default record" in {
+      stubFor(
+        get(urlEqualTo(url(1L, 2, 3, 4)))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                s"""
+                   |{"gpaPayments":[
+                   |  {"displayDate":"2008-04-14",
+                   |  "total":6250,
+                   |  "tablename":"Payslip",
+                   |  "paymentType":"BGP",
+                   |  "targetApNo":0,
+                   |  "participatorCount":0
+                   |  }
+                   |  ],
+                   |  "totalNumOfRecords":1,
+                   |  "gppEndDate":"2007-12-31",
+                   |  "gppTotalGroupPayment":25000,
+                   |  "gppTotalGroupTax":-250000,
+                   |  "gppStatus":"L",
+                   |  "gppApportionmentMethod":"METHOD"}
+                   |""".stripMargin
+              )
+          )
+      )
+
+      val result = connector.getPaymentDetails(1L, 2, 3, 4).futureValue
+      result mustBe Some(defaultPaymentDetails)
+    }
+
+    "return INTERNAL_ERROR when service failed" in {
+      stubFor(
+        get(urlEqualTo(url(1L, 2, 3, 4)))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody(
+                s"""{
+                   |error" : "Failed to retrieve penalties"
+                   |}""".stripMargin
+              )
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getPaymentDetails(1L, 2, 3, 4).futureValue
+      }
+      ex.getMessage.toLowerCase must include("error")
+    }
+
+
+  }
+
+
 }
