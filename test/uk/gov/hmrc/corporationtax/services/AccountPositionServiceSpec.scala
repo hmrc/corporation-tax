@@ -61,7 +61,6 @@ class AccountPositionServiceSpec
     verify(mockAccountPositionConnector).getAccountPosition(1L)(hc)
   }
 
-
   "getAccountPosition returns transformed empty record" in new Fixture {
     when(mockAccountPositionConnector.getAccountPosition(any[Long])(any[HeaderCarrier]))
       .thenReturn(Future.successful(emptyRecord))

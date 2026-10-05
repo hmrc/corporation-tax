@@ -41,7 +41,7 @@ trait AccountPositionHelper {
     doesCompanyExist = Some("Y")
   )
 
-  val emptyRecord = AccountPosition (
+  val emptyRecord = AccountPosition(
     amountDue = None,
     asOnDate = None,
     gpaLinkFlag = None,
