@@ -31,7 +31,6 @@ import uk.gov.hmrc.corporationtax.services.AccountPositionService
 import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
-
 class AccountPositionControllerSpec extends AnyWordSpec with Matchers with AccountPositionHelper {
 
   private trait Setup {
@@ -58,7 +57,6 @@ class AccountPositionControllerSpec extends AnyWordSpec with Matchers with Accou
 
       verify(mockAccountPositionService).getAccountPosition(eqTo(1L))(any[HeaderCarrier])
     }
-
 
     "return 500 INTERNAL_SERVER_ERROR" in new Setup {
       when(mockAccountPositionService.getAccountPosition(any())(any[HeaderCarrier]))
