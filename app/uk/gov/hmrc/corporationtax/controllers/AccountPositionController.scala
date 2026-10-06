@@ -37,7 +37,7 @@ class AccountPositionController @Inject() (
       .map {
         case Some(record) =>
           Ok(Json.toJson(record))
-        case None =>
+        case None         =>
           NotFound(Json.obj("error" -> "Data not found"))
       }
       .recover { case ex: Exception =>
