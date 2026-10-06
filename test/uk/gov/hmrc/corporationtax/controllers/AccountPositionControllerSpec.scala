@@ -44,7 +44,7 @@ class AccountPositionControllerSpec extends AnyWordSpec with Matchers with Accou
       new AccountPositionController(Helpers.stubControllerComponents(), mockAccountPositionService)
   }
 
-  "GET /accounting-period-details" should {
+  "GET /account-position" should {
 
     "return 200 and a successful response with one item transformed amounts" in new Setup {
       when(mockAccountPositionService.getAccountPosition(any())(any[HeaderCarrier]))
