@@ -52,11 +52,11 @@ class AccountPositionService @Inject (
     )
   }
 
-  def getAccountPosition(taxRef: Long)(implicit hc: HeaderCarrier): Future[AccountPositionResponse] = {
+  def getAccountPosition(taxRef: Long)(implicit hc: HeaderCarrier): Future[Option[AccountPositionResponse]] = {
     logger.info(s"taxRef: $taxRef")
     connector
       .getAccountPosition(taxRef)
-      .map(transform)
+      .map(x => x.map(transform))
   }
 
 }

@@ -34,10 +34,11 @@ class AccountPositionController @Inject() (
   def getAccountPosition(taxRef: Long): Action[AnyContent] = Action.async { implicit request =>
     service
       .getAccountPosition(taxRef)
-      .map { rec =>
-        Ok(
-          Json.toJson(rec)
-        )
+      .map {
+        case Some(record) =>
+          Ok(Json.toJson(record))
+        case None =>
+          NotFound(Json.obj("error" -> "Data not found"))
       }
       .recover { case ex: Exception =>
         logger.error("Error while retrieving account position", ex)

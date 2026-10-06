@@ -34,11 +34,11 @@ class AccountPositionConnector @Inject() (http: HttpClientV2, appConfig: AppConf
 
   def getAccountPosition(taxRef: Long)(implicit
     hc: HeaderCarrier
-  ): Future[AccountPosition] = {
+  ): Future[Option[AccountPosition]] = {
     val url: URL = url"${appConfig.rdsDatacacheProxyFullUrl}/account-position/$taxRef"
     http
       .get(url)
-      .execute[AccountPosition]
+      .execute[Option[AccountPosition]]
       .recover { case e: Throwable =>
         logger.error(s"$taxRef - ${e.getMessage}")
         throw new RuntimeException(e.getMessage)

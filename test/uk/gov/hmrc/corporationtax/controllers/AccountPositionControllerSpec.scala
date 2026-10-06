@@ -58,6 +58,18 @@ class AccountPositionControllerSpec extends AnyWordSpec with Matchers with Accou
       verify(mockAccountPositionService).getAccountPosition(eqTo(1L))(any[HeaderCarrier])
     }
 
+    "return 404 when no data found or SQL error" in new Setup {
+      when(mockAccountPositionService.getAccountPosition(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(None))
+
+      val result: Future[Result] = controller.getAccountPosition(1L)(fakeRequest)
+      status(result) shouldBe Status.OK
+
+      contentAsJson(result) shouldBe Json.toJson(defaultResponse)
+
+      verify(mockAccountPositionService).getAccountPosition(eqTo(1L))(any[HeaderCarrier])
+    }
+
     "return 500 INTERNAL_SERVER_ERROR" in new Setup {
       when(mockAccountPositionService.getAccountPosition(any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("error")))
