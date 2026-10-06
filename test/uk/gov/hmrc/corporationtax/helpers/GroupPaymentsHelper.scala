@@ -17,8 +17,8 @@
 package uk.gov.hmrc.corporationtax.helpers
 
 import uk.gov.hmrc.corporationtax.models.{
-  GroupReferenceNumberLstItem, GroupSummaryDetails, GroupSummaryDetailsItem, GroupSummaryDetailsRecord,
-  GroupSummaryDetailsResponse
+  GpaPaymentsDetails, GpaPaymentsDetailsResponse, GpaPaymentsItem, GpaPaymentsRecord, GroupReferenceNumberLstItem,
+  GroupSummaryDetails, GroupSummaryDetailsItem, GroupSummaryDetailsRecord, GroupSummaryDetailsResponse
 }
 
 import java.time.LocalDate
@@ -68,4 +68,52 @@ trait GroupPaymentsHelper {
     nominatedCompanyName = "CompanyName"
   )
 
+  // PaymentDetails
+  val defaultPaymentDetails = GpaPaymentsDetails(
+    gpaPayments = List(
+      GpaPaymentsItem(
+        displayDate = Some(LocalDate.of(2008, 4, 14)),
+        total = Some(BigDecimal(6250)),
+        tablename = Some("Payslip"),
+        targetTaxpayerReference = None,
+        paymentType = Some("BGP"),
+        repaymentType = None,
+        targetApNo = Some(0),
+        targetApEndDate = None,
+        contractEndDate = None,
+        participatorCount = Some(0L)
+      )
+    ),
+    totalNumOfRecords = Some(1L),
+    gppEndDate = Some(LocalDate.of(2007, 12, 31)),
+    gppTotalGroupPayment = Some(BigDecimal(25000)),
+    gppTotalGroupTax = Some(BigDecimal(-250000)),
+    gppStatus = "L",
+    gppCni = None,
+    gppApportionmentMethod = Some("METHOD")
+  )
+
+  val defaultPaymentDetailsResponse = GpaPaymentsDetailsResponse(
+    gpaPayments = List(
+      GpaPaymentsRecord(
+        displayDate = Some(LocalDate.of(2008, 4, 14)),
+        total = BigDecimal(-6250),
+        tablename = Some("Payslip"),
+        targetTaxpayerReference = None,
+        paymentType = Some("BGP"),
+        repaymentType = None,
+        targetApNo = Some(0),
+        targetApEndDate = None,
+        contractEndDate = None,
+        participatorPresent = Some(false)
+      )
+    ),
+    totalNumOfRecords = Some(1L),
+    gppEndDate = Some(LocalDate.of(2007, 12, 31)),
+    gppTotalGroupPayment = BigDecimal(-25000),
+    gppTotalGroupTax = BigDecimal(250000),
+    gppStatus = "L",
+    gppCni = None,
+    gppApportionmentMethod = Some("METHOD")
+  )
 }

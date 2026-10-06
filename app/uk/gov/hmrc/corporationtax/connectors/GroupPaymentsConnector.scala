@@ -19,7 +19,7 @@ package uk.gov.hmrc.corporationtax.connectors
 import play.api.Logging
 import uk.gov.hmrc.*
 import uk.gov.hmrc.corporationtax.config.AppConfig
-import uk.gov.hmrc.corporationtax.models.GroupSummaryDetails
+import uk.gov.hmrc.corporationtax.models.{GpaPaymentsDetails, GroupSummaryDetails}
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
@@ -41,6 +41,20 @@ class GroupPaymentsConnector @Inject() (http: HttpClientV2, appConfig: AppConfig
       .execute[Option[GroupSummaryDetails]]
       .recover { case e: Throwable =>
         logger.error(s"$gpaUTR :: $nomCompanyUTR - ${e.getMessage}")
+        throw new RuntimeException(e.getMessage)
+      }
+  }
+
+  def getPaymentDetails(gpaUTR: Long, contractVersion: Int, startIndex: Int, count: Int)(implicit
+    hc: HeaderCarrier
+  ): Future[Option[GpaPaymentsDetails]] = {
+    val url: URL =
+      url"${appConfig.rdsDatacacheProxyFullUrl}/gpa-payment-details/$gpaUTR?contractVersion=$contractVersion&startIndex=$startIndex&count=$count"
+    http
+      .get(url)
+      .execute[Option[GpaPaymentsDetails]]
+      .recover { case e: Throwable =>
+        logger.error(s"$gpaUTR :: $contractVersion :: $startIndex :: $count - ${e.getMessage}")
         throw new RuntimeException(e.getMessage)
       }
   }
