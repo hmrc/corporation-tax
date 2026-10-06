@@ -74,7 +74,7 @@ class AccountPositionConnectorISpec extends
 
       val result = accountPositionConnector.getAccountPosition(1L).futureValue
 
-      result mustBe defaultRecord
+      result mustBe Some(defaultRecord)
     }
 
     "return a record with empty values from proxy" in {
@@ -95,7 +95,7 @@ class AccountPositionConnectorISpec extends
 
       val result = accountPositionConnector.getAccountPosition(1L).futureValue
 
-      result mustBe emptyRecord
+      result mustBe Some(emptyRecord)
     }
 
 
