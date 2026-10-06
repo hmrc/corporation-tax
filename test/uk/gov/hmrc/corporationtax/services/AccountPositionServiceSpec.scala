@@ -52,22 +52,22 @@ class AccountPositionServiceSpec
 
   "getAccountPosition returns transformed default record" in new Fixture {
     when(mockAccountPositionConnector.getAccountPosition(any[Long])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(defaultRecord))
+      .thenReturn(Future.successful(Some(defaultRecord)))
 
-    val result: AccountPositionResponse = service.getAccountPosition(1L).futureValue
+    val result = service.getAccountPosition(1L).futureValue
 
-    result shouldBe defaultResponse
+    result shouldBe Some(defaultResponse)
 
     verify(mockAccountPositionConnector).getAccountPosition(1L)(hc)
   }
 
   "getAccountPosition returns transformed empty record" in new Fixture {
     when(mockAccountPositionConnector.getAccountPosition(any[Long])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(emptyRecord))
+      .thenReturn(Future.successful(Some(emptyRecord)))
 
-    val result: AccountPositionResponse = service.getAccountPosition(1L).futureValue
+    val result = service.getAccountPosition(1L).futureValue
 
-    result shouldBe emptyResponse
+    result shouldBe Some(emptyResponse)
 
     verify(mockAccountPositionConnector).getAccountPosition(1L)(hc)
   }

@@ -48,7 +48,7 @@ class AccountPositionControllerSpec extends AnyWordSpec with Matchers with Accou
 
     "return 200 and a successful response with one item transformed amounts" in new Setup {
       when(mockAccountPositionService.getAccountPosition(any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(defaultResponse))
+        .thenReturn(Future.successful(Some(defaultResponse)))
 
       val result: Future[Result] = controller.getAccountPosition(1L)(fakeRequest)
       status(result) shouldBe Status.OK
@@ -63,9 +63,7 @@ class AccountPositionControllerSpec extends AnyWordSpec with Matchers with Accou
         .thenReturn(Future.successful(None))
 
       val result: Future[Result] = controller.getAccountPosition(1L)(fakeRequest)
-      status(result) shouldBe Status.OK
-
-      contentAsJson(result) shouldBe Json.toJson(defaultResponse)
+      status(result) shouldBe Status.NOT_FOUND
 
       verify(mockAccountPositionService).getAccountPosition(eqTo(1L))(any[HeaderCarrier])
     }
