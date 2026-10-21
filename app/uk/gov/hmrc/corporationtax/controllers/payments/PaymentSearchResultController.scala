@@ -27,26 +27,27 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class PaymentSearchResultController @Inject()(
+class PaymentSearchResultController @Inject() (
   cc: ControllerComponents,
   service: PaymentSearchResultService
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def getPaymentSearchResult(taxRef: Long, queryParams: PaymentSearchResultQueryParams): Action[AnyContent] = Action.async { implicit request =>
-    service
-      .getPaymentSearchResult(taxRef, queryParams.fromDate, queryParams.toDate)
-      .map { paymentSearchResultResponse =>
-        Ok(Json.toJson(paymentSearchResultResponse))
-      }
-      .recover {
-        case u: UpstreamErrorResponse =>
-          Status(u.statusCode)(Json.obj("message" -> u.message))
-        case t: Throwable             =>
-          logger.error("Error while retrieving paymentSearchResult", t)
-          InternalServerError(Json.obj("error" -> "Failed to retrieve paymentSearchResult"))
-      }
-  }
+  def getPaymentSearchResult(taxRef: Long, queryParams: PaymentSearchResultQueryParams): Action[AnyContent] =
+    Action.async { implicit request =>
+      service
+        .getPaymentSearchResult(taxRef, queryParams.fromDate, queryParams.toDate)
+        .map { paymentSearchResultResponse =>
+          Ok(Json.toJson(paymentSearchResultResponse))
+        }
+        .recover {
+          case u: UpstreamErrorResponse =>
+            Status(u.statusCode)(Json.obj("message" -> u.message))
+          case t: Throwable             =>
+            logger.error("Error while retrieving paymentSearchResult", t)
+            InternalServerError(Json.obj("error" -> "Failed to retrieve paymentSearchResult"))
+        }
+    }
 
 }

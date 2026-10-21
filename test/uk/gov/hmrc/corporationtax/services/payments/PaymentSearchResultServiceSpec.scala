@@ -32,13 +32,17 @@ import uk.gov.hmrc.http.HeaderCarrier
 import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
-class PaymentSearchResultServiceSpec extends AnyWordSpec with Matchers with ScalaFutures with PaymentSearchResultHelper {
+class PaymentSearchResultServiceSpec
+    extends AnyWordSpec
+    with Matchers
+    with ScalaFutures
+    with PaymentSearchResultHelper {
 
   private trait Setup {
     val mockConnector: PaymentSearchResultConnector = mock[PaymentSearchResultConnector]
-    implicit val hc: HeaderCarrier                     = HeaderCarrier()
-    private val cc: ControllerComponents               = stubControllerComponents()
-    implicit val ec: ExecutionContext                  = cc.executionContext
+    implicit val hc: HeaderCarrier                  = HeaderCarrier()
+    private val cc: ControllerComponents            = stubControllerComponents()
+    implicit val ec: ExecutionContext               = cc.executionContext
 
     val taxRef: Long = 1287892L
 
@@ -48,7 +52,11 @@ class PaymentSearchResultServiceSpec extends AnyWordSpec with Matchers with Scal
 
   "getPaymentSearchResult" should {
     "return a transformed list of PaymentSearchResults" in new Setup {
-      when(mockConnector.getPaymentSearchResult(any[Long], any[Option[LocalDate]], any[Option[LocalDate]])(any[HeaderCarrier]))
+      when(
+        mockConnector.getPaymentSearchResult(any[Long], any[Option[LocalDate]], any[Option[LocalDate]])(
+          any[HeaderCarrier]
+        )
+      )
         .thenReturn(Future.successful(rdsMultiplePaymentSearchResult))
       val result: PaymentSearchResultResponse = service.getPaymentSearchResult(taxRef, None, None).futureValue
 
@@ -60,9 +68,13 @@ class PaymentSearchResultServiceSpec extends AnyWordSpec with Matchers with Scal
 
     "return an emptyList if the connector returns an empty CompanyDetails" in new Setup {
 
-      when(mockConnector.getPaymentSearchResult(any[Long], any[Option[LocalDate]], any[Option[LocalDate]])(any[HeaderCarrier]))
+      when(
+        mockConnector.getPaymentSearchResult(any[Long], any[Option[LocalDate]], any[Option[LocalDate]])(
+          any[HeaderCarrier]
+        )
+      )
         .thenReturn(Future.successful(rdsEmptyPaymentSearchResult))
-      
+
       val result: PaymentSearchResultResponse = service.getPaymentSearchResult(taxRef, None, None).futureValue
 
       result shouldBe PaymentSearchResultResponse(paymentSearchResult = List.empty)
@@ -73,7 +85,11 @@ class PaymentSearchResultServiceSpec extends AnyWordSpec with Matchers with Scal
     "propagates exceptions from connector" in new Setup {
       val ex = new RuntimeException("Error from Downstream")
 
-      when(mockConnector.getPaymentSearchResult(any[Long], any[Option[LocalDate]], any[Option[LocalDate]])(any[HeaderCarrier]))
+      when(
+        mockConnector.getPaymentSearchResult(any[Long], any[Option[LocalDate]], any[Option[LocalDate]])(
+          any[HeaderCarrier]
+        )
+      )
         .thenReturn(Future.failed(ex))
 
       val result: Exception = intercept[Exception] {

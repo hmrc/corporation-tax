@@ -18,7 +18,9 @@ package uk.gov.hmrc.corporationtax.services.payments
 
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.payments.PaymentSearchResultConnector
-import uk.gov.hmrc.corporationtax.models.payments.{PaymentSearchResult, PaymentSearchResultResponse, PaymentSearchResultResponseRds}
+import uk.gov.hmrc.corporationtax.models.payments.{
+  PaymentSearchResult, PaymentSearchResultResponse, PaymentSearchResultResponseRds
+}
 import uk.gov.hmrc.corporationtax.utils.AmountTransformation
 import uk.gov.hmrc.corporationtax.utils.EmptyAndZeroConstants.{emptyString, zeroValue}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -27,11 +29,10 @@ import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PaymentSearchResultService @Inject()(
+class PaymentSearchResultService @Inject() (
   connector: PaymentSearchResultConnector
 )(implicit ec: ExecutionContext)
     extends Logging {
-
 
   def getPaymentSearchResult(taxRef: Long, fromDate: Option[LocalDate], toDate: Option[LocalDate])(implicit
     hc: HeaderCarrier
@@ -46,8 +47,8 @@ class PaymentSearchResultService @Inject()(
   }
 
   private def toPaymentSearchResult(
-                                     paymentSearchResultResponseRds: PaymentSearchResultResponseRds
-                                 ): PaymentSearchResultResponse =
+    paymentSearchResultResponseRds: PaymentSearchResultResponseRds
+  ): PaymentSearchResultResponse =
     PaymentSearchResultResponse(
       paymentSearchResult = paymentSearchResultResponseRds.paymentSearchResult.map { value =>
         PaymentSearchResult(

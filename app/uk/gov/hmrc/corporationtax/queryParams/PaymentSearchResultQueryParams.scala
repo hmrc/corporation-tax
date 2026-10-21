@@ -21,7 +21,6 @@ import play.api.mvc.QueryStringBindable
 import java.time.LocalDate
 import scala.util.Try
 
-
 final case class PaymentSearchResultQueryParams(fromDate: Option[LocalDate], toDate: Option[LocalDate])
 
 object PaymentSearchResultQueryParams {
@@ -29,18 +28,18 @@ object PaymentSearchResultQueryParams {
   given QueryStringBindable[PaymentSearchResultQueryParams] with {
 
     override def bind(
-                       key: String,
-                       params: Map[String, Seq[String]]
-                     ): Option[Either[String, PaymentSearchResultQueryParams]] = {
+      key: String,
+      params: Map[String, Seq[String]]
+    ): Option[Either[String, PaymentSearchResultQueryParams]] = {
 
       val stringBinder = summon[QueryStringBindable[String]]
 
       val fromDateE = stringBinder.bind("fromDate", params)
-      val toDateE = stringBinder.bind("toDate", params)
+      val toDateE   = stringBinder.bind("toDate", params)
 
       def parseDate(
-                     value: Option[Either[String, String]]
-                   ): Either[String, Option[LocalDate]] =
+        value: Option[Either[String, String]]
+      ): Either[String, Option[LocalDate]] =
         value match {
           case None =>
             Right(None)
@@ -61,12 +60,10 @@ object PaymentSearchResultQueryParams {
         for {
           fromDate <- parseDate(fromDateE)
           toDate   <- parseDate(toDateE)
-        } yield {
-          PaymentSearchResultQueryParams(
-            fromDate = fromDate,
-            toDate   = toDate
-          )
-        }
+        } yield PaymentSearchResultQueryParams(
+          fromDate = fromDate,
+          toDate = toDate
+        )
       )
     }
 

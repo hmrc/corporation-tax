@@ -27,17 +27,17 @@ object PaymentSearchResultResponseRds {
 }
 
 case class PaymentSearchResultRds(
-                                   accountingPeriod: Option[BigDecimal],
-                                   payslipId: Option[BigDecimal],
-                                   amount: Option[BigDecimal],
-                                   effectiveDateOfPayment: Option[LocalDate],
-                                   paymentType: Option[String],
-                                   bankSortCode: Option[BigDecimal],
-                                   bankAccountNumber: Option[BigDecimal],
-                                   chequeNumber: Option[BigDecimal],
-                                   paymentAmount: Option[BigDecimal],
-                                   chequeId: Option[BigDecimal]
-                                  )
+  accountingPeriod: Option[BigDecimal],
+  payslipId: Option[BigDecimal],
+  amount: Option[BigDecimal],
+  effectiveDateOfPayment: Option[LocalDate],
+  paymentType: Option[String],
+  bankSortCode: Option[BigDecimal],
+  bankAccountNumber: Option[BigDecimal],
+  chequeNumber: Option[BigDecimal],
+  paymentAmount: Option[BigDecimal],
+  chequeId: Option[BigDecimal]
+)
 
 object PaymentSearchResultRds {
   implicit val format: OFormat[PaymentSearchResultRds] = Json.format[PaymentSearchResultRds]
@@ -49,20 +49,18 @@ object PaymentSearchResultResponse {
   implicit val format: OFormat[PaymentSearchResultResponse] = Json.format[PaymentSearchResultResponse]
 }
 case class PaymentSearchResult(
-                                accountingPeriod: BigDecimal,
-                                payslipId: BigDecimal,
-                                amount: BigDecimal,
-                                effectiveDateOfPayment: Option[LocalDate],
-                                paymentType: String,
-                                bankSortCode: BigDecimal,
-                                bankAccountNumber: BigDecimal,
-                                chequeNumber: BigDecimal,
-                                paymentAmount: BigDecimal,
-                                chequeId: BigDecimal
+  accountingPeriod: BigDecimal,
+  payslipId: BigDecimal,
+  amount: BigDecimal,
+  effectiveDateOfPayment: Option[LocalDate],
+  paymentType: String,
+  bankSortCode: BigDecimal,
+  bankAccountNumber: BigDecimal,
+  chequeNumber: BigDecimal,
+  paymentAmount: BigDecimal,
+  chequeId: BigDecimal
 )
 
 object PaymentSearchResult {
   implicit val format: OFormat[PaymentSearchResult] = Json.format[PaymentSearchResult]
 }
-
-

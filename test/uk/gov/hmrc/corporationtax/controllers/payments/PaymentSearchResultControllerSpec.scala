@@ -38,7 +38,7 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
 
   private trait Fixture {
     val mockService: PaymentSearchResultService = mock[PaymentSearchResultService]
-    private val cc: ControllerComponents   = stubControllerComponents()
+    private val cc: ControllerComponents        = stubControllerComponents()
 
     implicit val ec: ExecutionContext                    = cc.executionContext
     val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/foo")
@@ -55,7 +55,10 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
         .thenReturn(Future.successful(multiplePaymentSearchResult))
 
       val result: Future[Result] = controller
-        .getPaymentSearchResult(taxReferenceNumber, PaymentSearchResultQueryParams(Some(LocalDate.parse("1991-04-19")), Some(LocalDate.parse("1992-06-20"))))(fakeRequest)
+        .getPaymentSearchResult(
+          taxReferenceNumber,
+          PaymentSearchResultQueryParams(Some(LocalDate.parse("1991-04-19")), Some(LocalDate.parse("1992-06-20")))
+        )(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(multiplePaymentSearchResult)
@@ -66,7 +69,8 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
       when(mockService.getPaymentSearchResult(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(emptyPaymentSearchResult))
 
-      val result: Future[Result] = controller.getPaymentSearchResult(taxReferenceNumber, PaymentSearchResultQueryParams(None, None))(fakeRequest)
+      val result: Future[Result] =
+        controller.getPaymentSearchResult(taxReferenceNumber, PaymentSearchResultQueryParams(None, None))(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(emptyPaymentSearchResult)
@@ -80,7 +84,8 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
       when(mockService.getPaymentSearchResult(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(err))
 
-      val result: Future[Result] = controller.getPaymentSearchResult(taxReferenceNumber, PaymentSearchResultQueryParams(None, None))(fakeRequest)
+      val result: Future[Result] =
+        controller.getPaymentSearchResult(taxReferenceNumber, PaymentSearchResultQueryParams(None, None))(fakeRequest)
 
       status(result) shouldBe BAD_GATEWAY
 
@@ -91,7 +96,8 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
       when(mockService.getPaymentSearchResult(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("unexpected")))
 
-      val result: Future[Result] = controller.getPaymentSearchResult(taxReferenceNumber, PaymentSearchResultQueryParams(None, None))(fakeRequest)
+      val result: Future[Result] =
+        controller.getPaymentSearchResult(taxReferenceNumber, PaymentSearchResultQueryParams(None, None))(fakeRequest)
 
       status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve paymentSearchResult"

@@ -29,7 +29,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PaymentSearchResultConnector @Inject()(http: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext)
+class PaymentSearchResultConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext)
     extends Logging {
 
   def getPaymentSearchResult(taxRef: Long, fromDate: Option[LocalDate], toDate: Option[LocalDate])(implicit
@@ -42,7 +42,9 @@ class PaymentSearchResultConnector @Inject()(http: HttpClientV2, appConfig: AppC
       .get(url)
       .execute[PaymentSearchResultResponseRds]
       .recover { case e: Throwable =>
-        logger.error(s"[PaymentSearchResultConnector][getPaymentSearchResult]: $taxRef :: $fromDate :: $toDate - ${e.getMessage}")
+        logger.error(
+          s"[PaymentSearchResultConnector][getPaymentSearchResult]: $taxRef :: $fromDate :: $toDate - ${e.getMessage}"
+        )
         throw new RuntimeException(e.getMessage)
       }
   }

@@ -16,69 +16,74 @@
 
 package uk.gov.hmrc.corporationtax.helpers.payments
 
-import uk.gov.hmrc.corporationtax.models.payments.{PaymentSearchResult, PaymentSearchResultRds, PaymentSearchResultResponse, PaymentSearchResultResponseRds}
+import uk.gov.hmrc.corporationtax.models.payments.{
+  PaymentSearchResult, PaymentSearchResultRds, PaymentSearchResultResponse, PaymentSearchResultResponseRds
+}
 
 import java.time.LocalDate
 
 trait PaymentSearchResultHelper {
 
-  val rdsEmptyPaymentSearchResult: PaymentSearchResultResponseRds = PaymentSearchResultResponseRds(paymentSearchResult = List.empty)
+  val rdsEmptyPaymentSearchResult: PaymentSearchResultResponseRds =
+    PaymentSearchResultResponseRds(paymentSearchResult = List.empty)
 
-  val rdsMultiplePaymentSearchResult: PaymentSearchResultResponseRds = PaymentSearchResultResponseRds(paymentSearchResult =
-    List(
-      PaymentSearchResultRds(
-        accountingPeriod       = Some(1),
-        payslipId              = Some(1),
-        amount                 = Some(37500),
-        effectiveDateOfPayment = Some(LocalDate.of(2007, 7, 14)),
-        paymentType            = Some("BGP"),
-        bankSortCode           = Some(114433),
-        bankAccountNumber      = Some(1004005),
-        chequeNumber           = Some(100301),
-        paymentAmount          = Some(31250),
-        chequeId               = Some(916)
-      ),
-      PaymentSearchResultRds(
-        accountingPeriod       = Some(1),
-        payslipId              = Some(2),
-        amount                 = Some(37500),
-        effectiveDateOfPayment = Some(LocalDate.of(2007, 7, 14)),
-        paymentType            = Some("BGP"),
-        bankSortCode           = Some(114433),
-        bankAccountNumber      = Some(1004005),
-        chequeNumber           = Some(100301),
-        paymentAmount          = Some(30000),
-        chequeId               = Some(917)
+  val rdsMultiplePaymentSearchResult: PaymentSearchResultResponseRds =
+    PaymentSearchResultResponseRds(paymentSearchResult =
+      List(
+        PaymentSearchResultRds(
+          accountingPeriod = Some(1),
+          payslipId = Some(1),
+          amount = Some(37500),
+          effectiveDateOfPayment = Some(LocalDate.of(2007, 7, 14)),
+          paymentType = Some("BGP"),
+          bankSortCode = Some(114433),
+          bankAccountNumber = Some(1004005),
+          chequeNumber = Some(100301),
+          paymentAmount = Some(31250),
+          chequeId = Some(916)
+        ),
+        PaymentSearchResultRds(
+          accountingPeriod = Some(1),
+          payslipId = Some(2),
+          amount = Some(37500),
+          effectiveDateOfPayment = Some(LocalDate.of(2007, 7, 14)),
+          paymentType = Some("BGP"),
+          bankSortCode = Some(114433),
+          bankAccountNumber = Some(1004005),
+          chequeNumber = Some(100301),
+          paymentAmount = Some(30000),
+          chequeId = Some(917)
+        )
       )
     )
-  )
 
-  val emptyPaymentSearchResult: PaymentSearchResultResponse = PaymentSearchResultResponse(paymentSearchResult = List.empty)
-  val multiplePaymentSearchResult: PaymentSearchResultResponse        = PaymentSearchResultResponse(paymentSearchResult =
+  val emptyPaymentSearchResult: PaymentSearchResultResponse    =
+    PaymentSearchResultResponse(paymentSearchResult = List.empty)
+  val multiplePaymentSearchResult: PaymentSearchResultResponse = PaymentSearchResultResponse(paymentSearchResult =
     List(
       PaymentSearchResult(
-        accountingPeriod       = 1,
-        payslipId              = 1,
-        amount                 = -37500,
+        accountingPeriod = 1,
+        payslipId = 1,
+        amount = -37500,
         effectiveDateOfPayment = Some(LocalDate.of(2007, 7, 14)),
-        paymentType            = "BGP",
-        bankSortCode           = 114433,
-        bankAccountNumber      = 1004005,
-        chequeNumber           = 100301,
-        paymentAmount          = -31250,
-        chequeId               = 916
+        paymentType = "BGP",
+        bankSortCode = 114433,
+        bankAccountNumber = 1004005,
+        chequeNumber = 100301,
+        paymentAmount = -31250,
+        chequeId = 916
       ),
       PaymentSearchResult(
-        accountingPeriod       = 1,
-        payslipId              = 2,
-        amount                 = -37500,
+        accountingPeriod = 1,
+        payslipId = 2,
+        amount = -37500,
         effectiveDateOfPayment = Some(LocalDate.of(2007, 7, 14)),
-        paymentType            = "BGP",
-        bankSortCode           = 114433,
-        bankAccountNumber      = 1004005,
-        chequeNumber           = 100301,
-        paymentAmount          = -30000,
-        chequeId               = 917
+        paymentType = "BGP",
+        bankSortCode = 114433,
+        bankAccountNumber = 1004005,
+        chequeNumber = 100301,
+        paymentAmount = -30000,
+        chequeId = 917
       )
     )
   )
