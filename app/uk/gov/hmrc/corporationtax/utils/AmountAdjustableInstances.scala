@@ -21,6 +21,7 @@ import uk.gov.hmrc.corporationtax.models.{
   PenaltyTransactionItem, RdsReallocationFromAccDetails, ReallocationRow, RepaymentsDetails, TaxTransactionsItem
 }
 import uk.gov.hmrc.corporationtax.models.gpa.{AllocationDetails, RdsPaymentAllocationDetails}
+import uk.gov.hmrc.corporationtax.models.payments.ElectronicPaymentAllocationInfo
 
 object AmountAdjustableInstances {
 
@@ -161,6 +162,19 @@ object AmountAdjustableInstances {
       ] =
         List(
           (item => Some(item.paymentAmount), (item, newValue) => item.copy(paymentAmount = newValue))
+        )
+    }
+
+  implicit val ePaymentAllocationDetailsAdjustable: AmountAdjustable[ElectronicPaymentAllocationInfo] =
+    new AmountAdjustable[ElectronicPaymentAllocationInfo] {
+      def amountFields: List[
+        (
+          ElectronicPaymentAllocationInfo => Option[BigDecimal],
+          (ElectronicPaymentAllocationInfo, BigDecimal) => ElectronicPaymentAllocationInfo
+        )
+      ] =
+        List(
+          (item => Some(item.amount), (item, newValue) => item.copy(amount = newValue))
         )
     }
 }

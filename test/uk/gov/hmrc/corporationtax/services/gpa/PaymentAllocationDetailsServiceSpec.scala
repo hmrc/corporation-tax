@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.corporationtax.services
+package uk.gov.hmrc.corporationtax.services.gpa
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
@@ -29,7 +29,6 @@ import play.api.test.Helpers.stubControllerComponents
 import uk.gov.hmrc.corporationtax.connectors.gpa.PaymentAllocationDetailsConnector
 import uk.gov.hmrc.corporationtax.helpers.gpa.PaymentAllocationDetailsHelper
 import uk.gov.hmrc.corporationtax.models.gpa.PaymentAllocationDetails
-import uk.gov.hmrc.corporationtax.services.gpa.PaymentAllocationDetailsService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
