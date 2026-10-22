@@ -25,7 +25,7 @@ GET        /repayments-and-reallocations/:taxRef/:accPeriod                    u
 GET        /company-details/:taxRef                                            uk.gov.hmrc.corporationtax.controllers.CompanyDetailsController.getCompanyDetails(taxRef: Long)
 GET        /display-needed/:taxRef/:accPeriod                                  uk.gov.hmrc.corporationtax.controllers.DisplayNeededController.getDisplayNeeded(taxRef: Long, accPeriod: Long)
 
-#GPA routes
+# GPA routes
 GET        /is-company-nominator/:gpaUtr/:nominatedCompanyUtr                  uk.gov.hmrc.corporationtax.controllers.gpa.CompanyNominatorController.getIsCompanyNominatorOfGPA(gpaUtr: Long, nominatedCompanyUtr: Long)
 GET        /group-summary/:gpaUTR/:nomCompanyUTR                               uk.gov.hmrc.corporationtax.controllers.GroupPaymentsController.getGroupSummary(gpaUTR: Long, nomCompanyUTR: Long)
 GET        /group-tax-charges/:pGpaUtr/:pGppContractVersion                    uk.gov.hmrc.corporationtax.controllers.gpa.GpaGroupTaxChargesController.getGpaGroupTaxCharges(pGpaUtr:Long, pGppContractVersion: Int, pStartIndex:Int ?=0, pCount:Int ?=10)
@@ -34,5 +34,6 @@ GET        /group-payment-periods-in-range/:gpaUTR/:nominatedCompanyUTR/:pPeriod
 GET        /gpa-payment-details/:gpaUTR                                        uk.gov.hmrc.corporationtax.controllers.GroupPaymentsController.getPaymentDetails(gpaUTR: Long, contractVersion: Int, startIndex: Int ?= 0, count: Int ?= 10)
 GET        /account-position/:taxRef                                           uk.gov.hmrc.corporationtax.controllers.AccountPositionController.getAccountPosition(taxRef: Long)
 
-#Payment routes
+# Payments routes
 GET        /payment-search-result/:taxRef                                       uk.gov.hmrc.corporationtax.controllers.payments.PaymentSearchResultController.getPaymentSearchResult(taxRef: Long, queryParams: uk.gov.hmrc.corporationtax.queryParams.PaymentSearchResultQueryParams)
+GET        /electronic-payment-allocation-details/:taxRef/:accPeriod/:payslipId            uk.gov.hmrc.corporationtax.controllers.payments.ElectronicPaymentAllocationDetailsController.getPayAllocationElectronicDtls(taxRef: Long, accPeriod: Long, payslipId: Long)
