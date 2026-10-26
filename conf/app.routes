@@ -36,3 +36,4 @@ GET        /account-position/:taxRef                                           u
 
 #Payment routes
 GET        /payment-search-result/:taxRef                                       uk.gov.hmrc.corporationtax.controllers.payments.PaymentSearchResultController.getPaymentSearchResult(taxRef: Long, queryParams: uk.gov.hmrc.corporationtax.queryParams.PaymentSearchResultQueryParams)
+GET        /cheque-payment-allocation-details/:taxRef/:chequeId                 uk.gov.hmrc.corporationtax.controllers.payments.PaymentAllocationChequeDetailsController.getPaymentAllocationChequeDetails(taxRef: Long, chequeId: Long)
