@@ -29,10 +29,27 @@ object AllAccountingPeriods {
 case class AccountingPeriodList(
   accountingPeriod: BigDecimal,
   apEndDate: LocalDate,
-  taxChargePresent: String,
+  taxChargePresent: Boolean,
   penaltyTotal: BigDecimal
 )
 
 object AccountingPeriodList {
   implicit val format: OFormat[AccountingPeriodList] = Json.format[AccountingPeriodList]
+}
+
+case class RdsAllAccountingPeriods(accountingPeriodList: List[RdsAccountingPeriodList])
+
+object RdsAllAccountingPeriods {
+  implicit val format: OFormat[RdsAllAccountingPeriods] = Json.format[RdsAllAccountingPeriods]
+}
+
+case class RdsAccountingPeriodList(
+  accountingPeriod: BigDecimal,
+  apEndDate: LocalDate,
+  taxChargePresent: String,
+  penaltyTotal: BigDecimal
+)
+
+object RdsAccountingPeriodList {
+  implicit val format: OFormat[RdsAccountingPeriodList] = Json.format[RdsAccountingPeriodList]
 }

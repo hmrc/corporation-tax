@@ -18,25 +18,31 @@ package uk.gov.hmrc.corporationtax.services.payments
 
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.connectors.payments.AllAccountingPeriodsConnector
-import uk.gov.hmrc.corporationtax.models.payments.AllAccountingPeriods
-import uk.gov.hmrc.corporationtax.utils.AmountAdjustableInstances
-import uk.gov.hmrc.corporationtax.utils.applyAmountTransformToList
+import uk.gov.hmrc.corporationtax.models.payments.{AccountingPeriodList, AllAccountingPeriods}
+import uk.gov.hmrc.corporationtax.utils.CommonBooleanTransformation.toBool
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-
-class AllAccountingPeriodsService @Inject()(allAccountingPeriodsConnector: AllAccountingPeriodsConnector)
-                                           (implicit ec: ExecutionContext) extends Logging {
-  
+class AllAccountingPeriodsService @Inject() (allAccountingPeriodsConnector: AllAccountingPeriodsConnector)(implicit
+  ec: ExecutionContext
+) extends Logging {
 
   def getAccountingPeriodList(taxRef: Long)(implicit hc: HeaderCarrier): Future[AllAccountingPeriods] = {
     logger.info(s"Calling connector for taxRef: $taxRef")
 
-    allAccountingPeriodsConnector.getAccountingPeriodList(taxRef).map { allAccountingPeriods =>
-      allAccountingPeriods.copy(accountingPeriodList = 
-        applyAmountTransformToList(allAccountingPeriods.accountingPeriodList))
-      }
+    allAccountingPeriodsConnector.getAccountingPeriodList(taxRef).map { rdsAllAccountingPeriods =>
+      AllAccountingPeriods(
+        accountingPeriodList = rdsAllAccountingPeriods.accountingPeriodList.map { rdsAccountingPeriodList =>
+          AccountingPeriodList(
+            accountingPeriod = rdsAccountingPeriodList.accountingPeriod,
+            apEndDate = rdsAccountingPeriodList.apEndDate,
+            taxChargePresent = toBool(rdsAccountingPeriodList.taxChargePresent),
+            penaltyTotal = rdsAccountingPeriodList.penaltyTotal
+          )
+        }
+      )
+    }
   }
 }

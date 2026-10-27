@@ -26,7 +26,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class AllAccountingPeriodsController @Inject()(
+class AllAccountingPeriodsController @Inject() (
   allAccountingPeriodsService: AllAccountingPeriodsService,
   cc: ControllerComponents
 )(implicit ec: ExecutionContext)
@@ -34,7 +34,9 @@ class AllAccountingPeriodsController @Inject()(
     with Logging {
 
   def getAccountingPeriodList(taxRef: Long): Action[AnyContent] = Action.async { implicit request =>
-    allAccountingPeriodsService.getAccountingPeriodList(taxRef).map { allAccountingPeriods =>
+    allAccountingPeriodsService
+      .getAccountingPeriodList(taxRef)
+      .map { allAccountingPeriods =>
         Ok(Json.toJson(allAccountingPeriods))
       }
       .recover { case ex: Exception =>

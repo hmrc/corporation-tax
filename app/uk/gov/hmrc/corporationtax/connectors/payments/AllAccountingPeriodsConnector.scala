@@ -19,7 +19,7 @@ package uk.gov.hmrc.corporationtax.connectors.payments
 import play.api.Logging
 import uk.gov.hmrc.*
 import uk.gov.hmrc.corporationtax.config.AppConfig
-import uk.gov.hmrc.corporationtax.models.payments.AllAccountingPeriods
+import uk.gov.hmrc.corporationtax.models.payments.RdsAllAccountingPeriods
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
@@ -28,20 +28,19 @@ import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AllAccountingPeriodsConnector @Inject()(http: HttpClientV2, appConfig: AppConfig)(implicit
-                                                                                        ec: ExecutionContext
+class AllAccountingPeriodsConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit
+  ec: ExecutionContext
 ) extends Logging {
 
-  def getAccountingPeriodList(
-    taxRef: Long)(implicit
+  def getAccountingPeriodList(taxRef: Long)(implicit
     hc: HeaderCarrier
-  ): Future[AllAccountingPeriods] = {
+  ): Future[RdsAllAccountingPeriods] = {
     val url: URL =
       url"${appConfig.rdsDatacacheProxyFullUrl}/all-accounting-period/$taxRef"
 
     http
       .get(url)
-      .execute[AllAccountingPeriods]
+      .execute[RdsAllAccountingPeriods]
       .recover { case ex: Throwable =>
         logger.error(
           s"Error receiving all accounting periods for: $taxRef - ${ex.getMessage}"
