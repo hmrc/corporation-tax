@@ -1,5 +1,8 @@
 # microservice specific routes
 
+GET        /client-list-status/:credentialId                                    uk.gov.hmrc.corporationtax.controllers.ClientListDownloadStatusController.getClientListDownloadStatus(credentialId: String)
+
+#Accounting Period Routes
 GET        /penalty-transactions/:taxRef/:accPeriod                        uk.gov.hmrc.corporationtax.controllers.PenaltiesController.getPenaltyTransactionList(taxRef: Long, accPeriod: Long, endDate: Option[String])
 
 GET        /tax-transactions/:taxRef/:accPeriod                            uk.gov.hmrc.corporationtax.controllers.TaxTransactionsController.getTaxTransactions(taxRef: Long, accPeriod: Long)
