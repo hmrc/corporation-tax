@@ -42,3 +42,6 @@ GET        /payment-search-result/:taxRef                                       
 GET        /cheque-payment-allocation-details/:taxRef/:chequeId                 uk.gov.hmrc.corporationtax.controllers.payments.PaymentAllocationChequeDetailsController.getPaymentAllocationChequeDetails(taxRef: Long, chequeId: Long)
 GET        /electronic-payment-allocation-details/:taxRef/:accPeriod/:payslipId            uk.gov.hmrc.corporationtax.controllers.payments.ElectronicPaymentAllocationDetailsController.getPayAllocationElectronicDtls(taxRef: Long, accPeriod: Long, payslipId: Long)
 GET        /all-accounting-period/:taxRef                                      uk.gov.hmrc.corporationtax.controllers.payments.AllAccountingPeriodsController.getAccountingPeriodList(taxRef: Long)
+
+#Client-list-download
+GET        /initiate-client-list-download                                       uk.gov.hmrc.corporationtax.controllers.clientExchangeProxy.ClientExchangeProxyController.initiateClientListDownload()
