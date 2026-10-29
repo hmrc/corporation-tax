@@ -57,6 +57,24 @@ trait PaymentSearchResultHelper {
       )
     )
 
+  val rdsMultiplePaymentSearchResultMissingFields: PaymentSearchResultResponseRds =
+    PaymentSearchResultResponseRds(paymentSearchResult =
+      List(
+        PaymentSearchResultRds(
+          accountingPeriod = None,
+          payslipId = None,
+          amount = None,
+          effectiveDateOfPayment = Some(LocalDate.of(2007, 7, 14)),
+          paymentType = None,
+          bankSortCode = None,
+          bankAccountNumber = None,
+          chequeNumber = None,
+          paymentAmount = None,
+          chequeId = None
+        )
+      )
+    )
+
   val emptyPaymentSearchResult: PaymentSearchResultResponse    =
     PaymentSearchResultResponse(paymentSearchResult = List.empty)
   val multiplePaymentSearchResult: PaymentSearchResultResponse = PaymentSearchResultResponse(paymentSearchResult =
@@ -87,5 +105,23 @@ trait PaymentSearchResultHelper {
       )
     )
   )
+
+  val multiplePaymentSearchResultMissingFields: PaymentSearchResultResponse =
+    PaymentSearchResultResponse(paymentSearchResult =
+      List(
+        PaymentSearchResult(
+          accountingPeriod = 0,
+          payslipId = 0,
+          amount = 0,
+          effectiveDateOfPayment = Some(LocalDate.of(2007, 7, 14)),
+          paymentType = "",
+          bankSortCode = 0,
+          bankAccountNumber = 0,
+          chequeNumber = 0,
+          paymentAmount = 0,
+          chequeId = 0
+        )
+      )
+    )
 
 }

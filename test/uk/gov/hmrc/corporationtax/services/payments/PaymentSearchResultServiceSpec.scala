@@ -66,6 +66,21 @@ class PaymentSearchResultServiceSpec
 
     }
 
+    "return a transformed list of PaymentSearchResults when fields are missing" in new Setup {
+      when(
+        mockConnector.getPaymentSearchResult(any[Long], any[Option[LocalDate]], any[Option[LocalDate]])(
+          any[HeaderCarrier]
+        )
+      )
+        .thenReturn(Future.successful(rdsMultiplePaymentSearchResultMissingFields))
+      val result: PaymentSearchResultResponse = service.getPaymentSearchResult(taxRef, None, None).futureValue
+
+      result shouldBe multiplePaymentSearchResultMissingFields
+
+      verify(mockConnector, times(1)).getPaymentSearchResult(any(), any(), any())(any[HeaderCarrier])
+
+    }
+
     "return an emptyList if the connector returns an empty CompanyDetails" in new Setup {
 
       when(
