@@ -33,3 +33,11 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
 
   lazy val rdsDatacacheProxyFullUrl: String =
     rdsDatacacheProxyBaseUrl + rdsDatacacheProxyEndpoint
+
+  lazy val clientExchangeProxyBaseUrl: String =
+    servicesConfig.baseUrl("client-exchange-proxy")
+
+  lazy val clientExchangeProxyEndpoint: String =
+    servicesConfig.getString("microservice.services.client-exchange-proxy.path") + "/corporation-tax"
+
+  lazy val clientExchangeProxyFullUrl: String = clientExchangeProxyBaseUrl + clientExchangeProxyEndpoint
