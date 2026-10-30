@@ -99,7 +99,7 @@ class PaymentSearchResultServiceSpec
         )
       )
         .thenReturn(Future.successful(rdsMultiplePaymentSearchResultMissingFields))
-      val result: PaymentSearchResultResponse = service.getPaymentSearchResult(taxRef, None, None).futureValue
+      val result: PaymentSearchResultResponse = service.getPaymentSearchResult(taxRef, None, None, 100).futureValue
 
       result shouldBe multiplePaymentSearchResultMissingFields
 
