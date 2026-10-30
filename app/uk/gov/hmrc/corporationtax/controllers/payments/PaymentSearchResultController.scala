@@ -34,10 +34,13 @@ class PaymentSearchResultController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def getPaymentSearchResult(taxRef: Long, queryParams: PaymentSearchResultQueryParams): Action[AnyContent] =
+  def getPaymentSearchResult(taxRef: Long, queryParams: PaymentSearchResultQueryParams): Action[AnyContent] = {
+    // TODO update to session repository screen input when implemented
+    val userEnteredPaymentAmount = 38000
+
     Action.async { implicit request =>
       service
-        .getPaymentSearchResult(taxRef, queryParams.fromDate, queryParams.toDate)
+        .getPaymentSearchResult(taxRef, queryParams.fromDate, queryParams.toDate, userEnteredPaymentAmount)
         .map { paymentSearchResultResponse =>
           Ok(Json.toJson(paymentSearchResultResponse))
         }
@@ -49,5 +52,6 @@ class PaymentSearchResultController @Inject() (
             InternalServerError(Json.obj("error" -> "Failed to retrieve paymentSearchResult"))
         }
     }
+  }
 
 }

@@ -34,16 +34,20 @@ class PaymentSearchResultService @Inject() (
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def getPaymentSearchResult(taxRef: Long, fromDate: Option[LocalDate], toDate: Option[LocalDate])(implicit
+  def getPaymentSearchResult(
+    taxRef: Long,
+    fromDate: Option[LocalDate],
+    toDate: Option[LocalDate],
+    userEnteredPaymentAmount: BigDecimal
+  )(implicit
     hc: HeaderCarrier
   ): Future[PaymentSearchResultResponse] = {
     logger.info(s"Calling Connector to getPaymentSearchResult: $taxRef :: $fromDate - $toDate")
     connector
       .getPaymentSearchResult(taxRef, fromDate, toDate)
       .map { paymentSearchResultResponseRds =>
-        toPaymentSearchResult(paymentSearchResultResponseRds)
+        filterPaymentSearchResult(toPaymentSearchResult(paymentSearchResultResponseRds), userEnteredPaymentAmount)
       }
-
   }
 
   private def toPaymentSearchResult(
@@ -65,5 +69,31 @@ class PaymentSearchResultService @Inject() (
         )
       }
     )
+
+  def filterPaymentSearchResult(
+    paymentSearchResultResponse: PaymentSearchResultResponse,
+    userEnteredPaymentAmount: BigDecimal
+  ): PaymentSearchResultResponse = {
+    val electronicPaymentList = paymentSearchResultResponse.paymentSearchResult.filter { row =>
+      Set("BAC", "BGP", "CHP").contains(row.paymentType) &&
+      row.amount.abs.equals(userEnteredPaymentAmount.abs)
+    }
+
+    val chequePaymentZeroList = paymentSearchResultResponse.paymentSearchResult.filter { row =>
+      Set("BLP", "LOP", "NGP", "BGT").contains(row.paymentType) &&
+      row.chequeId.equals(0) &&
+      row.amount.abs.equals(userEnteredPaymentAmount.abs)
+    }
+
+    val chequePaymentNonZeroList = paymentSearchResultResponse.paymentSearchResult
+      .filter { row =>
+        Set("BLP", "LOP", "NGP", "BGT").contains(row.paymentType) &&
+        !row.chequeId.equals(0) &&
+        row.paymentAmount.abs.equals(userEnteredPaymentAmount.abs)
+      }
+      .distinctBy(row => (row.bankSortCode, row.bankAccountNumber, row.chequeNumber))
+
+    PaymentSearchResultResponse(electronicPaymentList ++ chequePaymentZeroList ++ chequePaymentNonZeroList)
+  }
 
 }
