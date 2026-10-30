@@ -51,7 +51,7 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
 
     "return 200: OK with multiple elements in PaymentSearchResult List" in new Fixture {
 
-      when(mockService.getPaymentSearchResult(any(), any(), any())(any[HeaderCarrier]))
+      when(mockService.getPaymentSearchResult(any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(multiplePaymentSearchResult))
 
       val result: Future[Result] = controller
@@ -63,10 +63,10 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
 
       contentAsJson(result) shouldBe Json.toJson(multiplePaymentSearchResult)
 
-      verify(mockService).getPaymentSearchResult(any(), any(), any())(any[HeaderCarrier])
+      verify(mockService).getPaymentSearchResult(any(), any(), any(), any())(any[HeaderCarrier])
     }
     "return 200: OK for empty response in PaymentSearchResult" in new Fixture {
-      when(mockService.getPaymentSearchResult(any(), any(), any())(any[HeaderCarrier]))
+      when(mockService.getPaymentSearchResult(any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(emptyPaymentSearchResult))
 
       val result: Future[Result] =
@@ -75,13 +75,13 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
 
       contentAsJson(result) shouldBe Json.toJson(emptyPaymentSearchResult)
 
-      verify(mockService).getPaymentSearchResult(any(), any(), any())(any[HeaderCarrier])
+      verify(mockService).getPaymentSearchResult(any(), any(), any(), any())(any[HeaderCarrier])
     }
 
     "returns status code BAD_GATEWAY when Upstream error is returned" in new Fixture {
       val err: UpstreamErrorResponse = UpstreamErrorResponse("Rds-cache service unavailable", BAD_GATEWAY, BAD_GATEWAY)
 
-      when(mockService.getPaymentSearchResult(any(), any(), any())(any[HeaderCarrier]))
+      when(mockService.getPaymentSearchResult(any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(err))
 
       val result: Future[Result] =
@@ -93,7 +93,7 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
     }
 
     "return 500: INTERNAL_SERVER_ERROR" in new Fixture {
-      when(mockService.getPaymentSearchResult(any(), any(), any())(any[HeaderCarrier]))
+      when(mockService.getPaymentSearchResult(any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("unexpected")))
 
       val result: Future[Result] =
@@ -102,7 +102,7 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
       status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve paymentSearchResult"
 
-      verify(mockService).getPaymentSearchResult(any(), any(), any())(any[HeaderCarrier])
+      verify(mockService).getPaymentSearchResult(any(), any(), any(), any())(any[HeaderCarrier])
     }
 
   }

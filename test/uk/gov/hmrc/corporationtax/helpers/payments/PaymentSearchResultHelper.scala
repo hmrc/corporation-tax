@@ -33,9 +33,9 @@ trait PaymentSearchResultHelper {
         PaymentSearchResultRds(
           accountingPeriod = Some(1),
           payslipId = Some(1),
-          amount = Some(37500),
+          amount = Some(-37500),
           effectiveDateOfPayment = Some(LocalDate.of(2007, 7, 14)),
-          paymentType = Some("BGP"),
+          paymentType = Some("BAC"),
           bankSortCode = Some(114433),
           bankAccountNumber = Some(1004005),
           chequeNumber = Some(100301),
@@ -77,14 +77,15 @@ trait PaymentSearchResultHelper {
 
   val emptyPaymentSearchResult: PaymentSearchResultResponse    =
     PaymentSearchResultResponse(paymentSearchResult = List.empty)
+
   val multiplePaymentSearchResult: PaymentSearchResultResponse = PaymentSearchResultResponse(paymentSearchResult =
     List(
       PaymentSearchResult(
         accountingPeriod = 1,
         payslipId = 1,
-        amount = -37500,
+        amount = 37500,
         effectiveDateOfPayment = Some(LocalDate.of(2007, 7, 14)),
-        paymentType = "BGP",
+        paymentType = "BAC",
         bankSortCode = 114433,
         bankAccountNumber = 1004005,
         chequeNumber = 100301,
