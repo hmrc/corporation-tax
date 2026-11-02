@@ -57,7 +57,7 @@ class PaymentPostingsConnectorISpec
               .withBody(
                 s"""
                    |{
-                   |  "paymentPostings": []
+                   |  "paymentPostingResults": []
                    |}
                    |""".stripMargin
               )
@@ -77,7 +77,7 @@ class PaymentPostingsConnectorISpec
               .withBody(
                 s"""
                    |{
-                   |  "paymentPostings": [
+                   |  "paymentPostingResults": [
                    |    {
                    |      "accountingPeriod": 202408,
                    |      "settlementSequenceNo": 123456,
@@ -106,7 +106,7 @@ class PaymentPostingsConnectorISpec
               .withBody(
                 s"""
                    |{
-                   |    "paymentPostings": [
+                   |    "paymentPostingResults": [
                    |    {
                    |      "accountingPeriod": 202408,
                    |      "settlementSequenceNo": 123456,
@@ -142,6 +142,39 @@ class PaymentPostingsConnectorISpec
       result shouldBe multiplePaymentPostings
     }
 
+    "return INTERNAL_SERVER_ERROR when the service failed" in {
+      stubFor(
+        get(urlPathEqualTo(url(16L)))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("Error")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getPaymentPostings(16L).futureValue
+      }
+
+      ex.getMessage should include("Error")
+    }
+
+    "return 404 when BE returns BAD_REQUEST" in {
+      stubFor(
+        get(urlPathEqualTo(url(16L)))
+          .willReturn(
+            aResponse()
+              .withStatus(BAD_REQUEST)
+              .withBody("Invalid Request")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getPaymentPostings(16L).futureValue
+      }
+
+      ex.getMessage should include("Invalid Request")
+    }
   }
 
 }
