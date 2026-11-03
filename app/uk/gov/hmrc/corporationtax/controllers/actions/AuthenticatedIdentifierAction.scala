@@ -21,7 +21,7 @@ import play.api.Logging
 import play.api.mvc.*
 import play.api.mvc.Results.Forbidden
 import uk.gov.hmrc.auth.core.*
-import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Organisation}
+import uk.gov.hmrc.auth.core.AffinityGroup.Agent
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.{Credentials, ~}
 import uk.gov.hmrc.corporationtax.models.auth.IdentifierRequest
@@ -38,9 +38,8 @@ class AuthenticatedIdentifierAction @Inject() (
     with AuthorisedFunctions
     with Logging {
 
-  private val orgEnrollment: String                  = "IR-CT"
   private val agentEnrollment: String                = "IR-CT-AGENT"
-  private val permittedEnrollmentStates: Set[String] = Set("activated", "notyetactivated")
+  private val permittedEnrollmentStates: Set[String] = Set("activated")
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
     given hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
@@ -53,16 +52,11 @@ class AuthenticatedIdentifierAction @Inject() (
           Retrievals.credentialRole and
           Retrievals.credentials
       ) {
-        case Some(_) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) ~ Some(Credentials(credId, _))
-            if enrolments
-              .find(_.key == orgEnrollment)
-              .exists(s => permittedEnrollmentStates.contains(s.state.toLowerCase)) =>
-          block(IdentifierRequest(request, credId, Organisation))
-
         case Some(_) ~ Enrolments(enrolments) ~ Some(Agent) ~ Some(User) ~ Some(Credentials(credId, _))
             if enrolments
               .find(_.key == agentEnrollment)
               .exists(e => permittedEnrollmentStates.contains(e.state.toLowerCase())) =>
+          logger.info(s"Authorisation requested as Agent")
           block(IdentifierRequest(request, credId, Agent))
 
         case _ ~ _ ~ _ ~ _ ~ _ =>
@@ -71,7 +65,7 @@ class AuthenticatedIdentifierAction @Inject() (
       }
       .recoverWith { case ex =>
         logger.error(
-          s"[AuthenticatedIdentifierAction][authorised] - Authentication failed: ${ex.getCause}-${ex.getMessage}"
+          s"Authentication failed: ${ex.getCause}-${ex.getMessage}"
         )
         Future.successful(Forbidden)
       }

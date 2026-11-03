@@ -48,7 +48,7 @@ class AuthenticatedIdentifierActionSpec extends AnyWordSpec with Matchers {
 
     val id: String = UUID.randomUUID().toString
 
-    val testUtr: String = "testUTR"
+    val testUtr: String = "STN005"
 
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
@@ -81,8 +81,16 @@ class AuthenticatedIdentifierActionSpec extends AnyWordSpec with Matchers {
       "activated",
       None
     )
+    val orgEnrolment: Enrolment          = Enrolment(
+      "IR-CT",
+      Seq(
+        EnrolmentIdentifier("UTR", testUtr)
+      ),
+      "activated",
+      None
+    )
 
-    val agentNotActiveEnrollment: Enrolment = Enrolment(
+    val agentNotActiveEnrollment: Enrolment     = Enrolment(
       "IR-CT-AGENT",
       Seq(
         EnrolmentIdentifier("UTR", testUtr)
@@ -90,41 +98,10 @@ class AuthenticatedIdentifierActionSpec extends AnyWordSpec with Matchers {
       "inactivated",
       None
     )
-
-    val agentNotYetActiveEnrollment: Enrolment = Enrolment(
-      "IR-CT-AGENT",
-      Seq(
-        EnrolmentIdentifier("UTR", testUtr)
-      ),
-      "notyetactivated",
-      None
-    )
-
-    val orgActiveNotActiveEnrollment: Enrolment = Enrolment(
-      "IR-CT",
-      Seq(
-        EnrolmentIdentifier("utr", testUtr)
-      ),
-      "inactivated",
-      None
-    )
-
-    val orgActiveNotYetActiveEnrollment: Enrolment = Enrolment(
-      "IR-CT",
-      Seq(
-        EnrolmentIdentifier("UTR", testUtr)
-      ),
-      "notyetactivated",
-      None
-    )
-
-    val orgEnrollments: Enrolments             = Enrolments(Set(orgActiveEnrollment))
-    val orgEnrollmentsNotActive: Enrolments    = Enrolments(Set(orgActiveNotActiveEnrollment))
-    val orgEnrollmentsNotYetActive: Enrolments = Enrolments(Set(orgActiveNotYetActiveEnrollment))
-
-    val agentEnrollments: Enrolments             = Enrolments(Set(agentActiveEnrollment))
-    val agentEnrollmentsNotActive: Enrolments    = Enrolments(Set(agentNotActiveEnrollment))
-    val agentEnrollmentsNotYetActive: Enrolments = Enrolments(Set(agentNotYetActiveEnrollment))
+    val agentEnrollments: Enrolments            = Enrolments(Set(agentActiveEnrollment))
+    val agentEnrollmentsNotActive: Enrolments   = Enrolments(Set(agentNotActiveEnrollment))
+    val agentNotYetActiveEnrollment: Enrolments = Enrolments(Set(agentNotActiveEnrollment))
+    val orgEnrolments: Enrolments               = Enrolments(Set(orgEnrolment))
   }
 
   class Harness(authAction: IdentifierAction) {
@@ -132,20 +109,6 @@ class AuthenticatedIdentifierActionSpec extends AnyWordSpec with Matchers {
   }
 
   "Request contains expected:: enrollments | affinityGroup | credentialRole " should {
-    "must process request with OrgEnrollments :: return 200:OK " in new Fixture {
-      when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
-        .thenReturn(
-          Future.successful(Some(id) ~ orgEnrollments ~ Some(Organisation) ~ Some(User) ~ Some(testCredentials))
-        )
-
-      running(application) {
-        val authAction = new AuthenticatedIdentifierAction(mockAuthConnector, bodyParsers)
-        val controller = new Harness(authAction)
-        val result     = controller.onPageLoad()(FakeRequest())
-
-        status(result) mustBe OK
-      }
-    }
     "must process request with AgentEnrollments :: return 200:OK " in new Fixture {
       when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(id) ~ agentEnrollments ~ Some(Agent) ~ Some(User) ~ Some(testCredentials)))
@@ -174,11 +137,11 @@ class AuthenticatedIdentifierActionSpec extends AnyWordSpec with Matchers {
       }
     }
 
-    "must process request with NOT YET ACTIVE AgentEnrollments :: return 200:OK " in new Fixture {
+    "must not process request with NOT YET ACTIVE AgentEnrollments :: return 200:OK " in new Fixture {
       when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
         .thenReturn(
           Future.successful(
-            Some(id) ~ agentEnrollmentsNotYetActive ~ Some(Agent) ~ Some(User) ~ Some(testCredentials)
+            Some(id) ~ agentNotYetActiveEnrollment ~ Some(Agent) ~ Some(User) ~ Some(testCredentials)
           )
         )
 
@@ -187,15 +150,15 @@ class AuthenticatedIdentifierActionSpec extends AnyWordSpec with Matchers {
         val controller = new Harness(authAction)
         val result     = controller.onPageLoad()(FakeRequest())
 
-        status(result) mustBe OK
+        status(result) mustBe FORBIDDEN
       }
     }
 
-    "must NOT process request with inactive OrgEnrollments :: return 403:Forbidden " in new Fixture {
+    "must NOT process request with active OrgEnrollments :: return 403:Forbidden " in new Fixture {
       when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
         .thenReturn(
           Future.successful(
-            Some(id) ~ orgEnrollmentsNotActive ~ Some(Organisation) ~ Some(User) ~ Some(testCredentials)
+            Some(id) ~ orgEnrolment ~ Some(Organisation) ~ Some(User) ~ Some(testCredentials)
           )
         )
 
@@ -210,7 +173,7 @@ class AuthenticatedIdentifierActionSpec extends AnyWordSpec with Matchers {
 
     "must NOT process request with OrgEnrollments and role Agent:: return 403:Forbidden " in new Fixture {
       when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
-        .thenReturn(Future.successful(Some(id) ~ orgEnrollments ~ Some(Agent) ~ Some(User) ~ Some(testCredentials)))
+        .thenReturn(Future.successful(Some(id) ~ orgEnrolment ~ Some(Agent) ~ Some(User) ~ Some(testCredentials)))
 
       running(application) {
         val authAction = new AuthenticatedIdentifierAction(mockAuthConnector, bodyParsers)
@@ -221,24 +184,7 @@ class AuthenticatedIdentifierActionSpec extends AnyWordSpec with Matchers {
       }
     }
 
-    "must process request with NOT YET ACTIVE OrgEnrollments:: return 200:OK " in new Fixture {
-      when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
-        .thenReturn(
-          Future.successful(
-            Some(id) ~ orgEnrollmentsNotYetActive ~ Some(Organisation) ~ Some(User) ~ Some(testCredentials)
-          )
-        )
-
-      running(application) {
-        val authAction = new AuthenticatedIdentifierAction(mockAuthConnector, bodyParsers)
-        val controller = new Harness(authAction)
-        val result     = controller.onPageLoad()(FakeRequest())
-
-        status(result) mustBe OK
-      }
-    }
-
-    "must NOT process request with AgentEnrollments and role Agent:: return 403:Forbidden " in new Fixture {
+    "must NOT process request with AgentEnrollments with Organisation and role Agent:: return 403:Forbidden " in new Fixture {
       when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
         .thenReturn(
           Future.successful(Some(id) ~ agentEnrollments ~ Some(Organisation) ~ Some(User) ~ Some(testCredentials))
