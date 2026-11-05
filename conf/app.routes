@@ -1,3 +1,5 @@
+GET        /has-client/:utr/:irAgentId/:credentialId                            uk.gov.hmrc.corporationtax.controllers.HasClientController.getHasClient(utr: Long, irAgentId: String, credentialId: String)
+
 # microservice specific routes
 
 GET        /client-list-status/:credentialId                                    uk.gov.hmrc.corporationtax.controllers.ClientListDownloadStatusController.getClientListDownloadStatus(credentialId: String)
