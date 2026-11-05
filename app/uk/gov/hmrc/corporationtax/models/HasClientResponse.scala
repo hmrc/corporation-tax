@@ -18,6 +18,12 @@ package uk.gov.hmrc.corporationtax.models
 
 import play.api.libs.json.{Json, OFormat}
 
+case class HasClient(status: Int)
+
+object HasClient {
+  implicit val format: OFormat[HasClient] = Json.format[HasClient]
+}
+
 case class HasClientResponse(status: Boolean)
 
 object HasClientResponse {
