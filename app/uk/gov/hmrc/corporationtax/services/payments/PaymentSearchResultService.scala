@@ -42,7 +42,9 @@ class PaymentSearchResultService @Inject() (
   )(implicit
     hc: HeaderCarrier
   ): Future[PaymentSearchResultResponse] = {
-    logger.info(s"Calling Connector to getPaymentSearchResult: $taxRef :: $fromDate - $toDate")
+    logger.info(
+      s"Calling Connector to getPaymentSearchResult: $taxRef :: $fromDate - $toDate :: $userEnteredPaymentAmount"
+    )
     connector
       .getPaymentSearchResult(taxRef, fromDate, toDate)
       .map { paymentSearchResultResponseRds =>
@@ -92,6 +94,7 @@ class PaymentSearchResultService @Inject() (
         row.paymentAmount.abs.equals(userEnteredPaymentAmount.abs)
       }
       .distinctBy(row => (row.bankSortCode, row.bankAccountNumber, row.chequeNumber))
+      .map(row => row.copy(amount = row.paymentAmount))
 
     PaymentSearchResultResponse(electronicPaymentList ++ chequePaymentZeroList ++ chequePaymentNonZeroList)
   }
