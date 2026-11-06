@@ -17,40 +17,52 @@
 package uk.gov.hmrc.corporationtax.services.payments
 
 import play.api.Logging
+import uk.gov.hmrc.corporationtax.models.payments.{ElectronicPaymentAllocationDetails, PaymentAllocationChequeDetails}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DeterminePaymentAllocationService @Inject()(paymentSearchResultService: PaymentSearchResultService,
-                                                  ePaymentAllocationDetailsService: ElectronicPaymentAllocationDetailsService,
-                                                  chequePaymentAllocationDetailsService: PaymentAllocationChequeDetailsService)(
-  implicit ec: ExecutionContext
+class DeterminePaymentAllocationService @Inject() (
+  paymentSearchResultService: PaymentSearchResultService,
+  electronicPaymentAllocationDetailsService: ElectronicPaymentAllocationDetailsService,
+  chequePaymentAllocationDetailsService: PaymentAllocationChequeDetailsService
+)(implicit
+  ec: ExecutionContext
 ) extends Logging {
 
-  def getPaymentType(taxRef: Long, fromDate: Option[LocalDate], toDate: Option[LocalDate])(implicit
+  def getPaymentType(
+    taxRef: Long,
+    fromDate: Option[LocalDate],
+    toDate: Option[LocalDate],
+    userEnteredPaymentAmount: BigDecimal
+  )(implicit
     hc: HeaderCarrier
-  ): Future[PaymentAllocationDetails] = {
-    logger.info(s"Calling services for taxRef: $taxRef, fromDate: $fromDate, toDate: $toDate")
+  ): Future[List[Option[Either[ElectronicPaymentAllocationDetails, PaymentAllocationChequeDetails]]]] = {
+    logger.info(
+      s"Calling services for taxRef: $taxRef, fromDate: $fromDate, toDate: $toDate, userEnteredPaymentAmount: $userEnteredPaymentAmount"
+    )
 
-    paymentSearchResultService.getPaymentSearchResult(taxRef, fromDate, toDate).map { paymentSearchResultResponse =>
-      paymentSearchResultResponse.paymentSearchResult.map { rdsAccountingPeriodList =>
-
+    paymentSearchResultService.getPaymentSearchResult(taxRef, fromDate, toDate, userEnteredPaymentAmount).flatMap {
+      paymentSearchResultResponse =>
+        Future.sequence(paymentSearchResultResponse.paymentSearchResult.map { paymentSearchResult =>
+          if (paymentSearchResult.chequeId == -1 || paymentSearchResult.chequeId == 0) {
+            electronicPaymentAllocationDetailsService
+              .getPayAllocationElectronicDtls(
+                taxRef,
+                paymentSearchResult.accountingPeriod.toLong,
+                paymentSearchResult.payslipId.toLong
+              )
+              .map(electronic => Some(Left(electronic)))
+          } else if (paymentSearchResult.payslipId == -1 && paymentSearchResult.accountingPeriod == -1) {
+            chequePaymentAllocationDetailsService
+              .getPaymentAllocationChequeDetails(taxRef, paymentSearchResult.chequeId.toLong)
+              .map(cheque => Some(Right(cheque)))
+          } else {
+            Future.successful(None)
+          }
+        })
     }
-  }
-
-    for {
-      reallocationTo <- chequePaymentAllocationDetailsService.getPaymentAllocationChequeDetails(taxRef, accPeriod)
-    } yield {
-      val repaymentsSummary = repayments.repayments.map { repaymentsDetails =>
-        RepayReallocationSummaryDetails(
-          transactionDate = Some(repaymentsDetails.repaymentDate),
-          `type` = Some(repaymentsDetails.repaymentType),
-          amount = repaymentsDetails.amount,
-          accountingPeriodEndDate = None,
-          taxpayerReference = None
-        )
-      }
   }
 }

@@ -46,6 +46,7 @@ GET        /electronic-payment-allocation-details/:taxRef/:accPeriod/:payslipId 
 GET        /all-accounting-period/:taxRef                                      uk.gov.hmrc.corporationtax.controllers.payments.AllAccountingPeriodsController.getAccountingPeriodList(taxRef: Long)
 GET        /posting-summary/:taxRef/:postingType                                uk.gov.hmrc.corporationtax.controllers.payments.PostingSummaryByTypeController.getPostingSummaryByType(taxRef: Long, postingType:String)
 GET        /payment-postings/:taxRef                                           uk.gov.hmrc.corporationtax.controllers.payments.PaymentPostingsController.getPaymentPostings(taxRef: Long)
+GET        /determine-payment-allocation/:taxRef                                uk.gov.hmrc.corporationtax.controllers.payments.DeterminePaymentAllocationController.getPaymentType(taxRef: Long, queryParams: uk.gov.hmrc.corporationtax.queryParams.PaymentSearchResultQueryParams)
 
 #Client-list-download
 GET        /initiate-client-list-download                                       uk.gov.hmrc.corporationtax.controllers.clientExchangeProxy.ClientExchangeProxyController.initiateClientListDownload()

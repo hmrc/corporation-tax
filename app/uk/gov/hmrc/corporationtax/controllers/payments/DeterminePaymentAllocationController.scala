@@ -22,26 +22,34 @@ import play.api.mvc.Results.InternalServerError
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.corporationtax.queryParams.PaymentSearchResultQueryParams
 import uk.gov.hmrc.corporationtax.services.payments.DeterminePaymentAllocationService
+import uk.gov.hmrc.corporationtax.utils.DeterminePaymentAllocationSerializer._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class DeterminePaymentAllocationController @Inject()(
+class DeterminePaymentAllocationController @Inject() (
   determinePaymentAllocationService: DeterminePaymentAllocationService,
   cc: ControllerComponents
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def getPaymentType(taxRef: Long, queryParams: PaymentSearchResultQueryParams): Action[AnyContent] = Action.async { implicit request =>
-    determinePaymentAllocationService.getPaymentType(taxRef, queryParams.fromDate, queryParams.toDate)
-      .map { determinePaymentAllocation =>
-        Ok(Json.toJson(determinePaymentAllocation))
-      }
-      .recover { case ex: Exception =>
-        logger.error("Error while retrieving payment type for determining payment allocation", ex)
-        InternalServerError(Json.obj("error" -> "Failed to retrieve payment type for for determining payment allocation"))
-      }
+  // TODO update to session repository screen input when implemented
+  val userEnteredPaymentAmount = 1000
+
+  def getPaymentType(taxRef: Long, queryParams: PaymentSearchResultQueryParams): Action[AnyContent] = Action.async {
+    implicit request =>
+      determinePaymentAllocationService
+        .getPaymentType(taxRef, queryParams.fromDate, queryParams.toDate, userEnteredPaymentAmount)
+        .map { determinePaymentAllocation =>
+          Ok(Json.toJson(determinePaymentAllocation))
+        }
+        .recover { case ex: Exception =>
+          logger.error("Error while retrieving payment type for determining payment allocation", ex)
+          InternalServerError(
+            Json.obj("error" -> "Failed to retrieve payment type for for determining payment allocation")
+          )
+        }
   }
 }
