@@ -192,6 +192,32 @@ class PaymentSearchResultServiceSpec
       result.paymentSearchResult.map(_.paymentType) should not contain "XYZ"
     }
 
+    "replace amount with paymentAmount when type is BLP, NGP, LOP or BGT and amount matches and chequeId is not zero" in new Setup {
+      val userEnteredAmount = 300
+      val response          = PaymentSearchResultResponse(
+        List(
+          createRow(paymentType = "BLP", amount = 100, paymentAmount = 300, chequeId = 1),
+          createRow(paymentType = "NGP", amount = -100, paymentAmount = -300, chequeId = 2, bankSortCode = 234),
+          createRow(paymentType = "BGT", amount = 100, paymentAmount = 300, chequeId = 5, bankSortCode = 345),
+          createRow(paymentType = "LOP", amount = -100, paymentAmount = -300, chequeId = -6, bankSortCode = 456)
+        )
+      )
+
+      val result = service.filterPaymentSearchResult(response, userEnteredAmount)
+
+      result.paymentSearchResult.size mustBe 4
+      result.paymentSearchResult.map(_.paymentType) should contain theSameElementsAs
+        Seq("BLP", "NGP", "BGT", "LOP")
+
+      result.paymentSearchResult.forall(row =>
+        row.amount == BigDecimal(300) || row.amount == BigDecimal(-300)
+      ) mustBe true
+
+      result.paymentSearchResult.forall(row =>
+        row.paymentAmount == BigDecimal(300) || row.paymentAmount == BigDecimal(-300)
+      ) mustBe true
+    }
+
     "include BLP, NGP, LOP or BGT payment types when paymentAmount matches && chequeId is not zero && distinct bank details" in new Setup {
       val userEnteredAmount = 300
       val response          = PaymentSearchResultResponse(

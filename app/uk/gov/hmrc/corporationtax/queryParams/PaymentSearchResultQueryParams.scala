@@ -38,8 +38,8 @@ object PaymentSearchResultQueryParams {
 
       val stringBinder = summon[QueryStringBindable[String]]
 
-      val fromDateE                                      = stringBinder.bind("fromDate", params)
-      val toDateE                                        = stringBinder.bind("toDate", params)
+      val fromDateE                           = stringBinder.bind("fromDate", params)
+      val toDateE                             = stringBinder.bind("toDate", params)
       val userEnteredAmountE: Either[String, BigDecimal] =
         stringBinder.bind("amount", params) match {
           case Some(Right(value)) =>
