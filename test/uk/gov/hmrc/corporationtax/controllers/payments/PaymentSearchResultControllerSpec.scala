@@ -57,7 +57,7 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
       val result: Future[Result] = controller
         .getPaymentSearchResult(
           taxReferenceNumber,
-          PaymentSearchResultQueryParams(Some(LocalDate.parse("1991-04-19")), Some(LocalDate.parse("1992-06-20")))
+          PaymentSearchResultQueryParams(Some(LocalDate.parse("1991-04-19")), Some(LocalDate.parse("1992-06-20")), BigDecimal(1000))
         )(fakeRequest)
       status(result) shouldBe Status.OK
 
@@ -70,7 +70,7 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
         .thenReturn(Future.successful(emptyPaymentSearchResult))
 
       val result: Future[Result] =
-        controller.getPaymentSearchResult(taxReferenceNumber, PaymentSearchResultQueryParams(None, None))(fakeRequest)
+        controller.getPaymentSearchResult(taxReferenceNumber, PaymentSearchResultQueryParams(None, None, BigDecimal(0)))(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(emptyPaymentSearchResult)
@@ -85,7 +85,7 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
         .thenReturn(Future.failed(err))
 
       val result: Future[Result] =
-        controller.getPaymentSearchResult(taxReferenceNumber, PaymentSearchResultQueryParams(None, None))(fakeRequest)
+        controller.getPaymentSearchResult(taxReferenceNumber, PaymentSearchResultQueryParams(None, None, BigDecimal(0)))(fakeRequest)
 
       status(result) shouldBe BAD_GATEWAY
 
@@ -97,7 +97,7 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
         .thenReturn(Future.failed(new RuntimeException("unexpected")))
 
       val result: Future[Result] =
-        controller.getPaymentSearchResult(taxReferenceNumber, PaymentSearchResultQueryParams(None, None))(fakeRequest)
+        controller.getPaymentSearchResult(taxReferenceNumber, PaymentSearchResultQueryParams(None, None, BigDecimal(0)))(fakeRequest)
 
       status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve paymentSearchResult"

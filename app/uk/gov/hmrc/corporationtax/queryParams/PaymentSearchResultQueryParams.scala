@@ -21,7 +21,7 @@ import play.api.mvc.QueryStringBindable
 import java.time.LocalDate
 import scala.util.Try
 
-final case class PaymentSearchResultQueryParams(fromDate: Option[LocalDate], toDate: Option[LocalDate])
+final case class PaymentSearchResultQueryParams(fromDate: Option[LocalDate], toDate: Option[LocalDate], amount: BigDecimal)
 
 object PaymentSearchResultQueryParams {
 
@@ -35,7 +35,18 @@ object PaymentSearchResultQueryParams {
       val stringBinder = summon[QueryStringBindable[String]]
 
       val fromDateE = stringBinder.bind("fromDate", params)
-      val toDateE   = stringBinder.bind("toDate", params)
+      val toDateE = stringBinder.bind("toDate", params)
+      val amountE: Either[String, BigDecimal] =
+        stringBinder.bind("amount", params) match {
+          case Some(Right(value)) =>
+            scala.util.Try(BigDecimal(value)).toEither.left.map(_ => s"Invalid amount: $value")
+
+          case Some(Left(error)) =>
+            Left(error)
+
+          case None =>
+            Left("Missing required parameter: amount")
+        }
 
       def parseDate(
         value: Option[Either[String, String]]
@@ -60,9 +71,11 @@ object PaymentSearchResultQueryParams {
         for {
           fromDate <- parseDate(fromDateE)
           toDate   <- parseDate(toDateE)
+          amount   <- amountE
         } yield PaymentSearchResultQueryParams(
           fromDate = fromDate,
-          toDate = toDate
+          toDate = toDate,
+          amount = amount
         )
       )
     }

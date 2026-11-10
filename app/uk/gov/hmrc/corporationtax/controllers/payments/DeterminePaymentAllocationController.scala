@@ -20,9 +20,10 @@ import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.Results.InternalServerError
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
+import uk.gov.hmrc.corporationtax.controllers.actions.IdentifierAction
 import uk.gov.hmrc.corporationtax.queryParams.PaymentSearchResultQueryParams
 import uk.gov.hmrc.corporationtax.services.payments.DeterminePaymentAllocationService
-import uk.gov.hmrc.corporationtax.utils.DeterminePaymentAllocationSerializer._
+import uk.gov.hmrc.corporationtax.utils.DeterminePaymentAllocationSerializer.*
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
@@ -30,18 +31,16 @@ import scala.concurrent.ExecutionContext
 
 class DeterminePaymentAllocationController @Inject() (
   determinePaymentAllocationService: DeterminePaymentAllocationService,
+  identify: IdentifierAction,
   cc: ControllerComponents
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  // TODO update to session repository screen input when implemented
-  val userEnteredPaymentAmount = 1000
-
-  def getPaymentType(taxRef: Long, queryParams: PaymentSearchResultQueryParams): Action[AnyContent] = Action.async {
+  def getPaymentType(taxRef: Long, queryParams: PaymentSearchResultQueryParams): Action[AnyContent] = identify.async {
     implicit request =>
       determinePaymentAllocationService
-        .getPaymentType(taxRef, queryParams.fromDate, queryParams.toDate, userEnteredPaymentAmount)
+        .getPaymentType(taxRef, queryParams.fromDate, queryParams.toDate, queryParams.amount)
         .map { determinePaymentAllocation =>
           Ok(Json.toJson(determinePaymentAllocation))
         }

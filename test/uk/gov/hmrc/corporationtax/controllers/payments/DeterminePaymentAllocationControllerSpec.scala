@@ -26,10 +26,12 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.corporationtax.controllers.actions.IdentifierAction
 import uk.gov.hmrc.corporationtax.helpers.payments.DeterminePaymentAllocationHelper
 import uk.gov.hmrc.corporationtax.queryParams.PaymentSearchResultQueryParams
 import uk.gov.hmrc.corporationtax.services.payments.DeterminePaymentAllocationService
-import uk.gov.hmrc.corporationtax.utils.DeterminePaymentAllocationSerializer._
+import uk.gov.hmrc.corporationtax.utils.DeterminePaymentAllocationSerializer.*
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
@@ -39,13 +41,15 @@ class DeterminePaymentAllocationControllerSpec extends AnyWordSpec with Matchers
 
   private trait Setup {
     val mockService: DeterminePaymentAllocationService = mock[DeterminePaymentAllocationService]
+    val mockIdentify: IdentifierAction = mock[IdentifierAction]
+    val mockAuth = mock[AuthConnector]
 
     val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
 
     val fakeRequest = FakeRequest("GET", "/determine-payment-allocation")
     val controller  =
-      new DeterminePaymentAllocationController(mockService, Helpers.stubControllerComponents())
+      new DeterminePaymentAllocationController(mockService, mockIdentify, cc)
   }
 
   "GET /determine-payment-allocation" should {
@@ -56,7 +60,7 @@ class DeterminePaymentAllocationControllerSpec extends AnyWordSpec with Matchers
 
       val result: Future[Result] = controller.getPaymentType(
         1L,
-        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)))
+        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
       )(fakeRequest)
       status(result) shouldBe Status.OK
 
@@ -79,7 +83,7 @@ class DeterminePaymentAllocationControllerSpec extends AnyWordSpec with Matchers
 
       val result: Future[Result] = controller.getPaymentType(
         1L,
-        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)))
+        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
       )(fakeRequest)
       status(result) shouldBe Status.OK
 
@@ -102,7 +106,7 @@ class DeterminePaymentAllocationControllerSpec extends AnyWordSpec with Matchers
 
       val result: Future[Result] = controller.getPaymentType(
         1L,
-        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)))
+        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
       )(fakeRequest)
       status(result) shouldBe Status.OK
 
@@ -125,7 +129,7 @@ class DeterminePaymentAllocationControllerSpec extends AnyWordSpec with Matchers
 
       val result: Future[Result] = controller.getPaymentType(
         1L,
-        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)))
+        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
       )(fakeRequest)
       status(result) shouldBe Status.OK
 
@@ -148,7 +152,7 @@ class DeterminePaymentAllocationControllerSpec extends AnyWordSpec with Matchers
 
       val result: Future[Result] = controller.getPaymentType(
         1L,
-        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)))
+        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
       )(fakeRequest)
       status(result) shouldBe Status.OK
 
@@ -171,7 +175,7 @@ class DeterminePaymentAllocationControllerSpec extends AnyWordSpec with Matchers
 
       val result: Future[Result] = controller.getPaymentType(
         1L,
-        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)))
+        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
       )(fakeRequest)
       status(result) shouldBe Status.OK
 
@@ -194,7 +198,7 @@ class DeterminePaymentAllocationControllerSpec extends AnyWordSpec with Matchers
 
       val result: Future[Result] = controller.getPaymentType(
         1L,
-        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)))
+        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
       )(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
 
