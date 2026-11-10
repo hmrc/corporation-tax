@@ -88,7 +88,9 @@ object PaymentSearchResultQueryParams {
       val params = Seq(
         value.fromDate.map(d => "fromDate=" + d.toString),
         value.toDate.map(d => "toDate=" + d.toString)
-      ).flatten
+      ).flatten ++ Seq(
+        "amount=" + value.userEnteredPaymentAmount.toString()
+      )
 
       params.mkString("&")
     }
