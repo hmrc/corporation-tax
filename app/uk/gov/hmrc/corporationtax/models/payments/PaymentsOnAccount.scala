@@ -20,7 +20,7 @@ import play.api.libs.json.{Json, OFormat}
 
 import java.time.LocalDate
 
-case class PaymentsOnAccount(paymentsOnAccount: List[PaymentsOnAccount])
+case class PaymentsOnAccount(paymentsOnAccount: List[PaymentsOnAccountRow])
 
 object PaymentsOnAccount {
   implicit val format: OFormat[PaymentsOnAccount] = Json.format[PaymentsOnAccount]
