@@ -19,10 +19,15 @@ package uk.gov.hmrc.corporationtax.services.payments
 import play.api.Logging
 import uk.gov.hmrc.corporationtax.models.BusinessConstants.*
 import uk.gov.hmrc.corporationtax.models.InterestCharges
-import uk.gov.hmrc.corporationtax.models.payments.{AllAccountingPeriods, PaymentPostingRow, PaymentPostingsResponse, PaymentsOnAccount, PaymentsOnAccountRow}
+import uk.gov.hmrc.corporationtax.models.payments.{
+  AccountingPeriodList, AllAccountingPeriods, PaymentPostingRow, PaymentPostingsResponse, PaymentsOnAccount,
+  PaymentsOnAccountRow, PostingSummaryByTypeResponse
+}
 import uk.gov.hmrc.corporationtax.services.InterestChargeService
+import uk.gov.hmrc.corporationtax.utils.AmountTransformation
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.LocalDate
 import javax.inject.Inject
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
@@ -45,41 +50,178 @@ class PaymentsOnAccountService @Inject (
       repPostingSummary     <- postingSummaryByType.getPostingSummaryByType(taxReference, repPostingType)
       interestChargeSummary <- interestChargeService.getInterestChargesSummary(taxReference)
       allAccountingPeriod   <- allAccountingPeriodsService.getAccountingPeriodList(taxReference)
-    } yield ???
+    } yield
+      val combinedPostings = combinePosting(paymentPostings)
+      computeNewPaymentsOnAccount(
+        combinedPostings,
+        rfrPostingSummary,
+        repPostingSummary,
+        interestChargeSummary,
+        allAccountingPeriod
+      )
 
-  private def computeNewPaymentsOnAccount(paymentPostings: PaymentPostingsResponse): PaymentsOnAccount = {
+  private[payments] def computeNewPaymentsOnAccount(
+    paymentPostings: PaymentPostingsResponse,
+    rfrPostingSummary: PostingSummaryByTypeResponse,
+    rtrPostingSummary: PostingSummaryByTypeResponse,
+    interestChargeSummary: InterestCharges,
+    allAccountingPeriods: AllAccountingPeriods
+  ): PaymentsOnAccount = {
     @tailrec
-    def evaluateEachPaymentsOnAccount(remainingList: PaymentPostingsResponse, acc: PaymentsOnAccount): PaymentsOnAccount =
-      remainingList.paymentPostingResults match {
-        case Nil  => acc
-        case head :: tail  => if checkIfAccPeriodEqualsZero(head) then
-          if(tail == Nil) {
-            evaluateEachPaymentsOnAccount(tail, acc ++ head)
+    def evaluateEachPaymentsOnAccountRow(
+      remainingList: List[PaymentPostingRow],
+      acc: ListBuffer[PaymentsOnAccountRow] = ListBuffer.empty[PaymentsOnAccountRow]
+    ): PaymentsOnAccount =
+      remainingList match {
+        case Nil          => PaymentsOnAccount(paymentsOnAccount = acc.toList)
+        case head :: tail =>
+          if accPeriodEqualsZero(head.accountingPeriod) then {
+            evaluateEachPaymentsOnAccountRow(
+              tail,
+              applyReallocationsMayBeRepayments(head, rfrPostingSummary, rtrPostingSummary, acc)
+            )
+          } else {
+            allAccountingPeriods.accountingPeriodList.find(_.accountingPeriod == head.accountingPeriod) match {
+              case Some(matchingAccPeriod) =>
+                if isValidPaymentOnPosting(matchingAccPeriod, head, interestChargeSummary) then {
+                  evaluateEachPaymentsOnAccountRow(tail, acc)
+                } else {
+                  evaluateEachPaymentsOnAccountRow(
+                    tail,
+                    applyReallocationsMayBeRepayments(head, rfrPostingSummary, rtrPostingSummary, acc)
+                  )
+                }
+
+              case None => evaluateEachPaymentsOnAccountRow(tail, acc)
+            }
+
           }
-          else {
-            tryCombineCurrentPostingToNextPosting(head, tail.head)
-          }
-        else {
-          ???
-        }
       }
-    evaluateEachPaymentsOnAccount(paymentPostings, PaymentsOnAccount(List.empty))
+
+    evaluateEachPaymentsOnAccountRow(paymentPostings.paymentPostingResults)
   }
 
-
-
-  private def checkIfAccPeriodEqualsZero(accPeriod: Long): Boolean =
+  // Done
+  private[payments] def accPeriodEqualsZero(accPeriod: Long): Boolean =
     accPeriod == zeroAccPeriod
 
+  private[payments] def applyReallocationsMayBeRepayments(
+    currentPosting: PaymentPostingRow,
+    rfrPostingSummary: PostingSummaryByTypeResponse,
+    rtrPostingSummary: PostingSummaryByTypeResponse,
+    acc: ListBuffer[PaymentsOnAccountRow]
+  ): ListBuffer[PaymentsOnAccountRow] = {
 
-  private def tryCombineCurrentPostingToNextPosting(currentPosting:PaymentPostingRow, nextPosting:PaymentPostingRow, acc:ListBuffer[PaymentsOnAccount]):PaymentPostingRow = {
-    if((currentPosting.accountingPeriod == nextPosting.accountingPeriod) && (currentPosting.payslipId == nextPosting.payslipId)){
-      val combinedPosting = nextPosting.copy(postingAmount = nextPosting.postingAmount + currentPosting.postingAmount)
-    }
-    else {
-      
+    val postingAfterReallocationRepayments =
+      if (accPeriodEqualsZero(currentPosting.accountingPeriod)) {
+        applyReallocations(currentPosting, rfrPostingSummary)
+      } else {
+        val postingAfterReallocation = applyReallocations(currentPosting, rfrPostingSummary)
+        val postingAfterRepayments   = applyRepayments(postingAfterReallocation, rtrPostingSummary)
+        postingAfterRepayments
+      }
+
+    if (excludePayment(postingAfterReallocationRepayments, currentPosting)) {
+      acc
+    } else {
+      val newPosting: PaymentsOnAccountRow =
+        createNewPaymentsOnAccount(postingAfterReallocationRepayments, currentPosting.postingAmount)
+      acc += newPosting
     }
 
   }
+
+  private[payments] def combinePosting(paymentPostings: PaymentPostingsResponse): PaymentPostingsResponse = {
+    val combinedRows: List[PaymentPostingRow] = paymentPostings.paymentPostingResults
+      .foldLeft(Vector.empty[PaymentPostingRow]) { (acc, t) =>
+        acc.indexWhere(row => (row.accountingPeriod == t.accountingPeriod) && (row.payslipId == t.payslipId)) match {
+          case -1 => acc :+ t
+          case i  => acc.updated(i, t.copy(postingAmount = acc(i).postingAmount + t.postingAmount))
+        }
+      }
+      .toList
+
+    paymentPostings.copy(paymentPostingResults = combinedRows)
+  }
+
+  // Done
+  private[payments] def isValidPaymentOnPosting(
+    matchingAccPeriod: AccountingPeriodList,
+    currentPosting: PaymentPostingRow,
+    interestChargeSummary: InterestCharges
+  ): Boolean =
+    hasInterestCharges(currentPosting, interestChargeSummary) || hasPenalty(matchingAccPeriod)
+
+  // Done
+  private[payments] def hasInterestCharges(
+    currentPosting: PaymentPostingRow,
+    interestChargeSummary: InterestCharges
+  ): Boolean =
+    interestChargeSummary.interestCharges.find(record =>
+      (record.accountingPeriod == currentPosting.accountingPeriod) && (record.interestChargeSummary < zeroAmount)
+    ) match {
+      case Some(record) => true
+      case None         => false
+    }
+
+  // Done
+  private[payments] def hasPenalty(matchingAccPeriod: AccountingPeriodList): Boolean =
+    matchingAccPeriod.taxChargePresent && matchingAccPeriod.penaltyTotal < zeroAmount
+
+  private[payments] def applyReallocations(
+    currentPosting: PaymentPostingRow,
+    rfrPosting: PostingSummaryByTypeResponse
+  ): PaymentPostingRow =
+    addToCurrentPaymentPostingRow(currentPosting, rfrPosting)
+
+  private[payments] def applyRepayments(
+    currentPosting: PaymentPostingRow,
+    rtrPosting: PostingSummaryByTypeResponse
+  ): PaymentPostingRow =
+    addToCurrentPaymentPostingRow(currentPosting, rtrPosting)
+
+  private[payments] def addToCurrentPaymentPostingRow(
+    currentPosting: PaymentPostingRow,
+    repaymentsOrReallocations: PostingSummaryByTypeResponse
+  ): PaymentPostingRow = {
+    val matchingRecordsSum: BigDecimal = repaymentsOrReallocations.postingSummary
+      .find(record =>
+        record.accountingPeriod == currentPosting.accountingPeriod && record.settlementSequenceNo == currentPosting.settlementSequenceNo
+      )
+      .map(_.postingAmountSum)
+      .sum
+
+    val newPaymentPosting = currentPosting.copy(postingAmount = currentPosting.postingAmount + matchingRecordsSum)
+    newPaymentPosting
+  }
+
+  private[payments] def excludePayment(
+    postingAfterReallocationsRepayments: PaymentPostingRow,
+    originalPosting: PaymentPostingRow
+  ): Boolean =
+    (postingAfterReallocationsRepayments.postingAmount == zeroAmount) || (postingAfterReallocationsRepayments.postingAmount > originalPosting.postingAmount)
+
+  private[payments] def createNewPaymentsOnAccount(
+    currentPosting: PaymentPostingRow,
+    originalAmount: BigDecimal
+  ): PaymentsOnAccountRow =
+    PaymentsOnAccountRow(
+      accPeriod = currentPosting.accountingPeriod,
+      effectiveDateOfPayment = currentPosting.effectiveDateOfPayment,
+      apEndDate = evaluateApEndDate(currentPosting),
+      paymentType = currentPosting.paymentType,
+      postingAmount = AmountTransformation.apply(Some(currentPosting.postingAmount)),
+      isPartPayment = isPartPayment(currentPosting.postingAmount, originalAmount)
+    )
+
+  // Done
+  private[payments] def isPartPayment(currentPostingAmount: BigDecimal, originalPostingAmount: BigDecimal): Boolean =
+    currentPostingAmount < originalPostingAmount
+
+  // Done
+  private[payments] def evaluateApEndDate(currentPosting: PaymentPostingRow): Option[LocalDate] =
+    if (accPeriodEqualsZero(currentPosting.accountingPeriod)) {
+      None
+    } else Some(currentPosting.effectiveDateOfPayment)
 
 }

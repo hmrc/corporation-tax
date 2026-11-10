@@ -19,17 +19,15 @@ package uk.gov.hmrc.corporationtax.controllers.payments
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.corporationtax.models.MissingDataError
 import uk.gov.hmrc.corporationtax.models.payments.PaymentsOnAccount
-import uk.gov.hmrc.corporationtax.queryParams.PaymentSearchResultQueryParams
-import uk.gov.hmrc.corporationtax.services.payments.{PaymentSearchResultService, PaymentsOnAccountService}
+import uk.gov.hmrc.corporationtax.services.payments.PaymentsOnAccountService
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class PaymentOnAccountController @Inject()(
+class PaymentOnAccountController @Inject() (
   cc: ControllerComponents,
   service: PaymentsOnAccountService
 )(implicit ec: ExecutionContext)
@@ -40,10 +38,8 @@ class PaymentOnAccountController @Inject()(
     Action.async { implicit request =>
       service
         .getPaymentsOnAccount(taxRef)
-        .map {
-          case Right(response: PaymentsOnAccount) => ???
-          case Left(error: MissingDataError) => ???
-          case _ => ???
+        .map { response =>
+          Ok(Json.toJson(response))
         }
         .recover {
           case u: UpstreamErrorResponse =>
