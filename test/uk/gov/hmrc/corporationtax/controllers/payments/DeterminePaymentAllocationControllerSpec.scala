@@ -27,11 +27,10 @@ import play.api.mvc.Result
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.corporationtax.controllers.actions.IdentifierAction
+import uk.gov.hmrc.corporationtax.controllers.actions.FakeIdentifierAction
 import uk.gov.hmrc.corporationtax.helpers.payments.DeterminePaymentAllocationHelper
 import uk.gov.hmrc.corporationtax.queryParams.PaymentSearchResultQueryParams
 import uk.gov.hmrc.corporationtax.services.payments.DeterminePaymentAllocationService
-import uk.gov.hmrc.corporationtax.utils.DeterminePaymentAllocationSerializer.*
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
@@ -41,30 +40,34 @@ class DeterminePaymentAllocationControllerSpec extends AnyWordSpec with Matchers
 
   private trait Setup {
     val mockService: DeterminePaymentAllocationService = mock[DeterminePaymentAllocationService]
-    val mockIdentify: IdentifierAction = mock[IdentifierAction]
-    val mockAuth = mock[AuthConnector]
+    val mockAuth                                       = mock[AuthConnector]
 
     val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
+    val fakeIdentifierAction          = new FakeIdentifierAction(cc.parsers)
 
     val fakeRequest = FakeRequest("GET", "/determine-payment-allocation")
     val controller  =
-      new DeterminePaymentAllocationController(mockService, mockIdentify, cc)
+      new DeterminePaymentAllocationController(mockService, fakeIdentifierAction, cc)
   }
 
   "GET /determine-payment-allocation" should {
 
-    "return 200 and a successful response with one item list of electronic payments" in new Setup {
+    "return 200 and a successful response with one item list of payment allocations" in new Setup {
       when(mockService.getPaymentType(any(), any(), any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(electronicOneItemList))
+        .thenReturn(Future.successful(paymentAllocation))
 
       val result: Future[Result] = controller.getPaymentType(
         1L,
-        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
+        PaymentSearchResultQueryParams(
+          Some(LocalDate.of(2026, 7, 24)),
+          Some(LocalDate.of(2026, 7, 24)),
+          BigDecimal(1000)
+        )
       )(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson(electronicOneItemList)
+      contentAsJson(result) shouldBe Json.toJson(paymentAllocation)
 
       verify(mockService)
         .getPaymentType(
@@ -77,109 +80,21 @@ class DeterminePaymentAllocationControllerSpec extends AnyWordSpec with Matchers
         )
     }
 
-    "return 200 and a successful response with one item list of cheque payments" in new Setup {
+    "return 200 and a successful response with multiple item list of payments allocations" in new Setup {
       when(mockService.getPaymentType(any(), any(), any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(chequeOneItemList))
+        .thenReturn(Future.successful(multiPaymentAllocation))
 
       val result: Future[Result] = controller.getPaymentType(
         1L,
-        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
-      )(fakeRequest)
-      status(result) shouldBe Status.OK
-
-      contentAsJson(result) shouldBe Json.toJson(chequeOneItemList)
-
-      verify(mockService)
-        .getPaymentType(
-          eqTo(1L),
-          eqTo(Some(LocalDate.of(2026, 7, 24))),
-          eqTo(Some(LocalDate.of(2026, 7, 24))),
-          eqTo(BigDecimal(1000))
-        )(
-          any[HeaderCarrier]
+        PaymentSearchResultQueryParams(
+          Some(LocalDate.of(2026, 7, 24)),
+          Some(LocalDate.of(2026, 7, 24)),
+          BigDecimal(1000)
         )
-    }
-
-    "return 200 and a successful response with multiple item list of electronic payments" in new Setup {
-      when(mockService.getPaymentType(any(), any(), any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(electronicMultiItemList))
-
-      val result: Future[Result] = controller.getPaymentType(
-        1L,
-        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
       )(fakeRequest)
       status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson(electronicMultiItemList)
-
-      verify(mockService)
-        .getPaymentType(
-          eqTo(1L),
-          eqTo(Some(LocalDate.of(2026, 7, 24))),
-          eqTo(Some(LocalDate.of(2026, 7, 24))),
-          eqTo(BigDecimal(1000))
-        )(
-          any[HeaderCarrier]
-        )
-    }
-
-    "return 200 and a successful response with multiple item list of cheque payments" in new Setup {
-      when(mockService.getPaymentType(any(), any(), any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(chequeMultiItemList))
-
-      val result: Future[Result] = controller.getPaymentType(
-        1L,
-        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
-      )(fakeRequest)
-      status(result) shouldBe Status.OK
-
-      contentAsJson(result) shouldBe Json.toJson(chequeMultiItemList)
-
-      verify(mockService)
-        .getPaymentType(
-          eqTo(1L),
-          eqTo(Some(LocalDate.of(2026, 7, 24))),
-          eqTo(Some(LocalDate.of(2026, 7, 24))),
-          eqTo(BigDecimal(1000))
-        )(
-          any[HeaderCarrier]
-        )
-    }
-
-    "return 200 and a successful response with multiple item list of both electronic and cheque payments" in new Setup {
-      when(mockService.getPaymentType(any(), any(), any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(mixedElecAndCheqList))
-
-      val result: Future[Result] = controller.getPaymentType(
-        1L,
-        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
-      )(fakeRequest)
-      status(result) shouldBe Status.OK
-
-      contentAsJson(result) shouldBe Json.toJson(mixedElecAndCheqList)
-
-      verify(mockService)
-        .getPaymentType(
-          eqTo(1L),
-          eqTo(Some(LocalDate.of(2026, 7, 24))),
-          eqTo(Some(LocalDate.of(2026, 7, 24))),
-          eqTo(BigDecimal(1000))
-        )(
-          any[HeaderCarrier]
-        )
-    }
-
-    "return 200 and a successful response with empty list of both electronic and cheque payments" in new Setup {
-      when(mockService.getPaymentType(any(), any(), any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(emptyElecAndCheqList))
-
-      val result: Future[Result] = controller.getPaymentType(
-        1L,
-        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
-      )(fakeRequest)
-      status(result) shouldBe Status.OK
-
-      contentAsJson(result) shouldBe Json.toJson(emptyElecAndCheqList)
+      contentAsJson(result) shouldBe Json.toJson(multiPaymentAllocation)
 
       verify(mockService)
         .getPaymentType(
@@ -198,7 +113,11 @@ class DeterminePaymentAllocationControllerSpec extends AnyWordSpec with Matchers
 
       val result: Future[Result] = controller.getPaymentType(
         1L,
-        PaymentSearchResultQueryParams(Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
+        PaymentSearchResultQueryParams(
+          Some(LocalDate.of(2026, 7, 24)),
+          Some(LocalDate.of(2026, 7, 24)),
+          BigDecimal(1000)
+        )
       )(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
 

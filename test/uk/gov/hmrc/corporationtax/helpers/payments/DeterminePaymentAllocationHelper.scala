@@ -17,19 +17,14 @@
 package uk.gov.hmrc.corporationtax.helpers.payments
 
 import uk.gov.hmrc.corporationtax.models.payments.{
-  ElectronicPaymentAllocationDetails, ElectronicPaymentAllocationInfo, PaymentAllocationChequeDetails,
-  PaymentAllocationChequeRow, PaymentSearchResult, PaymentSearchResultResponse
+  ElectronicPaymentAllocationDetails, ElectronicPaymentAllocationInfo, PaymentAllocation,
+  PaymentAllocationChequeDetails, PaymentAllocationChequeRow, PaymentAllocationInfo, PaymentSearchResult,
+  PaymentSearchResultResponse
 }
 
 import java.time.LocalDate
 
 trait DeterminePaymentAllocationHelper {
-
-  val emptyElectronicPaymentAllocationDetails: ElectronicPaymentAllocationDetails =
-    ElectronicPaymentAllocationDetails(List.empty)
-
-  val emptyChequePaymentAllocationDetails: PaymentAllocationChequeDetails =
-    PaymentAllocationChequeDetails(List.empty)
 
   val electronicPaymentAllocationDetails: ElectronicPaymentAllocationDetails = ElectronicPaymentAllocationDetails(
     List(
@@ -45,10 +40,46 @@ trait DeterminePaymentAllocationHelper {
   val chequePaymentAllocationDetails: PaymentAllocationChequeDetails = PaymentAllocationChequeDetails(
     List(
       PaymentAllocationChequeRow(
-        accountingPeriod = 1L,
-        apEndDate = LocalDate.of(2023, 3, 31),
-        amount = BigDecimal("1500.47"),
-        effectiveDateOfPayment = LocalDate.of(2023, 4, 15)
+        accountingPeriod = 10L,
+        apEndDate = LocalDate.of(2024, 8, 31),
+        amount = BigDecimal(10.00),
+        effectiveDateOfPayment = LocalDate.of(2024, 8, 31)
+      )
+    )
+  )
+
+  val paymentAllocation: List[PaymentAllocation] = List(
+    PaymentAllocation(
+      List(
+        PaymentAllocationInfo(
+          accountingPeriod = BigDecimal(10),
+          apEndDate = LocalDate.of(2024, 8, 31),
+          amount = BigDecimal(10.00),
+          effectiveDateOfPayment = LocalDate.of(2024, 8, 31)
+        )
+      )
+    )
+  )
+
+  val multiPaymentAllocation: List[PaymentAllocation] = List(
+    PaymentAllocation(
+      List(
+        PaymentAllocationInfo(
+          accountingPeriod = BigDecimal(10),
+          apEndDate = LocalDate.of(2024, 8, 31),
+          amount = BigDecimal(10.00),
+          effectiveDateOfPayment = LocalDate.of(2024, 8, 31)
+        )
+      )
+    ),
+    PaymentAllocation(
+      List(
+        PaymentAllocationInfo(
+          accountingPeriod = BigDecimal(10),
+          apEndDate = LocalDate.of(2024, 8, 31),
+          amount = BigDecimal(10.00),
+          effectiveDateOfPayment = LocalDate.of(2024, 8, 31)
+        )
       )
     )
   )
@@ -86,37 +117,6 @@ trait DeterminePaymentAllocationHelper {
       )
     )
   )
-
-  val emptyElecAndCheqList: List[Option[Either[ElectronicPaymentAllocationDetails, PaymentAllocationChequeDetails]]] =
-    List(None)
-
-  val electronicOneItemList: List[Option[Either[ElectronicPaymentAllocationDetails, PaymentAllocationChequeDetails]]] =
-    List(
-      Some(Left(electronicPaymentAllocationDetails))
-    )
-
-  val chequeOneItemList: List[Option[Either[ElectronicPaymentAllocationDetails, PaymentAllocationChequeDetails]]] =
-    List(
-      Some(Right(chequePaymentAllocationDetails))
-    )
-
-  val electronicMultiItemList
-    : List[Option[Either[ElectronicPaymentAllocationDetails, PaymentAllocationChequeDetails]]] = List(
-    Some(Left(electronicPaymentAllocationDetails)),
-    Some(Left(electronicPaymentAllocationDetails))
-  )
-
-  val chequeMultiItemList: List[Option[Either[ElectronicPaymentAllocationDetails, PaymentAllocationChequeDetails]]] =
-    List(
-      Some(Right(chequePaymentAllocationDetails)),
-      Some(Right(chequePaymentAllocationDetails))
-    )
-
-  val mixedElecAndCheqList: List[Option[Either[ElectronicPaymentAllocationDetails, PaymentAllocationChequeDetails]]] =
-    List(
-      Some(Left(electronicPaymentAllocationDetails)),
-      Some(Right(chequePaymentAllocationDetails))
-    )
 
   val electronicOneItemPaymentSearchResult: PaymentSearchResultResponse =
     PaymentSearchResultResponse(paymentSearchResult =

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.corporationtax.services.payments
 
 import play.api.Logging
-import uk.gov.hmrc.corporationtax.models.payments.{ElectronicPaymentAllocationDetails, PaymentAllocation, PaymentAllocationChequeDetails, PaymentAllocationInfo}
+import uk.gov.hmrc.corporationtax.models.payments.{PaymentAllocation, PaymentAllocationInfo}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
@@ -36,55 +36,61 @@ class DeterminePaymentAllocationService @Inject() (
     taxRef: Long,
     fromDate: Option[LocalDate],
     toDate: Option[LocalDate],
-    amount: BigDecimal
+    userEnteredAmount: BigDecimal
   )(implicit
     hc: HeaderCarrier
   ): Future[List[PaymentAllocation]] = {
     logger.info(
-      s"Calling services for taxRef: $taxRef, fromDate: $fromDate, toDate: $toDate, amount: $amount"
+      s"Calling services for taxRef: $taxRef, fromDate: $fromDate, toDate: $toDate, userEnteredAmount: $userEnteredAmount"
     )
 
-    paymentSearchResultService.getPaymentSearchResult(taxRef, fromDate, toDate, amount).flatMap {
+    paymentSearchResultService.getPaymentSearchResult(taxRef, fromDate, toDate, userEnteredAmount).flatMap {
       paymentSearchResultResponse =>
-        Future.sequence(paymentSearchResultResponse.paymentSearchResult.map { paymentSearchResult =>
-          if (paymentSearchResult.chequeId == -1 || paymentSearchResult.chequeId == 0) {
-            electronicPaymentAllocationDetailsService
-              .getPayAllocationElectronicDtls(
-                taxRef,
-                paymentSearchResult.accountingPeriod.toLong,
-                paymentSearchResult.payslipId.toLong
-              )
-              .map(electronic => electronic.electronicPaymentAllocationDetails.map { e =>
-                PaymentAllocation(
-                  List(
-                    PaymentAllocationInfo(
-                      accountingPeriod = e.accountingPeriod,
-                      apEndDate = e.apEndDate,
-                      amount = e.amount,
-                      effectiveDateOfPayment = e.effectiveDateOfPayment
-                    )
-                  )
+        Future
+          .sequence(paymentSearchResultResponse.paymentSearchResult.map { paymentSearchResult =>
+            if (paymentSearchResult.chequeId == -1 || paymentSearchResult.chequeId == 0) {
+              electronicPaymentAllocationDetailsService
+                .getPayAllocationElectronicDtls(
+                  taxRef,
+                  paymentSearchResult.accountingPeriod.toLong,
+                  paymentSearchResult.payslipId.toLong
                 )
-              })
-          } else if (paymentSearchResult.payslipId == -1 && paymentSearchResult.accountingPeriod == -1) {
-            chequePaymentAllocationDetailsService
-              .getPaymentAllocationChequeDetails(taxRef, paymentSearchResult.chequeId.toLong)
-              .map(cheque => cheque.paymentAllocationDetails.map { c =>
-                PaymentAllocation(
-                  List(
-                    PaymentAllocationInfo(
-                      accountingPeriod = c.accountingPeriod,
-                      apEndDate = c.apEndDate,
-                      amount = c.amount,
-                      effectiveDateOfPayment = c.effectiveDateOfPayment
+                .map(electronic =>
+                  electronic.electronicPaymentAllocationDetails.map { e =>
+                    PaymentAllocation(
+                      List(
+                        PaymentAllocationInfo(
+                          accountingPeriod = e.accountingPeriod,
+                          apEndDate = e.apEndDate,
+                          amount = e.amount,
+                          effectiveDateOfPayment = e.effectiveDateOfPayment
+                        )
+                      )
                     )
-                  )
+                  }
                 )
-              })
-          } else {
-            Future.successful(None)
-          }
-        }).flatten
+            } else if (paymentSearchResult.payslipId == -1 && paymentSearchResult.accountingPeriod == -1) {
+              chequePaymentAllocationDetailsService
+                .getPaymentAllocationChequeDetails(taxRef, paymentSearchResult.chequeId.toLong)
+                .map(cheque =>
+                  cheque.paymentAllocationDetails.map { c =>
+                    PaymentAllocation(
+                      List(
+                        PaymentAllocationInfo(
+                          accountingPeriod = c.accountingPeriod,
+                          apEndDate = c.apEndDate,
+                          amount = c.amount,
+                          effectiveDateOfPayment = c.effectiveDateOfPayment
+                        )
+                      )
+                    )
+                  }
+                )
+            } else {
+              Future.successful(None)
+            }
+          })
+          .map(_.flatten)
     }
   }
 }

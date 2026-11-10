@@ -57,7 +57,7 @@ class DeterminePaymentAllocationServiceSpec
 
   "getPaymentType" should {
 
-    "delegate to service and successfully return one item list of electronic payments" in new Setup {
+    "delegate to service and successfully return one item list of payment allocation from electronic payments" in new Setup {
       when(mockPaymentSearchResultService.getPaymentSearchResult(any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(electronicOneItemPaymentSearchResult))
       when(mockElectronicService.getPayAllocationElectronicDtls(any(), any(), any())(any[HeaderCarrier]))
@@ -67,13 +67,13 @@ class DeterminePaymentAllocationServiceSpec
         .getPaymentType(1L, Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
         .futureValue
 
-      result shouldBe electronicOneItemList
+      result shouldBe paymentAllocation
 
       verify(mockPaymentSearchResultService).getPaymentSearchResult(any(), any(), any(), any())(any())
       verify(mockElectronicService).getPayAllocationElectronicDtls(any(), any(), any())(any())
     }
 
-    "delegate to service and successfully return one item list of cheque payments" in new Setup {
+    "delegate to service and successfully return one item list of payment allocation from cheque payments" in new Setup {
       when(mockPaymentSearchResultService.getPaymentSearchResult(any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(chequeOneItemPaymentSearchResult))
       when(mockChequeService.getPaymentAllocationChequeDetails(any(), any())(any[HeaderCarrier]))
@@ -83,13 +83,13 @@ class DeterminePaymentAllocationServiceSpec
         .getPaymentType(1L, Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
         .futureValue
 
-      result shouldBe chequeOneItemList
+      result shouldBe paymentAllocation
 
       verify(mockPaymentSearchResultService).getPaymentSearchResult(any(), any(), any(), any())(any())
       verify(mockChequeService).getPaymentAllocationChequeDetails(any(), any())(any())
     }
 
-    "delegate to service and successfully return multiple item list of electronic payments" in new Setup {
+    "delegate to service and successfully return multiple item list of payment allocation from electronic payments" in new Setup {
       when(mockPaymentSearchResultService.getPaymentSearchResult(any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(electronicMultiItemPaymentSearchResult))
       when(mockElectronicService.getPayAllocationElectronicDtls(any(), any(), any())(any[HeaderCarrier]))
@@ -102,13 +102,13 @@ class DeterminePaymentAllocationServiceSpec
         .getPaymentType(1L, Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
         .futureValue
 
-      result shouldBe electronicMultiItemList
+      result shouldBe multiPaymentAllocation
 
       verify(mockPaymentSearchResultService).getPaymentSearchResult(any(), any(), any(), any())(any())
       verify(mockElectronicService, times(2)).getPayAllocationElectronicDtls(any(), any(), any())(any())
     }
 
-    "delegate to service and successfully return multiple item list of cheque payments" in new Setup {
+    "delegate to service and successfully return multiple item list of payment allocation from cheque payments" in new Setup {
       when(mockPaymentSearchResultService.getPaymentSearchResult(any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(chequeMultiItemPaymentSearchResult))
       when(mockChequeService.getPaymentAllocationChequeDetails(any(), any())(any[HeaderCarrier]))
@@ -121,7 +121,7 @@ class DeterminePaymentAllocationServiceSpec
         .getPaymentType(1L, Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
         .futureValue
 
-      result shouldBe chequeMultiItemList
+      result shouldBe multiPaymentAllocation
 
       verify(mockPaymentSearchResultService).getPaymentSearchResult(any(), any(), any(), any())(any())
       verify(mockChequeService, times(2)).getPaymentAllocationChequeDetails(any(), any())(any())
@@ -139,30 +139,11 @@ class DeterminePaymentAllocationServiceSpec
         .getPaymentType(1L, Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
         .futureValue
 
-      result shouldBe mixedElecAndCheqList
+      result shouldBe multiPaymentAllocation
 
       verify(mockPaymentSearchResultService).getPaymentSearchResult(any(), any(), any(), any())(any())
       verify(mockElectronicService).getPayAllocationElectronicDtls(any(), any(), any())(any())
       verify(mockChequeService).getPaymentAllocationChequeDetails(any(), any())(any())
-    }
-
-    "delegate to service and successfully return empty list of electronic and cheque payments" in new Setup {
-      when(mockPaymentSearchResultService.getPaymentSearchResult(any(), any(), any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(emptyElecAndCheqPaymentSearchResult))
-      when(mockElectronicService.getPayAllocationElectronicDtls(any(), any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(emptyElectronicPaymentAllocationDetails))
-      when(mockChequeService.getPaymentAllocationChequeDetails(any(), any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(emptyChequePaymentAllocationDetails))
-
-      val result = determinePaymentAllocation
-        .getPaymentType(1L, Some(LocalDate.of(2026, 7, 24)), Some(LocalDate.of(2026, 7, 24)), BigDecimal(1000))
-        .futureValue
-
-      result shouldBe emptyElecAndCheqList
-
-      verify(mockPaymentSearchResultService).getPaymentSearchResult(any(), any(), any(), any())(any())
-      verify(mockElectronicService, never()).getPayAllocationElectronicDtls(any(), any(), any())(any())
-      verify(mockChequeService, never()).getPaymentAllocationChequeDetails(any(), any())(any())
     }
 
     "propagate any errors or exceptions from one service" in new Setup {

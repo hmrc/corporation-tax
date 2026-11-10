@@ -23,7 +23,6 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.corporationtax.controllers.actions.IdentifierAction
 import uk.gov.hmrc.corporationtax.queryParams.PaymentSearchResultQueryParams
 import uk.gov.hmrc.corporationtax.services.payments.DeterminePaymentAllocationService
-import uk.gov.hmrc.corporationtax.utils.DeterminePaymentAllocationSerializer.*
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
@@ -40,7 +39,7 @@ class DeterminePaymentAllocationController @Inject() (
   def getPaymentType(taxRef: Long, queryParams: PaymentSearchResultQueryParams): Action[AnyContent] = identify.async {
     implicit request =>
       determinePaymentAllocationService
-        .getPaymentType(taxRef, queryParams.fromDate, queryParams.toDate, queryParams.amount)
+        .getPaymentType(taxRef, queryParams.fromDate, queryParams.toDate, queryParams.userEnteredAmount)
         .map { determinePaymentAllocation =>
           Ok(Json.toJson(determinePaymentAllocation))
         }

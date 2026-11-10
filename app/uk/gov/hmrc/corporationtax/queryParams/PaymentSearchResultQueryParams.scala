@@ -21,7 +21,11 @@ import play.api.mvc.QueryStringBindable
 import java.time.LocalDate
 import scala.util.Try
 
-final case class PaymentSearchResultQueryParams(fromDate: Option[LocalDate], toDate: Option[LocalDate], amount: BigDecimal)
+final case class PaymentSearchResultQueryParams(
+  fromDate: Option[LocalDate],
+  toDate: Option[LocalDate],
+  userEnteredAmount: BigDecimal
+)
 
 object PaymentSearchResultQueryParams {
 
@@ -34,18 +38,18 @@ object PaymentSearchResultQueryParams {
 
       val stringBinder = summon[QueryStringBindable[String]]
 
-      val fromDateE = stringBinder.bind("fromDate", params)
-      val toDateE = stringBinder.bind("toDate", params)
-      val amountE: Either[String, BigDecimal] =
-        stringBinder.bind("amount", params) match {
+      val fromDateE                                      = stringBinder.bind("fromDate", params)
+      val toDateE                                        = stringBinder.bind("toDate", params)
+      val userEnteredAmountE: Either[String, BigDecimal] =
+        stringBinder.bind("userEnteredAmount", params) match {
           case Some(Right(value)) =>
-            scala.util.Try(BigDecimal(value)).toEither.left.map(_ => s"Invalid amount: $value")
+            scala.util.Try(BigDecimal(value)).toEither.left.map(_ => s"Invalid userEnteredAmount: $value")
 
           case Some(Left(error)) =>
             Left(error)
 
           case None =>
-            Left("Missing required parameter: amount")
+            Left("Missing required parameter: userEnteredAmount")
         }
 
       def parseDate(
@@ -69,13 +73,13 @@ object PaymentSearchResultQueryParams {
 
       Some(
         for {
-          fromDate <- parseDate(fromDateE)
-          toDate   <- parseDate(toDateE)
-          amount   <- amountE
+          fromDate          <- parseDate(fromDateE)
+          toDate            <- parseDate(toDateE)
+          userEnteredAmount <- userEnteredAmountE
         } yield PaymentSearchResultQueryParams(
           fromDate = fromDate,
           toDate = toDate,
-          amount = amount
+          userEnteredAmount = userEnteredAmount
         )
       )
     }
