@@ -26,7 +26,6 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.corporationtax.controllers.actions.FakeIdentifierAction
 import uk.gov.hmrc.corporationtax.helpers.payments.DeterminePaymentAllocationHelper
 import uk.gov.hmrc.corporationtax.queryParams.PaymentSearchResultQueryParams
@@ -40,7 +39,6 @@ class DeterminePaymentAllocationControllerSpec extends AnyWordSpec with Matchers
 
   private trait Setup {
     val mockService: DeterminePaymentAllocationService = mock[DeterminePaymentAllocationService]
-    val mockAuth                                       = mock[AuthConnector]
 
     val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
