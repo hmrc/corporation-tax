@@ -33,7 +33,7 @@ class RepayReallocationSummaryService @Inject() (
   def getRepayReallocationSummary(taxRef: Long, accPeriod: Long)(implicit
     hc: HeaderCarrier
   ): Future[RepayReallocationSummary] = {
-    logger.info(s"Calling connector for taxRef: $taxRef and accPeriod: $accPeriod")
+    logger.info(s"Calling services for taxRef: $taxRef and accPeriod: $accPeriod")
 
     for {
       repayments       <- repaymentsService.getRepayments(taxRef, accPeriod)
