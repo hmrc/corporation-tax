@@ -41,15 +41,15 @@ object PaymentSearchResultQueryParams {
       val fromDateE                                      = stringBinder.bind("fromDate", params)
       val toDateE                                        = stringBinder.bind("toDate", params)
       val userEnteredAmountE: Either[String, BigDecimal] =
-        stringBinder.bind("userEnteredAmount", params) match {
+        stringBinder.bind("amount", params) match {
           case Some(Right(value)) =>
-            scala.util.Try(BigDecimal(value)).toEither.left.map(_ => s"Invalid userEnteredAmount: $value")
+            scala.util.Try(BigDecimal(value)).toEither.left.map(_ => s"Invalid amount: $value")
 
           case Some(Left(error)) =>
             Left(error)
 
           case None =>
-            Left("Missing required parameter: userEnteredAmount")
+            Left("Missing required parameter: amount")
         }
 
       def parseDate(
