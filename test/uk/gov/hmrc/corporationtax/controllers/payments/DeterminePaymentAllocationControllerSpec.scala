@@ -26,7 +26,6 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.corporationtax.controllers.actions.FakeIdentifierAction
 import uk.gov.hmrc.corporationtax.helpers.payments.DeterminePaymentAllocationHelper
 import uk.gov.hmrc.corporationtax.queryParams.PaymentSearchResultQueryParams
 import uk.gov.hmrc.corporationtax.services.payments.DeterminePaymentAllocationService
@@ -42,11 +41,10 @@ class DeterminePaymentAllocationControllerSpec extends AnyWordSpec with Matchers
 
     val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
-    val fakeIdentifierAction          = new FakeIdentifierAction(cc.parsers)
 
     val fakeRequest = FakeRequest("GET", "/determine-payment-allocation")
     val controller  =
-      new DeterminePaymentAllocationController(mockService, fakeIdentifierAction, cc)
+      new DeterminePaymentAllocationController(mockService, cc)
   }
 
   "GET /determine-payment-allocation" should {

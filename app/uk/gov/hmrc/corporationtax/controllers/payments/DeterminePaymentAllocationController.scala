@@ -20,7 +20,6 @@ import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.Results.InternalServerError
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
-import uk.gov.hmrc.corporationtax.controllers.actions.IdentifierAction
 import uk.gov.hmrc.corporationtax.queryParams.PaymentSearchResultQueryParams
 import uk.gov.hmrc.corporationtax.services.payments.DeterminePaymentAllocationService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -30,13 +29,12 @@ import scala.concurrent.ExecutionContext
 
 class DeterminePaymentAllocationController @Inject() (
   determinePaymentAllocationService: DeterminePaymentAllocationService,
-  identify: IdentifierAction,
   cc: ControllerComponents
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def getPaymentType(taxRef: Long, queryParams: PaymentSearchResultQueryParams): Action[AnyContent] = identify.async {
+  def getPaymentType(taxRef: Long, queryParams: PaymentSearchResultQueryParams): Action[AnyContent] = Action.async {
     implicit request =>
       determinePaymentAllocationService
         .getPaymentType(taxRef, queryParams.fromDate, queryParams.toDate, queryParams.userEnteredAmount)
