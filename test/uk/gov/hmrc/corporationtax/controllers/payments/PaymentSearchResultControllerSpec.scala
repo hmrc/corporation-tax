@@ -44,6 +44,7 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
     val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/foo")
     val controller                                       = new PaymentSearchResultController(cc, mockService)
     val taxReferenceNumber: Long                         = 1234567L
+    val userEnteredAmount: BigDecimal                    = 38000
 
   }
 
@@ -60,7 +61,7 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
           PaymentSearchResultQueryParams(
             Some(LocalDate.parse("1991-04-19")),
             Some(LocalDate.parse("1992-06-20")),
-            BigDecimal(1000)
+            userEnteredAmount
           )
         )(fakeRequest)
       status(result) shouldBe Status.OK
@@ -76,7 +77,7 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
       val result: Future[Result] =
         controller.getPaymentSearchResult(
           taxReferenceNumber,
-          PaymentSearchResultQueryParams(None, None, BigDecimal(0))
+          PaymentSearchResultQueryParams(None, None, userEnteredAmount)
         )(fakeRequest)
       status(result) shouldBe Status.OK
 
@@ -94,7 +95,7 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
       val result: Future[Result] =
         controller.getPaymentSearchResult(
           taxReferenceNumber,
-          PaymentSearchResultQueryParams(None, None, BigDecimal(0))
+          PaymentSearchResultQueryParams(None, None, userEnteredAmount)
         )(fakeRequest)
 
       status(result) shouldBe BAD_GATEWAY
@@ -109,7 +110,7 @@ class PaymentSearchResultControllerSpec extends AnyWordSpec with Matchers with P
       val result: Future[Result] =
         controller.getPaymentSearchResult(
           taxReferenceNumber,
-          PaymentSearchResultQueryParams(None, None, BigDecimal(0))
+          PaymentSearchResultQueryParams(None, None, userEnteredAmount)
         )(fakeRequest)
 
       status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
