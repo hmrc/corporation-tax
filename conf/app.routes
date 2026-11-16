@@ -49,5 +49,8 @@ GET        /posting-summary/:taxRef/:postingType                                
 GET        /payment-postings/:taxRef                                           uk.gov.hmrc.corporationtax.controllers.payments.PaymentPostingsController.getPaymentPostings(taxRef: Long)
 GET        /determine-payment-allocation/:taxRef                                uk.gov.hmrc.corporationtax.controllers.payments.DeterminePaymentAllocationController.getPaymentType(taxRef: Long, queryParams: uk.gov.hmrc.corporationtax.queryParams.PaymentSearchResultQueryParams)
 
-#Client-list-download
+# Client-list-download
 GET        /initiate-client-list-download                                       uk.gov.hmrc.corporationtax.controllers.clientExchangeProxy.ClientExchangeProxyController.initiateClientListDownload()
+
+# Manage Clients Routes
+GET        /all-clients/:irAgentId/:credentialId                                uk.gov.hmrc.corporationtax.controllers.manageClient.AllClientsController.getAllClients(irAgentId: String, credentialId: String, start: Int ?= 0, count: Int ?= 30, sort: Int ?= 0, order: String ?= "ASC")
