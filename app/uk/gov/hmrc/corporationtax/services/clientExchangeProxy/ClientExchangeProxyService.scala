@@ -17,20 +17,218 @@
 package uk.gov.hmrc.corporationtax.services.clientExchangeProxy
 
 import play.api.Logging
+import org.apache.pekko.actor.ActorSystem
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.connectors.clientExchangeProxy.ClientExchangeProxyConnector
-import uk.gov.hmrc.corporationtax.models.clientExchangeProxy.ClientExchangeProxyResponse
+import uk.gov.hmrc.corporationtax.models.clientExchangeProxy.ClientListDownloadStatusTransformed
+import uk.gov.hmrc.corporationtax.models.clientExchangeProxy.ClientListDownloadStatusTransformed.*
+import uk.gov.hmrc.corporationtax.models.clientExchangeProxy.AsynchronousProcessWaitTime
+import uk.gov.hmrc.corporationtax.services.ClientListDownloadStatusService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.duration.*
+import scala.collection.concurrent.TrieMap
 
-class ClientExchangeProxyService @Inject (connector: ClientExchangeProxyConnector) extends Logging {
+final case class ClientListDownloadFailedException(msg: String) extends RuntimeException(msg)
+final case class ClientListDownloadInProgressException(msg: String) extends RuntimeException(msg)
+final case class SystemException(msg: String) extends RuntimeException(msg)
+final case class NoBusinessIntervalsException(msg: String) extends RuntimeException(msg)
 
-  def initiateClientListDownload(
-    credentialId: String
-  )(implicit hc: HeaderCarrier): Future[ClientExchangeProxyResponse] = {
-    logger.info("Invoking connector to get the client list download ")
-    connector.initiateClientListDownload(credentialId)
-  }
+class ClientExchangeProxyService @Inject (
+  connector: ClientExchangeProxyConnector,
+  clientListDownloadStatusService: ClientListDownloadStatusService,
+  appConfig: AppConfig,
+  actorSystem: ActorSystem
+)(implicit ec: ExecutionContext)
+    extends Logging {
+
+  private val serviceName = appConfig.ctServiceName
+
+  // ------------------------------------------------------------
+  // Cache: wait plans per credentialId
+  // ------------------------------------------------------------
+
+  private val waitTimeCache: TrieMap[String, AsynchronousProcessWaitTime] = TrieMap.empty
+
+  private def cacheWaitTime(credentialId: String, waitTime: AsynchronousProcessWaitTime): Unit =
+    waitTimeCache.update(credentialId, waitTime)
+
+  private def getCachedWaitTime(credentialId: String): Option[AsynchronousProcessWaitTime] =
+    waitTimeCache.get(credentialId)
+
+  private def clearWaitTime(credentialId: String): Unit =
+    waitTimeCache.remove(credentialId)
+
+  private def defaultWaitPlan: AsynchronousProcessWaitTime =
+    AsynchronousProcessWaitTime(
+      browserIntervalMs = appConfig.ctDefaultBrowserIntervalMs,
+      businessIntervalsMs = appConfig.ctDefaultBusinessIntervalsMs
+    )
+
+  // ------------------------------------------------------------
+  // Helpers
+  // ------------------------------------------------------------
+
+  protected def sleep(ms: Long): Future[Unit] =
+    val p = Promise[Unit]()
+    actorSystem.scheduler.scheduleOnce(ms.millis)(p.success(()))
+    p.future
+
+  def getStatus(credId: String)(implicit hc: HeaderCarrier): Future[ClientListDownloadStatusTransformed] =
+    clientListDownloadStatusService.getClientListDownloadStatus(credId).map { response =>
+      response.status match {
+        case -1    => InitiateDownload
+        case 0     => InProgress
+        case 1     => Succeeded
+        case 2     => Failed
+        case other =>
+          logger.error(s"[DatacacheProxyConnector] unknown status '$other' from rds-datacache-proxy")
+          throw new RuntimeException(s"Unknown status '$other' from rds-datacache-proxy")
+      }
+    }
+
+  protected def logWaitPlan(business: Seq[Long], browserMs: Long): Unit =
+    logger.info(
+      s"""event="wait_plan" service="$serviceName" business_ms="${business.mkString(",")}" browser_ms=$browserMs"""
+    )
+
+  private def logStatus(context: String, index: Option[Int], status: ClientListDownloadStatusTransformed): Unit =
+    val indexString = index.map(i => s" index=$i").getOrElse("")
+    logger.info(s"""event="status" service="$serviceName" context="$context"$indexString value="${status.toString}"""")
+
+  // ------------------------------------------------------------
+  // Shared polling logic (business + browser phases)
+  // ------------------------------------------------------------
+
+  // CALLED IF STATUS IS INITIATE DOWNLOAD OR IN PROGRESS
+  private def processWithWaitPlan(
+    credentialId: String,
+    waitPlan: AsynchronousProcessWaitTime
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    val business = waitPlan.businessIntervalsMs
+    logWaitPlan(business, waitPlan.browserIntervalMs)
+
+    // BUSINESS PHASE
+    if business.isEmpty then
+      clearWaitTime(credentialId)
+      Future.failed(NoBusinessIntervalsException("No business intervals"))
+    else
+      def loop(index: Int): Future[Boolean] = // INDEX RELATED TO CURRENT INTERVAL BEING USED BY THE LOOP
+        if index >= business.length then
+          Future.successful(
+            false
+          ) // FIRST CHECKS THAT THERE ARE INTERVALS REMAINING TO RUN. IF AT THE END OF THE LIST THEN RETURNS FALSE AND MOVES TO BROWSER PHASE
+        else
+          for
+            _      <- sleep(business(index)) // WAITS FOR THE CURRENT INTERVAL INDEX TIME
+            status <- getStatus(credentialId) // CHECK STATUS AFTER WAIT
+            _       = logStatus("business", Some(index), status)
+            result <- status match
+                        case Succeeded =>
+                          clearWaitTime(credentialId)
+                          Future.successful(true)
+
+                        case Failed =>
+                          clearWaitTime(credentialId)
+                          Future.failed(ClientListDownloadFailedException("Failed"))
+
+                        case InProgress =>
+                          loop(index + 1) // RECURSION GOES BACK INTO THE LOOP FOR THE NEXT INTERVAL TIME
+
+                        case InitiateDownload =>
+                          if index < business.length - 1 then
+                            loop(
+                              index + 1
+                            ) // DOES NOT INITITATE ANOTHER DOWNLOAD BUT WAITS FOR ALL BSINTERVALS CHECKING STATUS
+                          else // IF INTERVALS ARE EXHAUSTED WAIT TIME IS CLEARED AND RETURNS FAILED
+                            clearWaitTime(credentialId)
+                            Future.failed(SystemException("Initiate on final business interval"))
+          yield result
+
+      for
+        businessSucceeded <- loop(0)
+        outcome           <-
+          // BROWSER PHASE: only when we exhaust business intervals with last status = InProgress
+          if businessSucceeded then Future.unit
+          else
+            for
+              _           <- sleep(waitPlan.browserIntervalMs)
+              status      <- getStatus(credentialId)
+              _            = logStatus("browser", None, status)
+              finalResult <- status match
+                               case Succeeded =>
+                                 clearWaitTime(credentialId)
+                                 Future.unit
+
+                               case Failed =>
+                                 clearWaitTime(credentialId)
+                                 Future.failed(ClientListDownloadFailedException("Failed after browser interval"))
+
+                               case InitiateDownload =>
+                                 clearWaitTime(credentialId)
+                                 Future.failed(SystemException("Initiate after browser interval"))
+
+                               case InProgress =>
+                                 clearWaitTime(credentialId)
+                                 Future.failed(ClientListDownloadInProgressException("Still in progress"))
+            yield finalResult
+      yield outcome
+
+  // ------------------------------------------------------------
+  // Entry point
+  // ------------------------------------------------------------
+
+  def process(credentialId: String)(implicit hc: HeaderCarrier): Future[ClientListDownloadStatusTransformed] =
+    val underlying: Future[Unit] =
+      getStatus(credentialId)
+        .flatMap { // STEP 1 CALL FOR STATUS SI2.6 - GET STATUS TRANSFORMS THE RESPONSE FROM INT TO VALUE
+          case Succeeded =>
+            logStatus("initial", None, Succeeded)
+            clearWaitTime(credentialId) // CLEAR ANY STORED POLLING INTERVALS
+            Future.unit // RETURNS SUCCESSFUL FUTURE NO POLLING ACTION REQUIRED
+
+          case Failed =>
+            logStatus("initial", None, Failed)
+            clearWaitTime(credentialId) // CLEAR ANY STORED POLLING INTERVALS
+            Future.failed(
+              ClientListDownloadFailedException("Failed")
+            ) // RETURNS FAILED FUTURE NO POLLING ACTION REQUIRED
+
+          case InProgress => // DOWNLOAD HAS ALREADY BEEN INITIATED
+            logStatus("initial", None, InProgress)
+            val waitPlan = getCachedWaitTime(credentialId).getOrElse(
+              defaultWaitPlan
+            ) // CHECKS FOR PREVIOUSLY STORED POLLING INTERVALS, IF EXISTS THEN REUSE, IF NOT USE DEFAULT
+            processWithWaitPlan(
+              credentialId,
+              waitPlan
+            ) // CHECKS STATUS ACCORDING TO WAIT PLAN - DOES NOT INITIATE ANOTHER DOWNLOAD
+
+          case InitiateDownload => //
+            logStatus("initial", None, InitiateDownload)
+
+            for
+              waitPlan <- connector.initiateClientListDownload(
+                            credentialId
+                          ) // INITIATES CLIENT LIST DOWNLOAD TO RETRIEVE POLLING INTERVALS
+              _         = cacheWaitTime(credentialId, waitPlan) // STORED INTERVALS
+              outcome  <- processWithWaitPlan(
+                            credentialId,
+                            waitPlan
+                          ) // STARTS POLLING I2.6 (keeps checking status) USING INTERVALS RETURNED BY I1.5
+            yield outcome // RETURNS RESULT OF POLLING PROCESS
+        }
+
+    underlying
+      .map(_ => Succeeded) // IF PROCESS RETURNS FUTURE SUCCESSFUL THEN THIS IS MAPPED TO A SUCCEEDED STATUS
+      .recover { // FUTURE FAILED ERRORS ARE PASSED FORWARD
+        case _: ClientListDownloadInProgressException => InProgress
+        case _: ClientListDownloadFailedException     => Failed
+        case e: SystemException                       =>
+          logger.error("[ClientListService][process] - client list download failed with system exception", e)
+          InitiateDownload
+      }
 
 }

@@ -18,6 +18,7 @@ package uk.gov.hmrc.corporationtax.controllers.clientExchangeProxy
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
+import org.scalatest.matchers.must.Matchers.mustBe
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.http.Status
@@ -26,9 +27,11 @@ import play.api.mvc.Result
 import play.api.test.Helpers
 import play.api.test.Helpers.*
 import uk.gov.hmrc.corporationtax.controllers.base.SpecBase
-import uk.gov.hmrc.corporationtax.models.clientExchangeProxy.ClientExchangeProxyResponse
-import uk.gov.hmrc.corporationtax.services.clientExchangeProxy.ClientExchangeProxyService
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.corporationtax.models.clientExchangeProxy.ClientListDownloadStatusTransformed
+import uk.gov.hmrc.corporationtax.services.clientExchangeProxy.{
+  ClientExchangeProxyService, NoBusinessIntervalsException
+}
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -39,51 +42,87 @@ class ClientExchangeProxyControllerSpec extends SpecBase {
     val mockService: ClientExchangeProxyService = mock[ClientExchangeProxyService]
 
     val controller = new ClientExchangeProxyController(cc, fakeIdentifierAction, mockService)
-
-    val response: ClientExchangeProxyResponse =
-      ClientExchangeProxyResponse(browserInterval = 3000, businessServiceInterval = 900)
-
   }
 
   "GET /initiateClientListDownload" should {
 
-    "return 200: OK" in new Setup {
+    "return 200: OK and status of 1 when service.process completes successfully" in new Setup {
 
-      when(mockService.initiateClientListDownload(any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(response))
+      val downloadStatus: ClientListDownloadStatusTransformed = ClientListDownloadStatusTransformed.Succeeded
+      when(mockService.process(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(downloadStatus))
 
       val result: Future[Result] = controller.initiateClientListDownload()(fakeRequest)
-      status(result) shouldBe Status.OK
 
-      contentAsJson(result) shouldBe Json.toJson(response)
+      status(result) mustBe Status.OK
 
-      verify(mockService).initiateClientListDownload(any())(any[HeaderCarrier])
+      contentAsJson(result) mustBe Json.obj("result" -> 1)
+
+      verify(mockService).process(any())(any[HeaderCarrier])
+
     }
 
-    "returns status code BAD_GATEWAY when Upstream error is returned" in new Setup {
-      val err: UpstreamErrorResponse =
-        UpstreamErrorResponse("Client Exchange Proxy service unavailable", BAD_GATEWAY, BAD_GATEWAY)
+    "return 200: OK and In Progress status when service.process throws ClientListDownloadInProgressException" in new Setup {
 
-      when(mockService.initiateClientListDownload(any())(any[HeaderCarrier]))
-        .thenReturn(Future.failed(err))
+      val downloadStatus: ClientListDownloadStatusTransformed = ClientListDownloadStatusTransformed.InProgress
+      when(mockService.process(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(downloadStatus))
 
       val result: Future[Result] = controller.initiateClientListDownload()(fakeRequest)
 
-      status(result) shouldBe BAD_GATEWAY
+      status(result) mustBe Status.OK
 
-      (contentAsJson(result) \ "message").as[String] shouldBe "Client Exchange Proxy service unavailable"
+      contentAsJson(result) mustBe Json.obj("result" -> 0)
+
+      verify(mockService).process(any())(any[HeaderCarrier])
+
     }
 
-    "return 500: INTERNAL_SERVER_ERROR" in new Setup {
-      when(mockService.initiateClientListDownload(any())(any[HeaderCarrier]))
-        .thenReturn(Future.failed(new RuntimeException("unexpected")))
+    "return 200: OK and In Progress status when service.process throws ClientListDownloadFailedException" in new Setup {
+
+      val downloadStatus: ClientListDownloadStatusTransformed = ClientListDownloadStatusTransformed.Failed
+      when(mockService.process(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(downloadStatus))
 
       val result: Future[Result] = controller.initiateClientListDownload()(fakeRequest)
 
-      status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
-      (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve clientExchangeProxyResponse"
+      status(result) mustBe Status.OK
 
-      verify(mockService).initiateClientListDownload(any())(any[HeaderCarrier])
+      contentAsJson(result) mustBe Json.obj("result" -> 2)
+
+      verify(mockService).process(any())(any[HeaderCarrier])
+
+    }
+
+    "return 200: OK and Initiate download status when service.process throws SystemException" in new Setup {
+
+      val downloadStatus: ClientListDownloadStatusTransformed = ClientListDownloadStatusTransformed.InitiateDownload
+      when(mockService.process(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(downloadStatus))
+
+      val result: Future[Result] = controller.initiateClientListDownload()(fakeRequest)
+
+      status(result) mustBe Status.OK
+
+      contentAsJson(result) mustBe Json.obj("result" -> -1)
+
+      verify(mockService).process(any())(any[HeaderCarrier])
+
+    }
+
+    "return 500: InternalServerError and System Error status when service.process throws NoBusinessIntervalsException" in new Setup {
+
+      when(mockService.process(any())(any[HeaderCarrier]))
+        .thenReturn(Future.failed(NoBusinessIntervalsException("no business intervals")))
+
+      val result: Future[Result] = controller.initiateClientListDownload()(fakeRequest)
+
+      status(result) mustBe Status.INTERNAL_SERVER_ERROR
+
+      contentAsJson(result) mustBe Json.obj("result" -> "system-error")
+
+      verify(mockService).process(any())(any[HeaderCarrier])
+
     }
 
   }

@@ -16,68 +16,444 @@
 
 package uk.gov.hmrc.corporationtax.services.clientExchangeProxy
 
+import uk.gov.hmrc.corporationtax.controllers.base.SpecBase
+import org.mockito.Mockito.*
+import org.apache.pekko.actor.ActorSystem
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.matchers.should.Matchers
+import uk.gov.hmrc.corporationtax.config.AppConfig
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
-import play.api.mvc.ControllerComponents
-import play.api.test.Helpers.stubControllerComponents
+import uk.gov.hmrc.corporationtax.models.ClientDownloadStatus
 import uk.gov.hmrc.corporationtax.connectors.clientExchangeProxy.ClientExchangeProxyConnector
-import uk.gov.hmrc.corporationtax.models.clientExchangeProxy.ClientExchangeProxyResponse
+import uk.gov.hmrc.corporationtax.models.clientExchangeProxy.{
+  AsynchronousProcessWaitTime, ClientListDownloadStatusTransformed
+}
+import uk.gov.hmrc.corporationtax.services.ClientListDownloadStatusService
 import uk.gov.hmrc.http.HeaderCarrier
+import scala.collection.concurrent.TrieMap
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ClientExchangeProxyServiceSpec extends AnyWordSpec with Matchers with ScalaFutures with MockitoSugar {
+class ClientExchangeProxyServiceSpec extends SpecBase {
 
-  private trait BaseSetup {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+  private val appConfig: AppConfig     = app.injector.instanceOf[AppConfig]
+  private val actorSystem: ActorSystem = app.injector.instanceOf[ActorSystem]
 
-    private val cc: ControllerComponents = stubControllerComponents()
-    implicit val ec: ExecutionContext    = cc.executionContext
+  class TestClientListService(
+    clientExchangeProxyConnector: ClientExchangeProxyConnector,
+    clientListDownloadStatusService: ClientListDownloadStatusService
+  )(implicit ec: ExecutionContext)
+      extends ClientExchangeProxyService(
+        clientExchangeProxyConnector,
+        clientListDownloadStatusService,
+        appConfig,
+        actorSystem
+      ) {
 
-    val mockConnector: ClientExchangeProxyConnector = mock[ClientExchangeProxyConnector]
-    val service                                     = new ClientExchangeProxyService(mockConnector)
+    // capture the wait plan actually used by processWithWaitPlan
+    @volatile var lastWaitPlan: Option[AsynchronousProcessWaitTime] = None
 
-    val response: ClientExchangeProxyResponse =
-      ClientExchangeProxyResponse(browserInterval = 3000, businessServiceInterval = 900)
+    override protected def sleep(ms: Long): Future[Unit] =
+      Future.unit
 
-    val credentialId: String = "123456"
+    override protected def logWaitPlan(business: Seq[Long], browserMs: Long): Unit =
+      super.logWaitPlan(business, browserMs)
+      lastWaitPlan = Some(
+        AsynchronousProcessWaitTime(
+          browserIntervalMs = browserMs,
+          businessIntervalsMs = business.toList
+        )
+      )
   }
 
-  "ClientExchangeProxyService.initiateClientListDownload" should {
+  private def setupService(
+    clientExchangeProxyConnector: ClientExchangeProxyConnector = mock[ClientExchangeProxyConnector],
+    clientListDownloadStatusService: ClientListDownloadStatusService = mock[ClientListDownloadStatusService]
+  ): (TestClientListService, ClientExchangeProxyConnector, ClientListDownloadStatusService) = {
 
-    "delegate to connector and successfully return ClientExchangeProxyResponse" in new BaseSetup {
-      when(mockConnector.initiateClientListDownload(any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(response))
+    val service = new TestClientListService(clientExchangeProxyConnector, clientListDownloadStatusService)
+    (service, clientExchangeProxyConnector, clientListDownloadStatusService)
+  }
 
-      val result: ClientExchangeProxyResponse = service.initiateClientListDownload(credentialId).futureValue
+  private def waitTimeCacheOf(service: ClientExchangeProxyService): TrieMap[String, AsynchronousProcessWaitTime] = {
+    val field = classOf[ClientExchangeProxyService].getDeclaredField("waitTimeCache")
+    field.setAccessible(true)
+    field.get(service).asInstanceOf[TrieMap[String, AsynchronousProcessWaitTime]]
+  }
 
-      result shouldBe response
+  "ClientExchangeProxyService.process" should {
 
-      verify(mockConnector).initiateClientListDownload(any())(any[HeaderCarrier])
+    "return Succeeded status when initial status equals 1" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
 
-      verify(mockConnector, times(1)).initiateClientListDownload(any())(any[HeaderCarrier])
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(Future.successful(ClientDownloadStatus(status = 1)))
+
+      val status = service.process("cred-1").futureValue
+      status shouldBe ClientListDownloadStatusTransformed.Succeeded
 
     }
 
-    "propagate any errors or exceptions from connector" in new BaseSetup {
+    "return Failed status when initial status equals 2" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
 
-      when(mockConnector.initiateClientListDownload(any())(any[HeaderCarrier]))
-        .thenReturn(Future.failed(new RuntimeException("boom")))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(Future.successful(ClientDownloadStatus(status = 2)))
 
-      val ex: RuntimeException = intercept[RuntimeException] {
-        service.initiateClientListDownload(credentialId).futureValue
+      val exception = service.process("cred-1").futureValue
+
+      exception shouldBe ClientListDownloadStatusTransformed.Failed
+    }
+
+    "InitiateDownload status should call clientExchangeProxyConnector once to fetch wait plan" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(Future.successful(ClientDownloadStatus(status = -1)))
+
+      val waitPlan = AsynchronousProcessWaitTime(
+        browserIntervalMs = 1000L,
+        businessIntervalsMs = List(100L)
+      )
+
+      when(clientExchangeProxyConnector.initiateClientListDownload(any)(any))
+        .thenReturn(Future.successful(waitPlan))
+
+      whenReady(service.process("cred-1")) { _ =>
+        verify(clientExchangeProxyConnector, times(1)).initiateClientListDownload(any)(any)
+      }
+    }
+
+    "InitiateDownload status with no business intervals should throw NoBusinessIntervalsException" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(Future.successful(ClientDownloadStatus(status = -1)))
+
+      val waitPlan = AsynchronousProcessWaitTime(
+        browserIntervalMs = 1000L,
+        businessIntervalsMs = Nil
+      )
+
+      when(clientExchangeProxyConnector.initiateClientListDownload(any)(any))
+        .thenReturn(Future.successful(waitPlan))
+
+      val ex = service.process("cred-1").failed.futureValue
+
+      ex shouldBe a[NoBusinessIntervalsException]
+    }
+
+    "should call clientListDownloadStatusService after each business interval" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
+
+      val businessIntervals = List(10L, 20L, 30L)
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(
+          Future.successful(ClientDownloadStatus(status = -1)),
+          Future.successful(ClientDownloadStatus(status = 0)),
+          Future.successful(ClientDownloadStatus(status = 0)),
+          Future.successful(ClientDownloadStatus(status = 1))
+        )
+      val waitPlan = AsynchronousProcessWaitTime(
+        browserIntervalMs = 1000L,
+        businessIntervalsMs = businessIntervals
+      )
+
+      when(clientExchangeProxyConnector.initiateClientListDownload(any)(any))
+        .thenReturn(Future.successful(waitPlan))
+
+      whenReady(service.process("cred-1")) { _ =>
+        verify(clientListDownloadStatusService, times(4)).getClientListDownloadStatus(any)(any)
+      }
+    }
+
+    "terminal status equals 1 during business phase should abort loop and return Succeeded status" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
+
+      val waitPlan = AsynchronousProcessWaitTime(
+        browserIntervalMs = 1000L,
+        businessIntervalsMs = List(10L, 20L)
+      )
+
+      when(clientExchangeProxyConnector.initiateClientListDownload(any)(any))
+        .thenReturn(Future.successful(waitPlan))
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(
+          Future.successful(ClientDownloadStatus(status = -1)),
+          Future.successful(ClientDownloadStatus(status = 1))
+        )
+
+      whenReady(service.process("cred-1")) { _ =>
+        verify(clientListDownloadStatusService, times(2)).getClientListDownloadStatus(any)(any)
       }
 
-      ex.getMessage should include("boom")
+      val status = service.process("cred-1").futureValue
+      status shouldBe ClientListDownloadStatusTransformed.Succeeded
+    }
 
-      verify(mockConnector, times(1)).initiateClientListDownload(any())(any[HeaderCarrier])
+    "terminal status equals 2 during business phase should abort loop and return Failed status" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
 
+      val waitPlan = AsynchronousProcessWaitTime(
+        browserIntervalMs = 1000L,
+        businessIntervalsMs = List(10L, 20L)
+      )
+
+      when(clientExchangeProxyConnector.initiateClientListDownload(any)(any))
+        .thenReturn(Future.successful(waitPlan))
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(
+          Future.successful(ClientDownloadStatus(status = -1)),
+          Future.successful(ClientDownloadStatus(status = 2))
+        )
+
+      whenReady(service.process("cred-1")) { _ =>
+        verify(clientListDownloadStatusService, times(2)).getClientListDownloadStatus(any)(any)
+      }
+
+      val status = service.process("cred-1").futureValue
+      status shouldBe ClientListDownloadStatusTransformed.Failed
+    }
+
+    "return InitiateDownload status when status equals -1 returned after final business interval" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
+
+      val waitPlan = AsynchronousProcessWaitTime(
+        browserIntervalMs = 1000L,
+        businessIntervalsMs = List(10L, 20L)
+      )
+
+      when(clientExchangeProxyConnector.initiateClientListDownload(any)(any))
+        .thenReturn(Future.successful(waitPlan))
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(
+          Future.successful(ClientDownloadStatus(status = -1)),
+          Future.successful(ClientDownloadStatus(status = 0)),
+          Future.successful(ClientDownloadStatus(status = -1))
+        )
+
+      whenReady(service.process("cred-1")) { _ =>
+        verify(clientListDownloadStatusService, times(3)).getClientListDownloadStatus(any)(any)
+      }
+
+      val status = service.process("cred-1").futureValue
+
+      status shouldBe ClientListDownloadStatusTransformed.InitiateDownload
+    }
+
+    "return InProgress status when status equals 0 returned after browser wait" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
+
+      val waitPlan = AsynchronousProcessWaitTime(
+        browserIntervalMs = 1000L,
+        businessIntervalsMs = List(10L, 20L)
+      )
+
+      when(clientExchangeProxyConnector.initiateClientListDownload(any)(any))
+        .thenReturn(Future.successful(waitPlan))
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(
+          Future.successful(ClientDownloadStatus(status = -1)),
+          Future.successful(ClientDownloadStatus(status = 0)),
+          Future.successful(ClientDownloadStatus(status = 0)),
+          Future.successful(ClientDownloadStatus(status = 0))
+        )
+
+      whenReady(service.process("cred-1")) { _ =>
+        verify(clientListDownloadStatusService, times(4)).getClientListDownloadStatus(any)(any)
+      }
+
+      val status = service.process("cred-1").futureValue
+
+      status shouldBe ClientListDownloadStatusTransformed.InProgress
+    }
+
+    "return InitiateDownload status when status of -1 returned after browser wait" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
+
+      val waitPlan = AsynchronousProcessWaitTime(
+        browserIntervalMs = 1000L,
+        businessIntervalsMs = List(10L, 20L)
+      )
+
+      when(clientExchangeProxyConnector.initiateClientListDownload(any)(any))
+        .thenReturn(Future.successful(waitPlan))
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(
+          Future.successful(ClientDownloadStatus(status = -1)),
+          Future.successful(ClientDownloadStatus(status = 0)),
+          Future.successful(ClientDownloadStatus(status = 0)),
+          Future.successful(ClientDownloadStatus(status = -1))
+        )
+
+      whenReady(service.process("cred-1")) { _ =>
+        verify(clientListDownloadStatusService, times(4)).getClientListDownloadStatus(any)(any)
+      }
+
+      val status = service.process("cred-1").futureValue
+
+      status shouldBe ClientListDownloadStatusTransformed.InitiateDownload
+    }
+
+    "initial InProgress should use cached intervals when present" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
+
+      val cachedPlan = AsynchronousProcessWaitTime(
+        browserIntervalMs = 9999L,
+        businessIntervalsMs = List(111L, 222L)
+      )
+
+      val cache = waitTimeCacheOf(service)
+      cache.update("cred-1", cachedPlan)
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(
+          Future.successful(ClientDownloadStatus(status = 0)),
+          Future.successful(ClientDownloadStatus(status = 0)),
+          Future.successful(ClientDownloadStatus(status = 1))
+        )
+
+      whenReady(service.process("cred-1")) { _ =>
+        verify(clientExchangeProxyConnector, never()).initiateClientListDownload(any[String])(any[HeaderCarrier])
+        service.lastWaitPlan shouldBe Some(cachedPlan)
+      }
+    }
+
+    "initial InProgress should use default intervals when no cached plan exists" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
+
+      val cache = waitTimeCacheOf(service)
+      cache.remove("cred-2")
+
+      val defaultPlan = AsynchronousProcessWaitTime(
+        browserIntervalMs = appConfig.ctDefaultBrowserIntervalMs,
+        businessIntervalsMs = appConfig.ctDefaultBusinessIntervalsMs
+      )
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(
+          Future.successful(ClientDownloadStatus(status = 0)),
+          Future.successful(ClientDownloadStatus(status = 0)),
+          Future.successful(ClientDownloadStatus(status = 0)),
+          Future.successful(ClientDownloadStatus(status = 1))
+        )
+
+      whenReady(service.process("cred-2")) { _ =>
+        verify(clientExchangeProxyConnector, never()).initiateClientListDownload(any[String])(any[HeaderCarrier])
+        service.lastWaitPlan shouldBe Some(defaultPlan)
+      }
+    }
+
+    "initial InProgress should follow business and browser phases same as InitiateDownload" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
+
+      val cache = waitTimeCacheOf(service)
+      cache.remove("cred-1")
+
+      val defaultPlan = AsynchronousProcessWaitTime(
+        browserIntervalMs = appConfig.ctDefaultBrowserIntervalMs,
+        businessIntervalsMs = appConfig.ctDefaultBusinessIntervalsMs
+      )
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(
+          Future.successful(ClientDownloadStatus(status = 0)),
+          Future.successful(ClientDownloadStatus(status = 0)),
+          Future.successful(ClientDownloadStatus(status = 0)),
+          Future.successful(ClientDownloadStatus(status = 0))
+        )
+
+      val status = service.process("cred-1").futureValue
+
+      status shouldBe ClientListDownloadStatusTransformed.InProgress
+      verify(clientExchangeProxyConnector, never()).initiateClientListDownload(any)(any)
+
+      service.lastWaitPlan shouldBe Some(defaultPlan)
+      verify(clientListDownloadStatusService, times(4)).getClientListDownloadStatus(any)(any)
+    }
+
+  }
+
+  "ClientExchangeProxyService.getStatus" should {
+
+    "map a getClientListDownloadStatus of -1 to InitiateDownload" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(Future.successful(ClientDownloadStatus(status = -1)))
+
+      val result = service.getStatus("cred-1").futureValue
+
+      result shouldBe ClientListDownloadStatusTransformed.InitiateDownload
+    }
+
+    "map a getClientListDownloadStatus of 0 to InProgress" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(Future.successful(ClientDownloadStatus(status = 0)))
+
+      val result = service.getStatus("cred-1").futureValue
+
+      result shouldBe ClientListDownloadStatusTransformed.InProgress
+    }
+
+    "map a getClientListDownloadStatus of 1 to Succeeded" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(Future.successful(ClientDownloadStatus(status = 1)))
+
+      val result = service.getStatus("cred-1").futureValue
+
+      result shouldBe ClientListDownloadStatusTransformed.Succeeded
+    }
+
+    "map a getClientListDownloadStatus of 2 to Failed" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(Future.successful(ClientDownloadStatus(status = 2)))
+
+      val result = service.getStatus("cred-1").futureValue
+
+      result shouldBe ClientListDownloadStatusTransformed.Failed
+    }
+
+    "throw new runtime exception when an unknown getClientListDownloadStatus value is returned" in {
+      implicit val hc: HeaderCarrier                                               = HeaderCarrier()
+      val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
+
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+        .thenReturn(Future.successful(ClientDownloadStatus(status = 50)))
+
+      val exception = service.getStatus("cred-1").failed.futureValue
+
+      exception            shouldBe a[RuntimeException]
+      exception.getMessage shouldBe "Unknown status '50' from rds-datacache-proxy"
     }
 
   }

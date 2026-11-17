@@ -20,8 +20,7 @@ import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.corporationtax.controllers.actions.IdentifierAction
-import uk.gov.hmrc.corporationtax.services.clientExchangeProxy.ClientExchangeProxyService
-import uk.gov.hmrc.http.UpstreamErrorResponse
+import uk.gov.hmrc.corporationtax.services.clientExchangeProxy.*
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
@@ -36,18 +35,13 @@ class ClientExchangeProxyController @Inject() (
     with Logging {
 
   def initiateClientListDownload(): Action[AnyContent] = auth.async { implicit request =>
+    println(s"CREDENTIAL ID ${request.credentialId}")
     service
-      .initiateClientListDownload(request.credentialId)
-      .map { response =>
-        Ok(Json.toJson(response))
-      }
-      .recover {
-        case u: UpstreamErrorResponse =>
-          Status(u.statusCode)(Json.obj("message" -> u.message))
-        case t: Throwable             =>
-          logger.error("Error while retrieving ClientExchangeProxyResponse", t)
-          InternalServerError(Json.obj("error" -> "Failed to retrieve clientExchangeProxyResponse"))
+      .process(request.credentialId)
+      .map(status => Ok(Json.obj("result" -> status.asInt)))
+      .recover { case e: NoBusinessIntervalsException =>
+        logger.error("[ClientListController][start] - no business intervals found", e)
+        InternalServerError(Json.obj("result" -> "system-error"))
       }
   }
-
 }
