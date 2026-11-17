@@ -44,7 +44,7 @@ class AllClientsConnectorISpec
   "getAllClients" should {
 
     def url(irAgentId: String, credentialId: String, start: Int, count: Int, sort: Int, order: String) =
-      s"${appConfig.rdsDatacacheProxyEndpoint}/all-clients/$irAgentId/$credentialId"
+      s"${appConfig.rdsDatacacheProxyEndpoint}/all-clients/$irAgentId/$credentialId?start=$start&count=$count&sort=$sort&order=$order"
 
     "return successful response of all clients" in {
       stubFor(
@@ -138,6 +138,41 @@ class AllClientsConnectorISpec
 
       val result = connector.getAllClients("irAgentId3", "credentialId3", 0, 30, 0, "ASC").futureValue
       result mustBe multipleItemsClientNameAllClients
+    }
+
+    "return all clients with non default params" in {
+      stubFor(
+        get(urlEqualTo(url("irAgentId4", "credentialId4", 0, 30, 2, "DESC")))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                s"""{
+                   |  "clientCount": 100,
+                   |  "clientList": [
+                   |    {
+                   |      "utr": "12345",
+                   |      "companyRegNo": "01234A",
+                   |      "companyName": "ABC Limited",
+                   |      "agentOwnRef": "ABC10"
+                   |    },
+                   |    {
+                   |      "utr": "67890",
+                   |      "companyRegNo": "6789B",
+                   |      "companyName": "DEF Limited",
+                   |      "agentOwnRef": "DEF10"
+                   |    }
+                   |  ],
+                   |  "clientNameStartChars": [
+                   |    "D"
+                   |  ]
+                   |}""".stripMargin
+              )
+          )
+      )
+
+      val result = connector.getAllClients("irAgentId4", "credentialId4", 0, 30, 2, "DESC").futureValue
+      result mustBe multipleClientListAllClients
     }
 
     "return INTERNAL_ERROR when service failed" in {

@@ -36,7 +36,7 @@ class AllClientsConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(i
     hc: HeaderCarrier
   ): Future[AllClients] = {
     val url: URL =
-      url"${appConfig.rdsDatacacheProxyFullUrl}/all-clients/$irAgentId/$credentialId"
+      url"${appConfig.rdsDatacacheProxyFullUrl}/all-clients/$irAgentId/$credentialId?start=$start&count=$count&sort=$sort&order=$order"
 
     http
       .get(url)
