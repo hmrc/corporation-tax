@@ -103,5 +103,22 @@ class CommonDataConnectorISpec
 
       ex.getMessage must include("400")
     }
+
+    "return RuntimeException when response contains invalid JSON" in {
+      stubFor(
+        get(urlPathEqualTo(url))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("invalid json")
+          )
+      )
+
+      val ex = intercept[RuntimeException] {
+        connector.getCommonData().futureValue
+      }
+      ex.getMessage must not be empty
+    }
+
   }
 }
