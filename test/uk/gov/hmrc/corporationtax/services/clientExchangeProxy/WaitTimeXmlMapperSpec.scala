@@ -21,7 +21,6 @@ import org.scalatest.OptionValues
 import org.scalatest.matchers.must.Matchers.mustBe
 import uk.gov.hmrc.corporationtax.models.clientExchangeProxy.AsynchronousProcessWaitTime
 
-
 class WaitTimeXmlMapperSpec extends SpecBase with OptionValues {
 
   "WaitTimeXmlMapper.parse" should {

@@ -115,15 +115,15 @@ class ClientExchangeProxyService @Inject (
       clearWaitTime(credentialId)
       Future.failed(NoBusinessIntervalsException("No business intervals"))
     else
-      def loop(index: Int): Future[Boolean] = // INDEX RELATED TO CURRENT INTERVAL BEING USED BY THE LOOP
+      def loop(index: Int): Future[Boolean] =
         if index >= business.length then
           Future.successful(
             false
-          ) // FIRST CHECKS THAT THERE ARE INTERVALS REMAINING TO RUN. IF AT THE END OF THE LIST THEN RETURNS FALSE AND MOVES TO BROWSER PHASE
+          )
         else
           for
-            _      <- sleep(business(index)) // WAITS FOR THE CURRENT INTERVAL INDEX TIME
-            status <- getStatus(credentialId) // CHECK STATUS AFTER WAIT
+            _      <- sleep(business(index))
+            status <- getStatus(credentialId)
             _       = logStatus("business", Some(index), status)
             result <- status match
                         case Succeeded =>
@@ -135,14 +135,14 @@ class ClientExchangeProxyService @Inject (
                           Future.failed(ClientListDownloadFailedException("Failed"))
 
                         case InProgress =>
-                          loop(index + 1) // RECURSION GOES BACK INTO THE LOOP FOR THE NEXT INTERVAL TIME
+                          loop(index + 1)
 
                         case InitiateDownload =>
                           if index < business.length - 1 then
                             loop(
                               index + 1
-                            ) // DOES NOT INITITATE ANOTHER DOWNLOAD BUT WAITS FOR ALL BSINTERVALS CHECKING STATUS
-                          else // IF INTERVALS ARE EXHAUSTED WAIT TIME IS CLEARED AND RETURNS FAILED
+                            )
+                          else
                             clearWaitTime(credentialId)
                             Future.failed(SystemException("Initiate on final business interval"))
           yield result
@@ -150,7 +150,6 @@ class ClientExchangeProxyService @Inject (
       for
         businessSucceeded <- loop(0)
         outcome           <-
-          // BROWSER PHASE: only when we exhaust business intervals with last status = InProgress
           if businessSucceeded then Future.unit
           else
             for
@@ -183,47 +182,47 @@ class ClientExchangeProxyService @Inject (
   def process(credentialId: String)(implicit hc: HeaderCarrier): Future[ClientListDownloadStatusTransformed] =
     val underlying: Future[Unit] =
       getStatus(credentialId)
-        .flatMap { // STEP 1 CALL FOR STATUS SI2.6 - GET STATUS TRANSFORMS THE RESPONSE FROM INT TO VALUE
+        .flatMap {
           case Succeeded =>
             logStatus("initial", None, Succeeded)
-            clearWaitTime(credentialId) // CLEAR ANY STORED POLLING INTERVALS
-            Future.unit // RETURNS SUCCESSFUL FUTURE NO POLLING ACTION REQUIRED
+            clearWaitTime(credentialId)
+            Future.unit
 
           case Failed =>
             logStatus("initial", None, Failed)
-            clearWaitTime(credentialId) // CLEAR ANY STORED POLLING INTERVALS
+            clearWaitTime(credentialId)
             Future.failed(
               ClientListDownloadFailedException("Failed")
-            ) // RETURNS FAILED FUTURE NO POLLING ACTION REQUIRED
+            )
 
-          case InProgress => // DOWNLOAD HAS ALREADY BEEN INITIATED
+          case InProgress =>
             logStatus("initial", None, InProgress)
             val waitPlan = getCachedWaitTime(credentialId).getOrElse(
               defaultWaitPlan
-            ) // CHECKS FOR PREVIOUSLY STORED POLLING INTERVALS, IF EXISTS THEN REUSE, IF NOT USE DEFAULT
+            )
             processWithWaitPlan(
               credentialId,
               waitPlan
-            ) // CHECKS STATUS ACCORDING TO WAIT PLAN - DOES NOT INITIATE ANOTHER DOWNLOAD
+            )
 
-          case InitiateDownload => //
+          case InitiateDownload =>
             logStatus("initial", None, InitiateDownload)
 
             for
               waitPlan <- connector.initiateClientListDownload(
                             credentialId
-                          ) // INITIATES CLIENT LIST DOWNLOAD TO RETRIEVE POLLING INTERVALS
-              _         = cacheWaitTime(credentialId, waitPlan) // STORED INTERVALS
+                          )
+              _         = cacheWaitTime(credentialId, waitPlan)
               outcome  <- processWithWaitPlan(
                             credentialId,
                             waitPlan
-                          ) // STARTS POLLING I2.6 (keeps checking status) USING INTERVALS RETURNED BY I1.5
-            yield outcome // RETURNS RESULT OF POLLING PROCESS
+                          )
+            yield outcome
         }
 
     underlying
-      .map(_ => Succeeded) // IF PROCESS RETURNS FUTURE SUCCESSFUL THEN THIS IS MAPPED TO A SUCCEEDED STATUS
-      .recover { // FUTURE FAILED ERRORS ARE PASSED FORWARD
+      .map(_ => Succeeded)
+      .recover {
         case _: ClientListDownloadInProgressException => InProgress
         case _: ClientListDownloadFailedException     => Failed
         case e: SystemException                       =>

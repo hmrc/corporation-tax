@@ -35,7 +35,6 @@ class ClientExchangeProxyController @Inject() (
     with Logging {
 
   def initiateClientListDownload(): Action[AnyContent] = auth.async { implicit request =>
-    println(s"CREDENTIAL ID ${request.credentialId}")
     service
       .process(request.credentialId)
       .map(status => Ok(Json.obj("result" -> status.asInt)))
