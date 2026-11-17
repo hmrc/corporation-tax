@@ -107,11 +107,9 @@ class PaymentsOnAccountService @Inject (
     evaluateEachPaymentsOnAccountRow(paymentPostings.paymentPostingResults)
   }
 
-  // Done
   private[payments] def accPeriodEqualsZero(accPeriod: Long): Boolean =
     accPeriod == zeroAccPeriod
 
-  // Done
   private[payments] def applyReallocationsMayBeRepayments(
     matchingAccPeriodRecord: Option[AccountingPeriodList],
     currentPosting: PaymentPostingRow,
@@ -152,8 +150,8 @@ class PaymentsOnAccountService @Inject (
         }
       }
       .toList
-
     paymentPostings.copy(paymentPostingResults = combinedRows)
+
   }
 
   private[payments] def hasInterestChargesOrPenalties(
@@ -183,14 +181,12 @@ class PaymentsOnAccountService @Inject (
   ): PaymentPostingRow =
     addToCurrentPaymentPostingRow(currentPosting, rfrPosting)
 
-  // Done
   private def applyRepayments(
     currentPosting: PaymentPostingRow,
     rtrPosting: PostingSummaryByTypeResponse
   ): PaymentPostingRow =
     addToCurrentPaymentPostingRow(currentPosting, rtrPosting)
 
-  // Done
   private[payments] def addToCurrentPaymentPostingRow(
     currentPosting: PaymentPostingRow,
     repaymentsOrReallocations: PostingSummaryByTypeResponse

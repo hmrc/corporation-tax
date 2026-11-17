@@ -17,7 +17,7 @@
 package uk.gov.hmrc.corporationtax.services.payments
 
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{times, verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{times, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -906,6 +906,515 @@ class PaymentsOnAccountServiceSpec extends AnyWordSpec with Matchers with ScalaF
             )
           )
         )
+
+        verify(mockPaymentPostingService, times(1)).getPaymentPostings(any())(any[HeaderCarrier])
+        verify(mockPostingSummaryByType, times(1)).getPostingSummaryByType(any(), eqTo(rfrPostingType))(
+          any[HeaderCarrier]
+        )
+        verify(mockPostingSummaryByType, times(1)).getPostingSummaryByType(any(), eqTo(repPostingType))(
+          any[HeaderCarrier]
+        )
+        verify(mockInterestChargeService, times(1)).getInterestChargesSummary(any())(any[HeaderCarrier])
+        verify(mockAllAccountingPeriodsService, times(1)).getAccountingPeriodList(any())(any[HeaderCarrier])
+
+        verifyNoMoreInteractions(mockPaymentPostingService)
+        verifyNoMoreInteractions(mockPostingSummaryByType)
+        verifyNoMoreInteractions(mockInterestChargeService)
+        verifyNoMoreInteractions(mockAllAccountingPeriodsService)
+
+      }
+      "return exception when BE call fails for PaymentPostingsService" in new BaseSetup {
+        val rfrResponse: PostingSummaryByTypeResponse = PostingSummaryByTypeResponse(
+          postingSummary = List(
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56L),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("-15000.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202302),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("2000.50")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202303),
+              settlementSequenceNo = BigDecimal(2),
+              postingAmountSum = BigDecimal("800.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202306),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("-250.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("100.00")
+            )
+          )
+        )
+
+        val repResponse: PostingSummaryByTypeResponse = PostingSummaryByTypeResponse(
+          postingSummary = List(
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("3000.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202307),
+              settlementSequenceNo = BigDecimal(2),
+              postingAmountSum = BigDecimal("675.40")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("15.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202306),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("-950.43")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("100.00")
+            )
+          )
+        )
+
+        val interestCharges: InterestCharges =
+          InterestCharges(
+            List(
+              InterestChargesResponse(
+                accountingPeriod = BigDecimal(56),
+                interestChargeSummary = BigDecimal(123.45)
+              ),
+              InterestChargesResponse(
+                accountingPeriod = BigDecimal(145),
+                interestChargeSummary = BigDecimal(987.45)
+              )
+            )
+          )
+
+        val allAccountingPeriods: AllAccountingPeriods = AllAccountingPeriods(
+          List(
+            AccountingPeriodList(
+              accountingPeriod = BigDecimal(56),
+              apEndDate = LocalDate.of(2025, 8, 24),
+              taxChargePresent = true,
+              penaltyTotal = BigDecimal(20)
+            ),
+            AccountingPeriodList(
+              accountingPeriod = BigDecimal(30),
+              apEndDate = LocalDate.of(2025, 8, 24),
+              taxChargePresent = false,
+              penaltyTotal = BigDecimal(30)
+            ),
+            AccountingPeriodList(
+              accountingPeriod = BigDecimal(0),
+              apEndDate = LocalDate.of(2025, 8, 24),
+              taxChargePresent = false,
+              penaltyTotal = BigDecimal(30)
+            )
+          )
+        )
+
+        when(mockPaymentPostingService.getPaymentPostings(any())(any[HeaderCarrier]))
+          .thenReturn(Future.failed(new RuntimeException("Boom")))
+        when(mockPostingSummaryByType.getPostingSummaryByType(any(), eqTo(rfrPostingType))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(rfrResponse))
+        when(mockPostingSummaryByType.getPostingSummaryByType(any(), eqTo(repPostingType))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(repResponse))
+        when(mockInterestChargeService.getInterestChargesSummary(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(interestCharges))
+        when(mockAllAccountingPeriodsService.getAccountingPeriodList(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(allAccountingPeriods))
+
+        val ex = intercept[Exception] {
+          service.getPaymentsOnAccount(taxReference).futureValue
+        }
+
+        ex.getMessage should include("Boom")
+
+        verify(mockPaymentPostingService, times(1)).getPaymentPostings(any())(any[HeaderCarrier])
+
+        verifyNoMoreInteractions(mockPaymentPostingService)
+        verifyNoInteractions(mockPostingSummaryByType)
+        verifyNoInteractions(mockInterestChargeService)
+        verifyNoInteractions(mockAllAccountingPeriodsService)
+
+      }
+      "return exception when BE call fails for PostingSummaryByTypeService" in new BaseSetup {
+        val paymentPosting: PaymentPostingsResponse   = PaymentPostingsResponse(
+          List(
+            PaymentPostingRow(
+              accountingPeriod = 56L,
+              settlementSequenceNo = 1L,
+              payslipId = 94L,
+              postingAmount = 60000.00,
+              effectiveDateOfPayment = LocalDate.of(2024, 9, 15),
+              paymentType = "BAC"
+            )
+          )
+        )
+        val rfrResponse: PostingSummaryByTypeResponse = PostingSummaryByTypeResponse(
+          postingSummary = List(
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56L),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("-15000.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202302),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("2000.50")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202303),
+              settlementSequenceNo = BigDecimal(2),
+              postingAmountSum = BigDecimal("800.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202306),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("-250.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("100.00")
+            )
+          )
+        )
+
+        val repResponse: PostingSummaryByTypeResponse = PostingSummaryByTypeResponse(
+          postingSummary = List(
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("3000.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202307),
+              settlementSequenceNo = BigDecimal(2),
+              postingAmountSum = BigDecimal("675.40")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("15.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202306),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("-950.43")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("100.00")
+            )
+          )
+        )
+
+        val interestCharges: InterestCharges =
+          InterestCharges(
+            List(
+              InterestChargesResponse(
+                accountingPeriod = BigDecimal(56),
+                interestChargeSummary = BigDecimal(123.45)
+              ),
+              InterestChargesResponse(
+                accountingPeriod = BigDecimal(145),
+                interestChargeSummary = BigDecimal(987.45)
+              )
+            )
+          )
+
+        val allAccountingPeriods: AllAccountingPeriods = AllAccountingPeriods(
+          List(
+            AccountingPeriodList(
+              accountingPeriod = BigDecimal(56),
+              apEndDate = LocalDate.of(2025, 8, 24),
+              taxChargePresent = true,
+              penaltyTotal = BigDecimal(20)
+            ),
+            AccountingPeriodList(
+              accountingPeriod = BigDecimal(30),
+              apEndDate = LocalDate.of(2025, 8, 24),
+              taxChargePresent = false,
+              penaltyTotal = BigDecimal(30)
+            ),
+            AccountingPeriodList(
+              accountingPeriod = BigDecimal(0),
+              apEndDate = LocalDate.of(2025, 8, 24),
+              taxChargePresent = false,
+              penaltyTotal = BigDecimal(30)
+            )
+          )
+        )
+
+        when(mockPaymentPostingService.getPaymentPostings(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(paymentPosting))
+        when(mockPostingSummaryByType.getPostingSummaryByType(any(), eqTo(rfrPostingType))(any[HeaderCarrier]))
+          .thenReturn(Future.failed(new RuntimeException("Boom")))
+        when(mockPostingSummaryByType.getPostingSummaryByType(any(), eqTo(repPostingType))(any[HeaderCarrier]))
+          .thenReturn(Future.failed(new RuntimeException("Boom")))
+        when(mockInterestChargeService.getInterestChargesSummary(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(interestCharges))
+        when(mockAllAccountingPeriodsService.getAccountingPeriodList(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(allAccountingPeriods))
+
+        val ex = intercept[Exception] {
+          service.getPaymentsOnAccount(taxReference).futureValue
+        }
+
+        ex.getMessage should include("Boom")
+
+        verify(mockPaymentPostingService, times(1)).getPaymentPostings(any())(any[HeaderCarrier])
+        verify(mockPostingSummaryByType, times(1)).getPostingSummaryByType(any(), eqTo(rfrPostingType))(
+          any[HeaderCarrier]
+        )
+
+        verifyNoMoreInteractions(mockPaymentPostingService)
+        verifyNoMoreInteractions(mockPostingSummaryByType)
+        verifyNoInteractions(mockInterestChargeService)
+        verifyNoInteractions(mockAllAccountingPeriodsService)
+
+      }
+      "return exception when BE call fails for InterestChargeService" in new BaseSetup {
+        val paymentPosting: PaymentPostingsResponse   = PaymentPostingsResponse(
+          List(
+            PaymentPostingRow(
+              accountingPeriod = 56L,
+              settlementSequenceNo = 1L,
+              payslipId = 94L,
+              postingAmount = 60000.00,
+              effectiveDateOfPayment = LocalDate.of(2024, 9, 15),
+              paymentType = "BAC"
+            )
+          )
+        )
+        val rfrResponse: PostingSummaryByTypeResponse = PostingSummaryByTypeResponse(
+          postingSummary = List(
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56L),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("-15000.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202302),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("2000.50")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202303),
+              settlementSequenceNo = BigDecimal(2),
+              postingAmountSum = BigDecimal("800.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202306),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("-250.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("100.00")
+            )
+          )
+        )
+
+        val repResponse: PostingSummaryByTypeResponse = PostingSummaryByTypeResponse(
+          postingSummary = List(
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("3000.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202307),
+              settlementSequenceNo = BigDecimal(2),
+              postingAmountSum = BigDecimal("675.40")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("15.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202306),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("-950.43")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("100.00")
+            )
+          )
+        )
+
+        val allAccountingPeriods: AllAccountingPeriods = AllAccountingPeriods(
+          List(
+            AccountingPeriodList(
+              accountingPeriod = BigDecimal(56),
+              apEndDate = LocalDate.of(2025, 8, 24),
+              taxChargePresent = true,
+              penaltyTotal = BigDecimal(20)
+            ),
+            AccountingPeriodList(
+              accountingPeriod = BigDecimal(30),
+              apEndDate = LocalDate.of(2025, 8, 24),
+              taxChargePresent = false,
+              penaltyTotal = BigDecimal(30)
+            ),
+            AccountingPeriodList(
+              accountingPeriod = BigDecimal(0),
+              apEndDate = LocalDate.of(2025, 8, 24),
+              taxChargePresent = false,
+              penaltyTotal = BigDecimal(30)
+            )
+          )
+        )
+
+        when(mockPaymentPostingService.getPaymentPostings(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(paymentPosting))
+        when(mockPostingSummaryByType.getPostingSummaryByType(any(), eqTo(rfrPostingType))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(rfrResponse))
+        when(mockPostingSummaryByType.getPostingSummaryByType(any(), eqTo(repPostingType))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(repResponse))
+        when(mockInterestChargeService.getInterestChargesSummary(any())(any[HeaderCarrier]))
+          .thenReturn(Future.failed(new RuntimeException("Boom")))
+        when(mockAllAccountingPeriodsService.getAccountingPeriodList(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(allAccountingPeriods))
+
+        val ex = intercept[Exception] {
+          service.getPaymentsOnAccount(taxReference).futureValue
+        }
+
+        ex.getMessage should include("Boom")
+
+        verify(mockPaymentPostingService, times(1)).getPaymentPostings(any())(any[HeaderCarrier])
+        verify(mockPostingSummaryByType, times(1)).getPostingSummaryByType(any(), eqTo(rfrPostingType))(
+          any[HeaderCarrier]
+        )
+        verify(mockPostingSummaryByType, times(1)).getPostingSummaryByType(any(), eqTo(repPostingType))(
+          any[HeaderCarrier]
+        )
+        verify(mockInterestChargeService, times(1)).getInterestChargesSummary(any())(any[HeaderCarrier])
+
+        verifyNoMoreInteractions(mockPaymentPostingService)
+        verifyNoMoreInteractions(mockPostingSummaryByType)
+        verifyNoMoreInteractions(mockInterestChargeService)
+        verifyNoInteractions(mockAllAccountingPeriodsService)
+
+      }
+      "return exception when BE call fails for AccountingPeriodsService" in new BaseSetup {
+        val paymentPosting: PaymentPostingsResponse   = PaymentPostingsResponse(
+          List(
+            PaymentPostingRow(
+              accountingPeriod = 56L,
+              settlementSequenceNo = 1L,
+              payslipId = 94L,
+              postingAmount = 60000.00,
+              effectiveDateOfPayment = LocalDate.of(2024, 9, 15),
+              paymentType = "BAC"
+            )
+          )
+        )
+        val rfrResponse: PostingSummaryByTypeResponse = PostingSummaryByTypeResponse(
+          postingSummary = List(
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56L),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("-15000.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202302),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("2000.50")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202303),
+              settlementSequenceNo = BigDecimal(2),
+              postingAmountSum = BigDecimal("800.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202306),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("-250.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("100.00")
+            )
+          )
+        )
+
+        val repResponse: PostingSummaryByTypeResponse = PostingSummaryByTypeResponse(
+          postingSummary = List(
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("3000.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202307),
+              settlementSequenceNo = BigDecimal(2),
+              postingAmountSum = BigDecimal("675.40")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("15.00")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(202306),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("-950.43")
+            ),
+            PostingSummaryByTypeRow(
+              accountingPeriod = BigDecimal(56),
+              settlementSequenceNo = BigDecimal(1),
+              postingAmountSum = BigDecimal("100.00")
+            )
+          )
+        )
+
+        val interestCharges: InterestCharges =
+          InterestCharges(
+            List(
+              InterestChargesResponse(
+                accountingPeriod = BigDecimal(56),
+                interestChargeSummary = BigDecimal(123.45)
+              ),
+              InterestChargesResponse(
+                accountingPeriod = BigDecimal(145),
+                interestChargeSummary = BigDecimal(987.45)
+              )
+            )
+          )
+
+        when(mockPaymentPostingService.getPaymentPostings(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(paymentPosting))
+        when(mockPostingSummaryByType.getPostingSummaryByType(any(), eqTo(rfrPostingType))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(rfrResponse))
+        when(mockPostingSummaryByType.getPostingSummaryByType(any(), eqTo(repPostingType))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(repResponse))
+        when(mockInterestChargeService.getInterestChargesSummary(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(interestCharges))
+        when(mockAllAccountingPeriodsService.getAccountingPeriodList(any())(any[HeaderCarrier]))
+          .thenReturn(Future.failed(new RuntimeException("Boom")))
+
+        val ex = intercept[Exception] {
+          service.getPaymentsOnAccount(taxReference).futureValue
+        }
+
+        ex.getMessage should include("Boom")
 
         verify(mockPaymentPostingService, times(1)).getPaymentPostings(any())(any[HeaderCarrier])
         verify(mockPostingSummaryByType, times(1)).getPostingSummaryByType(any(), eqTo(rfrPostingType))(
