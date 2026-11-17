@@ -1,0 +1,107 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.corporationtax.connectors
+
+import com.github.tomakehurst.wiremock.client.WireMock.*
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.matchers.must.Matchers.{must, mustBe}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK}
+import uk.gov.hmrc.corporationtax.config.AppConfig
+import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
+import uk.gov.hmrc.corporationtax.models.CommonData
+import uk.gov.hmrc.http.HeaderCarrier
+
+import java.time.LocalDate
+
+class CommonDataConnectorISpec
+  extends AnyWordSpec
+    with Matchers
+    with ScalaFutures
+    with IntegrationPatience
+    with ApplicationWithWiremock
+    with BeforeAndAfterEach {
+
+  implicit val hc: HeaderCarrier = HeaderCarrier()
+
+  implicit private val appConfig: AppConfig =
+    app.injector.instanceOf[AppConfig]
+
+  private val connector: CommonDataConnector =
+    app.injector.instanceOf[CommonDataConnector]
+
+  "getCommonData" should {
+
+    def url = s"${appConfig.rdsDatacacheProxyEndpoint}/common-data"
+
+    "return CommonData when downstream returns a successful response" in {
+      stubFor(
+        get(urlPathEqualTo(url))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                """|
+                   |{
+                   |"asOnDate":"2026-09-15"
+                   |}
+                   |""".stripMargin)
+          )
+      )
+
+      val result = connector.getCommonData().futureValue
+
+      result mustBe CommonData(
+        asOnDate = LocalDate.of(2026, 9, 15)
+      )
+    }
+
+    "return failure when downstream returns INTERNAL_SERVER_ERROR" in {
+      stubFor(
+        get(urlPathEqualTo(url))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getCommonData().futureValue
+      }
+
+      ex.getMessage must include("500")
+    }
+
+    "return failure when downstream returns BAD_REQUEST" in {
+      stubFor(
+        get(urlPathEqualTo(url))
+          .willReturn(
+            aResponse()
+              .withStatus(BAD_REQUEST)
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getCommonData().futureValue
+      }
+
+      ex.getMessage must include("400")
+    }
+  }
+}
