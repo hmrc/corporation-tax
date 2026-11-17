@@ -2172,7 +2172,7 @@ class PaymentsOnAccountServiceSpec extends AnyWordSpec with Matchers with ScalaF
 
         val result: ListBuffer[PaymentsOnAccountRow] = service.applyReallocationsMayBeRepayments(
           Some(matchingAccountingPeriod),
-          currentPaymentPostingRowWithNonZeroAccPeriod,
+          currentPaymentPosting,
           rfrResponse,
           repResponse,
           originalAccumulator
