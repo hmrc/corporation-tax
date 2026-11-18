@@ -48,7 +48,7 @@ class ClientExchangeProxyConnectorISpec
   val gracePeriod = 14400
 
   def url(credentialId: String) =
-    s"${appConfig.clientExchangeProxyEndpoint}/CT/$credentialId/agent/clientList"
+    s"${appConfig.clientExchangeProxyEndpoint}/CT/$credentialId/agent/clientlist"
 
   "initiateClientListDownload" should {
 

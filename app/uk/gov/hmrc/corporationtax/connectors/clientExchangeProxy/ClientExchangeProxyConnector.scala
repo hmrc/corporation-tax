@@ -35,7 +35,7 @@ class ClientExchangeProxyConnector @Inject (http: HttpClientV2, appConfig: AppCo
   def initiateClientListDownload(
     credentialId: String
   )(implicit hc: HeaderCarrier): Future[AsynchronousProcessWaitTime] = {
-    val url: URL = url"${appConfig.clientExchangeProxyFullUrl}/CT/$credentialId/agent/clientList"
+    val url: URL = url"${appConfig.clientExchangeProxyFullUrl}/CT/$credentialId/agent/clientlist"
     http
       .get(url)
       .execute[HttpResponse]

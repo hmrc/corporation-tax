@@ -38,7 +38,7 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
     servicesConfig.baseUrl("client-exchange-proxy")
 
   lazy val clientExchangeProxyEndpoint: String =
-    servicesConfig.getString("microservice.services.client-exchange-proxy.path") + "/corporation-tax"
+    servicesConfig.getString("microservice.services.client-exchange-proxy.path")
 
   lazy val clientExchangeProxyFullUrl: String = clientExchangeProxyBaseUrl + clientExchangeProxyEndpoint
 
