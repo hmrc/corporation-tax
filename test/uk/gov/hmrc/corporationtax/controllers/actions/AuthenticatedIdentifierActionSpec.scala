@@ -199,6 +199,40 @@ class AuthenticatedIdentifierActionSpec extends AnyWordSpec with Matchers {
       }
     }
 
+    "must retrieve Some(agentEnrolment) from Enrolments when the Enrolments is defined" in {
+      val agentActiveEnrollment: Enrolment = Enrolment(
+        "IR-CT-AGENT",
+        Seq(
+          EnrolmentIdentifier("IRAgentReference", "IAR1")
+        ),
+        "activated",
+        None
+      )
+
+      val agentEnrolments: Enrolments = Enrolments(enrolments = Set(agentActiveEnrollment))
+
+      AuthenticatedIdentifierAction.getAgentEnrolments(agentEnrolments) shouldBe Some("IAR1")
+
+    }
+    "must retrieve None from Enrolments when the Enrolments is defined " in {
+
+      val agentActiveEnrollment: Enrolment = Enrolment(
+        "IR-CT-AGENT",
+        Seq(
+          EnrolmentIdentifier("IRAgent", "IAR2")
+        ),
+        "activated",
+        None
+      )
+
+      val invalidAgentEnrolments: Enrolments = Enrolments(enrolments = Set(agentActiveEnrollment))
+
+      val result: Option[String] = AuthenticatedIdentifierAction.getAgentEnrolments(invalidAgentEnrolments)
+
+      result mustBe None
+
+    }
+
   }
 
 }
