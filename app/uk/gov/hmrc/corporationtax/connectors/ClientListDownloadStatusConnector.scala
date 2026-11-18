@@ -32,8 +32,13 @@ class ClientListDownloadStatusConnector @Inject() (http: HttpClientV2, appConfig
   ec: ExecutionContext
 ) extends Logging {
 
-  def getClientListDownloadStatus(credentialId: String)(implicit hc: HeaderCarrier): Future[ClientDownloadStatus] = {
-    val url: URL = url"${appConfig.rdsDatacacheProxyFullUrl}/client-list-status/$credentialId"
+  def getClientListDownloadStatus(
+    credentialId: String,
+    serviceName: String,
+    gracePeriodSeconds: Int
+  )(implicit hc: HeaderCarrier): Future[ClientDownloadStatus] = {
+    val url: URL =
+      url"${appConfig.rdsDatacacheProxyFullUrl}/client-list-status/$credentialId?serviceName=$serviceName&gracePeriod=$gracePeriodSeconds"
     http
       .get(url)
       .execute[ClientDownloadStatus]

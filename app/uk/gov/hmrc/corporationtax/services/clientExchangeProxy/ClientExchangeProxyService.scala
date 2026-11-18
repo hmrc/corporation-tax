@@ -44,11 +44,8 @@ class ClientExchangeProxyService @Inject (
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  private val serviceName = appConfig.ctServiceName
-
-  // ------------------------------------------------------------
-  // Cache: wait plans per credentialId
-  // ------------------------------------------------------------
+  private val serviceName          = appConfig.ctServiceName
+  private val ctGracePeriodSeconds = appConfig.ctGracePeriodSeconds
 
   private val waitTimeCache: TrieMap[String, AsynchronousProcessWaitTime] = TrieMap.empty
 
@@ -67,26 +64,23 @@ class ClientExchangeProxyService @Inject (
       businessIntervalsMs = appConfig.ctDefaultBusinessIntervalsMs
     )
 
-  // ------------------------------------------------------------
-  // Helpers
-  // ------------------------------------------------------------
-
   protected def sleep(ms: Long): Future[Unit] =
     val p = Promise[Unit]()
     actorSystem.scheduler.scheduleOnce(ms.millis)(p.success(()))
     p.future
 
   def getStatus(credId: String)(implicit hc: HeaderCarrier): Future[ClientListDownloadStatusTransformed] =
-    clientListDownloadStatusService.getClientListDownloadStatus(credId).map { response =>
-      response.status match {
-        case -1    => InitiateDownload
-        case 0     => InProgress
-        case 1     => Succeeded
-        case 2     => Failed
-        case other =>
-          logger.error(s"[DatacacheProxyConnector] unknown status '$other' from rds-datacache-proxy")
-          throw new RuntimeException(s"Unknown status '$other' from rds-datacache-proxy")
-      }
+    clientListDownloadStatusService.getClientListDownloadStatus(credId, serviceName, ctGracePeriodSeconds).map {
+      response =>
+        response.status match {
+          case -1    => InitiateDownload
+          case 0     => InProgress
+          case 1     => Succeeded
+          case 2     => Failed
+          case other =>
+            logger.error(s"[DatacacheProxyConnector] unknown status '$other' from rds-datacache-proxy")
+            throw new RuntimeException(s"Unknown status '$other' from rds-datacache-proxy")
+        }
     }
 
   protected def logWaitPlan(business: Seq[Long], browserMs: Long): Unit =
@@ -98,11 +92,6 @@ class ClientExchangeProxyService @Inject (
     val indexString = index.map(i => s" index=$i").getOrElse("")
     logger.info(s"""event="status" service="$serviceName" context="$context"$indexString value="${status.toString}"""")
 
-  // ------------------------------------------------------------
-  // Shared polling logic (business + browser phases)
-  // ------------------------------------------------------------
-
-  // CALLED IF STATUS IS INITIATE DOWNLOAD OR IN PROGRESS
   private def processWithWaitPlan(
     credentialId: String,
     waitPlan: AsynchronousProcessWaitTime
@@ -110,7 +99,6 @@ class ClientExchangeProxyService @Inject (
     val business = waitPlan.businessIntervalsMs
     logWaitPlan(business, waitPlan.browserIntervalMs)
 
-    // BUSINESS PHASE
     if business.isEmpty then
       clearWaitTime(credentialId)
       Future.failed(NoBusinessIntervalsException("No business intervals"))
@@ -174,10 +162,6 @@ class ClientExchangeProxyService @Inject (
                                  Future.failed(ClientListDownloadInProgressException("Still in progress"))
             yield finalResult
       yield outcome
-
-  // ------------------------------------------------------------
-  // Entry point
-  // ------------------------------------------------------------
 
   def process(credentialId: String)(implicit hc: HeaderCarrier): Future[ClientListDownloadStatusTransformed] =
     val underlying: Future[Unit] =

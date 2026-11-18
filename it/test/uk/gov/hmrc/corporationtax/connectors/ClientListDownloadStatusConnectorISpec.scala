@@ -59,7 +59,7 @@ class ClientListDownloadStatusConnectorISpec
           )
       )
 
-      val result = connector.getClientListDownloadStatus("1").futureValue
+      val result = connector.getClientListDownloadStatus("1", "CT", 14400).futureValue
       result mustBe initiateDownload
     }
     
@@ -73,7 +73,7 @@ class ClientListDownloadStatusConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getClientListDownloadStatus("1").futureValue
+        connector.getClientListDownloadStatus("1", "CT", 14400).futureValue
       }
 
       ex.getMessage must include("500")

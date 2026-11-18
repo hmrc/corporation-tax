@@ -45,3 +45,4 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
   val ctServiceName: String                    = config.get[String]("ct.serviceName")
   val ctDefaultBrowserIntervalMs: Long         = config.get[Long]("ct.defaultBrowserIntervalMs")
   val ctDefaultBusinessIntervalsMs: List[Long] = config.get[Seq[Long]]("ct.defaultBusinessIntervalsMs").toList
+  val ctGracePeriodSeconds: Int                = config.get[Int]("ct.gracePeriodSeconds")

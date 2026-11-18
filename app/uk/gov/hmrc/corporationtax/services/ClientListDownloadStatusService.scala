@@ -28,8 +28,14 @@ class ClientListDownloadStatusService @Inject() (
   connector: ClientListDownloadStatusConnector
 ) extends Logging {
 
-  def getClientListDownloadStatus(credentialId: String)(implicit hc: HeaderCarrier): Future[ClientDownloadStatus] = {
-    logger.info(s"Calling repository with credentialId: $credentialId")
-    connector.getClientListDownloadStatus(credentialId)
+  def getClientListDownloadStatus(
+    credentialId: String,
+    serviceName: String,
+    gracePeriodSeconds: Int
+  )(implicit hc: HeaderCarrier): Future[ClientDownloadStatus] = {
+    logger.info(
+      s"Calling repository with credentialId: $credentialId - serviceName: $serviceName - gracePeriod $gracePeriodSeconds "
+    )
+    connector.getClientListDownloadStatus(credentialId, serviceName, gracePeriodSeconds)
   }
 }

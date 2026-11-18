@@ -44,6 +44,8 @@ class ClientExchangeProxyConnectorISpec
     app.injector.instanceOf[ClientExchangeProxyConnector]
 
   val credId = "cred-123"
+  val serviceName = "CT"
+  val gracePeriod = 14400
 
   def url(credentialId: String) =
     s"${appConfig.clientExchangeProxyEndpoint}/CT/$credentialId/agent/clientList"

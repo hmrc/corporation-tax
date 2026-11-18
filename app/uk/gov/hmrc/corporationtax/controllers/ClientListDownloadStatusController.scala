@@ -32,9 +32,13 @@ class ClientListDownloadStatusController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def getClientListDownloadStatus(credentialId: String): Action[AnyContent] = Action.async { implicit request =>
+  def getClientListDownloadStatus(
+    credentialId: String,
+    serviceName: String,
+    gracePeriodSeconds: Int
+  ): Action[AnyContent] = Action.async { implicit request =>
     service
-      .getClientListDownloadStatus(credentialId)
+      .getClientListDownloadStatus(credentialId, serviceName, gracePeriodSeconds)
       .map { status =>
         Ok(Json.toJson(status))
       }

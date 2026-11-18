@@ -87,7 +87,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       implicit val hc: HeaderCarrier                                               = HeaderCarrier()
       val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(Future.successful(ClientDownloadStatus(status = 1)))
 
       val status = service.process("cred-1").futureValue
@@ -99,7 +99,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       implicit val hc: HeaderCarrier                                               = HeaderCarrier()
       val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(Future.successful(ClientDownloadStatus(status = 2)))
 
       val exception = service.process("cred-1").futureValue
@@ -111,7 +111,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       implicit val hc: HeaderCarrier                                               = HeaderCarrier()
       val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(Future.successful(ClientDownloadStatus(status = -1)))
 
       val waitPlan = AsynchronousProcessWaitTime(
@@ -131,7 +131,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       implicit val hc: HeaderCarrier                                               = HeaderCarrier()
       val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(Future.successful(ClientDownloadStatus(status = -1)))
 
       val waitPlan = AsynchronousProcessWaitTime(
@@ -153,7 +153,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
 
       val businessIntervals = List(10L, 20L, 30L)
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(
           Future.successful(ClientDownloadStatus(status = -1)),
           Future.successful(ClientDownloadStatus(status = 0)),
@@ -169,7 +169,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
         .thenReturn(Future.successful(waitPlan))
 
       whenReady(service.process("cred-1")) { _ =>
-        verify(clientListDownloadStatusService, times(4)).getClientListDownloadStatus(any)(any)
+        verify(clientListDownloadStatusService, times(4)).getClientListDownloadStatus(any, any, any)(any)
       }
     }
 
@@ -185,14 +185,14 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       when(clientExchangeProxyConnector.initiateClientListDownload(any)(any))
         .thenReturn(Future.successful(waitPlan))
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(
           Future.successful(ClientDownloadStatus(status = -1)),
           Future.successful(ClientDownloadStatus(status = 1))
         )
 
       whenReady(service.process("cred-1")) { _ =>
-        verify(clientListDownloadStatusService, times(2)).getClientListDownloadStatus(any)(any)
+        verify(clientListDownloadStatusService, times(2)).getClientListDownloadStatus(any, any, any)(any)
       }
 
       val status = service.process("cred-1").futureValue
@@ -211,14 +211,14 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       when(clientExchangeProxyConnector.initiateClientListDownload(any)(any))
         .thenReturn(Future.successful(waitPlan))
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(
           Future.successful(ClientDownloadStatus(status = -1)),
           Future.successful(ClientDownloadStatus(status = 2))
         )
 
       whenReady(service.process("cred-1")) { _ =>
-        verify(clientListDownloadStatusService, times(2)).getClientListDownloadStatus(any)(any)
+        verify(clientListDownloadStatusService, times(2)).getClientListDownloadStatus(any, any, any)(any)
       }
 
       val status = service.process("cred-1").futureValue
@@ -237,7 +237,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       when(clientExchangeProxyConnector.initiateClientListDownload(any)(any))
         .thenReturn(Future.successful(waitPlan))
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(
           Future.successful(ClientDownloadStatus(status = -1)),
           Future.successful(ClientDownloadStatus(status = 0)),
@@ -245,7 +245,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
         )
 
       whenReady(service.process("cred-1")) { _ =>
-        verify(clientListDownloadStatusService, times(3)).getClientListDownloadStatus(any)(any)
+        verify(clientListDownloadStatusService, times(3)).getClientListDownloadStatus(any, any, any)(any)
       }
 
       val status = service.process("cred-1").futureValue
@@ -265,7 +265,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       when(clientExchangeProxyConnector.initiateClientListDownload(any)(any))
         .thenReturn(Future.successful(waitPlan))
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(
           Future.successful(ClientDownloadStatus(status = -1)),
           Future.successful(ClientDownloadStatus(status = 0)),
@@ -274,7 +274,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
         )
 
       whenReady(service.process("cred-1")) { _ =>
-        verify(clientListDownloadStatusService, times(4)).getClientListDownloadStatus(any)(any)
+        verify(clientListDownloadStatusService, times(4)).getClientListDownloadStatus(any, any, any)(any)
       }
 
       val status = service.process("cred-1").futureValue
@@ -294,7 +294,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       when(clientExchangeProxyConnector.initiateClientListDownload(any)(any))
         .thenReturn(Future.successful(waitPlan))
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(
           Future.successful(ClientDownloadStatus(status = -1)),
           Future.successful(ClientDownloadStatus(status = 0)),
@@ -303,7 +303,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
         )
 
       whenReady(service.process("cred-1")) { _ =>
-        verify(clientListDownloadStatusService, times(4)).getClientListDownloadStatus(any)(any)
+        verify(clientListDownloadStatusService, times(4)).getClientListDownloadStatus(any, any, any)(any)
       }
 
       val status = service.process("cred-1").futureValue
@@ -323,7 +323,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       val cache = waitTimeCacheOf(service)
       cache.update("cred-1", cachedPlan)
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(
           Future.successful(ClientDownloadStatus(status = 0)),
           Future.successful(ClientDownloadStatus(status = 0)),
@@ -348,7 +348,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
         businessIntervalsMs = appConfig.ctDefaultBusinessIntervalsMs
       )
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(
           Future.successful(ClientDownloadStatus(status = 0)),
           Future.successful(ClientDownloadStatus(status = 0)),
@@ -374,7 +374,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
         businessIntervalsMs = appConfig.ctDefaultBusinessIntervalsMs
       )
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(
           Future.successful(ClientDownloadStatus(status = 0)),
           Future.successful(ClientDownloadStatus(status = 0)),
@@ -388,7 +388,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       verify(clientExchangeProxyConnector, never()).initiateClientListDownload(any)(any)
 
       service.lastWaitPlan shouldBe Some(defaultPlan)
-      verify(clientListDownloadStatusService, times(4)).getClientListDownloadStatus(any)(any)
+      verify(clientListDownloadStatusService, times(4)).getClientListDownloadStatus(any, any, any)(any)
     }
 
   }
@@ -399,7 +399,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       implicit val hc: HeaderCarrier                                               = HeaderCarrier()
       val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(Future.successful(ClientDownloadStatus(status = -1)))
 
       val result = service.getStatus("cred-1").futureValue
@@ -411,7 +411,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       implicit val hc: HeaderCarrier                                               = HeaderCarrier()
       val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(Future.successful(ClientDownloadStatus(status = 0)))
 
       val result = service.getStatus("cred-1").futureValue
@@ -423,7 +423,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       implicit val hc: HeaderCarrier                                               = HeaderCarrier()
       val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(Future.successful(ClientDownloadStatus(status = 1)))
 
       val result = service.getStatus("cred-1").futureValue
@@ -435,7 +435,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       implicit val hc: HeaderCarrier                                               = HeaderCarrier()
       val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(Future.successful(ClientDownloadStatus(status = 2)))
 
       val result = service.getStatus("cred-1").futureValue
@@ -447,7 +447,7 @@ class ClientExchangeProxyServiceSpec extends SpecBase {
       implicit val hc: HeaderCarrier                                               = HeaderCarrier()
       val (service, clientExchangeProxyConnector, clientListDownloadStatusService) = setupService()
 
-      when(clientListDownloadStatusService.getClientListDownloadStatus(any)(any))
+      when(clientListDownloadStatusService.getClientListDownloadStatus(any, any, any)(any))
         .thenReturn(Future.successful(ClientDownloadStatus(status = 50)))
 
       val exception = service.getStatus("cred-1").failed.futureValue

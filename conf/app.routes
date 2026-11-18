@@ -3,7 +3,7 @@ GET        /common-data                                                         
 
 # microservice specific routes
 
-GET        /client-list-status/:credentialId                                    uk.gov.hmrc.corporationtax.controllers.ClientListDownloadStatusController.getClientListDownloadStatus(credentialId: String)
+GET        /client-list-status/:credentialId                                    uk.gov.hmrc.corporationtax.controllers.ClientListDownloadStatusController.getClientListDownloadStatus(credentialId: String, serviceName: String ?= "CT", gracePeriodSeconds: Int ?= 14400)
 
 #Accounting Period Routes
 GET        /penalty-transactions/:taxRef/:accPeriod                        uk.gov.hmrc.corporationtax.controllers.PenaltiesController.getPenaltyTransactionList(taxRef: Long, accPeriod: Long, endDate: Option[String])
