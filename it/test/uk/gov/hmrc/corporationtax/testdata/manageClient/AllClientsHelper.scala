@@ -72,4 +72,13 @@ trait AllClientsHelper {
       "I"
     )
   )
+
+  def getParamCombo(irAgentId: String, credentialId: String, start: Int, count: Int, sort: Int, order: String): AllClients = {
+    (start, count, sort, order) match {
+      case (0, 30, 1, "DESC") => allClients
+      case (0, 30, 2, "ASC") => multipleItemsClientNameAllClients
+      case (0, 30, 3, "DESC") => multipleClientListAllClients
+      case _ => throw new RuntimeException("Downstream error")
+    }
+  }
 }

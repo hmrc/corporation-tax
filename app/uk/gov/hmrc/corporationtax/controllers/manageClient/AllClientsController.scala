@@ -20,35 +20,38 @@ import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.Results.InternalServerError
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
+import uk.gov.hmrc.corporationtax.controllers.actions.IdentifierAction
 import uk.gov.hmrc.corporationtax.services.manageClient.AllClientsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class AllClientsController @Inject() (
   allClientsService: AllClientsService,
+  identify: IdentifierAction,
   cc: ControllerComponents
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def getAllClients(
-    irAgentId: String,
-    credentialId: String,
-    start: Int,
-    count: Int,
-    sort: Int,
-    order: String
-  ): Action[AnyContent] = Action.async { implicit request =>
-    allClientsService
-      .getAllClients(irAgentId, credentialId, start, count, sort, order)
-      .map { allClients =>
-        Ok(Json.toJson(allClients))
-      }
-      .recover { case ex: Exception =>
-        logger.error("Error while retrieving all clients", ex)
-        InternalServerError(Json.obj("error" -> "Failed to retrieve all clients"))
+  def getAllClients(start: Int, count: Int, sort: Int, order: String): Action[AnyContent] = identify.async {
+    implicit request =>
+      (request.irAgentReference, request.credentialId) match {
+        case (Some(agentId), credId) =>
+          allClientsService
+            .getAllClients(agentId, credId, start, count, sort, order)
+            .map { allClients =>
+              Ok(Json.toJson(allClients))
+            }
+            .recover { case ex: Exception =>
+              logger.error("Error while retrieving all clients", ex)
+              InternalServerError(Json.obj("error" -> "Failed to retrieve all clients"))
+            }
+        case _                       =>
+          Future.successful(
+            BadRequest(Json.obj("message" -> "irAgentReference and credentialId was not provided in the request"))
+          )
       }
   }
 }

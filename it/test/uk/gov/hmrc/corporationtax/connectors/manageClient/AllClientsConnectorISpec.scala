@@ -142,7 +142,7 @@ class AllClientsConnectorISpec
 
     "return all clients with non default params" in {
       stubFor(
-        get(urlEqualTo(url("irAgentId4", "credentialId4", 0, 30, 2, "DESC")))
+        get(urlEqualTo(url("irAgentId4", "credentialId4", 0, 30, 3, "DESC")))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -171,8 +171,8 @@ class AllClientsConnectorISpec
           )
       )
 
-      val result = connector.getAllClients("irAgentId4", "credentialId4", 0, 30, 2, "DESC").futureValue
-      result mustBe multipleClientListAllClients
+      val result = connector.getAllClients("irAgentId4", "credentialId4", 0, 30, 3, "DESC").futureValue
+      result mustBe getParamCombo("irAgentId4", "credentialId4", 0, 30, 3, "DESC")
     }
 
     "return INTERNAL_ERROR when service failed" in {

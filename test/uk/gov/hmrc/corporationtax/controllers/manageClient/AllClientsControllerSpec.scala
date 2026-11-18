@@ -28,6 +28,7 @@ import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.corporationtax.helpers.manageClient.AllClientsHelper
 import uk.gov.hmrc.corporationtax.services.manageClient.AllClientsService
+import uk.gov.hmrc.corporationtax.controllers.actions.FakeIdentifierAction
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,9 +41,10 @@ class AllClientsControllerSpec extends AnyWordSpec with Matchers with AllClients
     val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
 
-    val fakeRequest = FakeRequest("GET", "/all-clients")
-    val controller  =
-      new AllClientsController(mockService, Helpers.stubControllerComponents())
+    val fakeRequest          = FakeRequest("GET", "/all-clients")
+    val fakeIdentifierAction = FakeIdentifierAction(cc.parsers)
+    val controller           =
+      new AllClientsController(mockService, fakeIdentifierAction, Helpers.stubControllerComponents())
   }
 
   "GET /all-clients" should {
@@ -51,13 +53,20 @@ class AllClientsControllerSpec extends AnyWordSpec with Matchers with AllClients
       when(mockService.getAllClients(any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(allClients))
 
-      val result: Future[Result] = controller.getAllClients("irAgentId1", "credentialId1", 0, 30, 0, "ASC")(fakeRequest)
+      val result: Future[Result] = controller.getAllClients(0, 30, 0, "ASC")(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(allClients)
 
       verify(mockService)
-        .getAllClients(eqTo("irAgentId1"), eqTo("credentialId1"), eqTo(0), eqTo(30), eqTo(0), eqTo("ASC"))(
+        .getAllClients(
+          eqTo("fake-irAgent-reference"),
+          eqTo("fake-credential-id"),
+          eqTo(0),
+          eqTo(30),
+          eqTo(0),
+          eqTo("ASC")
+        )(
           any[HeaderCarrier]
         )
     }
@@ -66,13 +75,20 @@ class AllClientsControllerSpec extends AnyWordSpec with Matchers with AllClients
       when(mockService.getAllClients(any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(multipleClientListAllClients))
 
-      val result: Future[Result] = controller.getAllClients("irAgentId2", "credentialId2", 0, 30, 0, "ASC")(fakeRequest)
+      val result: Future[Result] = controller.getAllClients(0, 30, 0, "ASC")(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(multipleClientListAllClients)
 
       verify(mockService)
-        .getAllClients(eqTo("irAgentId2"), eqTo("credentialId2"), eqTo(0), eqTo(30), eqTo(0), eqTo("ASC"))(
+        .getAllClients(
+          eqTo("fake-irAgent-reference"),
+          eqTo("fake-credential-id"),
+          eqTo(0),
+          eqTo(30),
+          eqTo(0),
+          eqTo("ASC")
+        )(
           any[HeaderCarrier]
         )
     }
@@ -81,13 +97,20 @@ class AllClientsControllerSpec extends AnyWordSpec with Matchers with AllClients
       when(mockService.getAllClients(any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(multipleItemsClientNameAllClients))
 
-      val result: Future[Result] = controller.getAllClients("irAgentId3", "credentialId3", 0, 30, 0, "ASC")(fakeRequest)
+      val result: Future[Result] = controller.getAllClients(0, 30, 0, "ASC")(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(multipleItemsClientNameAllClients)
 
       verify(mockService)
-        .getAllClients(eqTo("irAgentId3"), eqTo("credentialId3"), eqTo(0), eqTo(30), eqTo(0), eqTo("ASC"))(
+        .getAllClients(
+          eqTo("fake-irAgent-reference"),
+          eqTo("fake-credential-id"),
+          eqTo(0),
+          eqTo(30),
+          eqTo(0),
+          eqTo("ASC")
+        )(
           any[HeaderCarrier]
         )
     }
@@ -97,13 +120,20 @@ class AllClientsControllerSpec extends AnyWordSpec with Matchers with AllClients
         .thenReturn(Future.failed(new RuntimeException("error")))
 
       val result: Future[Result] =
-        controller.getAllClients("irAgentIdNA", "credentialIdNA", 0, 30, 0, "ASC")(fakeRequest)
+        controller.getAllClients(0, 30, 0, "ASC")(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
 
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve all clients"
 
       verify(mockService)
-        .getAllClients(eqTo("irAgentIdNA"), eqTo("credentialIdNA"), eqTo(0), eqTo(30), eqTo(0), eqTo("ASC"))(
+        .getAllClients(
+          eqTo("fake-irAgent-reference"),
+          eqTo("fake-credential-id"),
+          eqTo(0),
+          eqTo(30),
+          eqTo(0),
+          eqTo("ASC")
+        )(
           any[HeaderCarrier]
         )
     }

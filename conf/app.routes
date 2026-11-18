@@ -53,4 +53,4 @@ GET        /determine-payment-allocation/:taxRef                                
 GET        /initiate-client-list-download                                       uk.gov.hmrc.corporationtax.controllers.clientExchangeProxy.ClientExchangeProxyController.initiateClientListDownload()
 
 # Manage Clients Routes
-GET        /all-clients/:irAgentId/:credentialId                                uk.gov.hmrc.corporationtax.controllers.manageClient.AllClientsController.getAllClients(irAgentId: String, credentialId: String, start: Int ?= 0, count: Int ?= 30, sort: Int ?= 0, order: String ?= "ASC")
+GET        /all-clients                                                         uk.gov.hmrc.corporationtax.controllers.manageClient.AllClientsController.getAllClients(start: Int ?= 0, count: Int ?= 30, sort: Int ?= 0, order: String ?= "ASC")
