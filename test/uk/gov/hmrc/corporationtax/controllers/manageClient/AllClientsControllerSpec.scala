@@ -17,18 +17,20 @@
 package uk.gov.hmrc.corporationtax.controllers.manageClient
 
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.http.Status
 import play.api.libs.json.Json
-import play.api.mvc.Result
+import play.api.mvc.{Request, Result}
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.corporationtax.helpers.manageClient.AllClientsHelper
 import uk.gov.hmrc.corporationtax.services.manageClient.AllClientsService
 import uk.gov.hmrc.corporationtax.controllers.actions.FakeIdentifierAction
+import uk.gov.hmrc.corporationtax.models.auth.IdentifierRequest
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,7 +45,16 @@ class AllClientsControllerSpec extends AnyWordSpec with Matchers with AllClients
 
     val fakeRequest          = FakeRequest("GET", "/all-clients")
     val fakeIdentifierAction = FakeIdentifierAction(cc.parsers)
-    val controller           =
+
+    val fake400IdentifierAction = new FakeIdentifierAction(cc.parsers) {
+      override def invokeBlock[A](
+        request: Request[A],
+        block: IdentifierRequest[A] => Future[Result]
+      ): Future[Result] =
+        block(IdentifierRequest(request, "fakeCredId", None, AffinityGroup.Agent))
+    }
+
+    val controller =
       new AllClientsController(mockService, fakeIdentifierAction, Helpers.stubControllerComponents())
   }
 
@@ -113,6 +124,22 @@ class AllClientsControllerSpec extends AnyWordSpec with Matchers with AllClients
         )(
           any[HeaderCarrier]
         )
+    }
+
+    "return 400 BadRequest" in new Setup {
+      when(mockService.getAllClients(any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(multipleItemsClientNameAllClients))
+
+      val controller400 =
+        new AllClientsController(mockService, fake400IdentifierAction, Helpers.stubControllerComponents())
+
+      val result: Future[Result] =
+        controller400.getAllClients(0, 30, 0, "ASC")(fakeRequest)
+
+      status(result) shouldBe Status.BAD_REQUEST
+
+      verify(mockService, never()).getAllClients(any(), any(), any(), any(), any(), any())(any[HeaderCarrier])
+
     }
 
     "return 500 INTERNAL_SERVER_ERROR" in new Setup {

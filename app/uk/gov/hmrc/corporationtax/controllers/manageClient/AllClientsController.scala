@@ -49,6 +49,7 @@ class AllClientsController @Inject() (
               InternalServerError(Json.obj("error" -> "Failed to retrieve all clients"))
             }
         case _                       =>
+          logger.error("Error while retrieving irAgentReference and credentialId")
           Future.successful(
             BadRequest(Json.obj("message" -> "irAgentReference and credentialId was not provided in the request"))
           )
