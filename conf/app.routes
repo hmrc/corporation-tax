@@ -57,3 +57,4 @@ GET        /client-list-download-status                                         
 GET        /all-clients                                                         uk.gov.hmrc.corporationtax.controllers.manageClient.AllClientsController.getAllClients(start: Int ?= 0, count: Int ?= 30, sort: Int ?= 0, order: String ?= "ASC")
 GET        /clients-by-utr/:utr                                                 uk.gov.hmrc.corporationtax.controllers.manageClient.GetClientsByUtrController.getClientByUtr(utr:String)
 GET        /clients-by-crn/:companyRegNo                                        uk.gov.hmrc.corporationtax.controllers.manageClient.GetClientByCrnController.getClientByCrn(companyRegNo:String)
+GET        /clients-by-name                                                     uk.gov.hmrc.corporationtax.controllers.manageClient.ClientsByNameController.getClientsByName(start: Int ?= 0, count: Int ?= -1, sort: Int ?= 0, order: String ?= "ASC")
