@@ -27,11 +27,11 @@ import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class GetClientByCrnRdsProxyConnector @Inject()(http: HttpClientV2, appConfig: AppConfig)(implicit
-                                                                                          ec: ExecutionContext
+class GetClientByCrnRdsProxyConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit
+  ec: ExecutionContext
 ) extends Logging {
 
-  def getClientByCrn(irAgentReference:String, credentialId:String, companyRegNo:String)(implicit
+  def getClientByCrn(irAgentReference: String, credentialId: String, companyRegNo: String)(implicit
     hc: HeaderCarrier
   ): Future[AllClients] = {
     val url: URL =

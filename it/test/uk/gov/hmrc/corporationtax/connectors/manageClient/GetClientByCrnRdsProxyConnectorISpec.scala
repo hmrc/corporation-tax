@@ -24,7 +24,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
 import uk.gov.hmrc.corporationtax.config.AppConfig
 import uk.gov.hmrc.corporationtax.itutils.ApplicationWithWiremock
-import uk.gov.hmrc.corporationtax.testdata.ReallocationFromAccPeriodHelper
+import uk.gov.hmrc.corporationtax.testdata.manageClient.AllClientsHelper
 import uk.gov.hmrc.http.HeaderCarrier
 
 class GetClientByCrnRdsProxyConnectorISpec
@@ -34,106 +34,88 @@ class GetClientByCrnRdsProxyConnectorISpec
     with IntegrationPatience
     with ApplicationWithWiremock
     with BeforeAndAfterEach
-    with ReallocationFromAccPeriodHelper {
+    with AllClientsHelper{
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   implicit private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
-  private val connector: ReallocationFromAccPeriodRdsProxyConnector =
-    app.injector.instanceOf[ReallocationFromAccPeriodRdsProxyConnector]
+  private val connector: GetClientByCrnRdsProxyConnector =
+    app.injector.instanceOf[GetClientByCrnRdsProxyConnector]
 
-  "getReallocationFromAccPeriod" should {
+  "getClientByCrn" should {
 
-    def url(taxPayerReference: Long, accPeriod: Long) =
-      s"${appConfig.rdsDatacacheProxyEndpoint}/reallocation-from-accounting-period/$taxPayerReference/$accPeriod"
+    def url(irAgentReference:String, credentialId:String, companyRegNo:String) =
+      s"${appConfig.rdsDatacacheProxyEndpoint}/clients-by-crn/$irAgentReference/$credentialId/$companyRegNo"
 
-    "return ReallocationFromAccPeriod empty list from BE with status code OK" in {
+    "return AllClients with emptyClient List  empty list from BE with status code OK" in {
       stubFor(
-        get(urlPathEqualTo(url(1234L, 345L)))
+        get(urlPathEqualTo(url("STN003", "123456", "BUX300")))
           .willReturn(
             aResponse()
               .withStatus(OK)
               .withBody(
-                s"""{
-                   |"reallocation":
-                   |[]
+                s"""
+                   |{
+                   |  "clientCount": 0,
+                   |  "clientList": [],
+                   |  "clientNameStartChars": []
                    |}
                    |""".stripMargin
               )
           )
       )
 
-      val result = connector.getReallocationFromAccPeriod(1234L, 345L).futureValue
-      result.reallocation must contain allElementsOf emptyListReallocationFromAccPeriod.reallocation
+      val result = connector.getClientByCrn("STN003", "123456", "BUX300").futureValue
+      result mustEqual emptyAllClients
     }
-
-    "return ReallocationFromAccPeriod list (single item) from BE with status code OK" in {
+    "return AllClients with multiple clientList and clientNameStartChars from BE with status code OK" in {
       stubFor(
-        get(urlPathEqualTo(url(78965432L, 8745L)))
+        get(urlPathEqualTo(url("STN003", "123456", "BUX300")))
           .willReturn(
             aResponse()
               .withStatus(OK)
               .withBody(
-                s"""{
-                   |"reallocation":
-                   |[
-                   |  {
-                   |  "amount" : 12390.67,
-                   |  "reallocationDate": "2026-12-27",
-                   |  "destinationApEndDate": "2024-02-02",
-                   |  "destinationTaxPayerReference": "18969779586"
-                   |  }
-                   |]
-                   |}""".stripMargin
+                s"""
+                   |{
+                   |  "clientCount": 3,
+                   |  "clientList": [
+                   |    {
+                   |      "utr": "1234567890",
+                   |      "companyRegNo": "01234567",
+                   |      "companyName": "ABC Limited",
+                   |      "agentOwnRef": "AGENT001"
+                   |    },
+                   |    {
+                   |      "utr": "9876543210",
+                   |      "companyRegNo": null,
+                   |      "companyName": "XYZ Solutions Ltd",
+                   |      "agentOwnRef": "AGENT002"
+                   |    },
+                   |    {
+                   |      "utr": "5678901234",
+                   |      "companyRegNo": "09876543",
+                   |      "companyName": "Global Technologies Ltd",
+                   |      "agentOwnRef": null
+                   |    }
+                   |  ],
+                   |  "clientNameStartChars": [
+                   |    "A",
+                   |    "G",
+                   |    "X"
+                   |  ]
+                   |}
+                   |""".stripMargin
               )
           )
       )
 
-      val result = connector.getReallocationFromAccPeriod(78965432L, 8745L).futureValue
-      result.reallocation must contain allElementsOf reallocationFromAccPeriodWithSingleElement.reallocation
-    }
-
-    "return InterestCharges list (two items) from BE with status code OK" in {
-      stubFor(
-        get(urlPathEqualTo(url(789652L, 8745L)))
-          .willReturn(
-            aResponse()
-              .withStatus(OK)
-              .withBody(
-                s"""{
-                   |"reallocation":
-                   |[
-                   |  {
-                   |  "amount" : 12390.0,
-                   |  "reallocationDate": "2026-12-27",
-                   |  "destinationApEndDate": "2024-02-02",
-                   |  "destinationTaxPayerReference": "18969779586"
-                   |  },
-                   |  {
-                   |  "amount" : 180007.0,
-                   |  "reallocationDate":"2026-12-27",
-                   |  "destinationApEndDate":"2024-02-02",
-                   |  "destinationTaxPayerReference": "18969779586"
-                   |  },
-                   |  {
-                   |  "amount":89075.0,
-                   |  "reallocationDate":"2026-12-27",
-                   |  "destinationApEndDate":"2024-02-02",
-                   |  "destinationTaxPayerReference": "18969779586"
-                   |  }
-                   |]
-                   |}""".stripMargin
-              )
-          )
-      )
-
-      val result = connector.getReallocationFromAccPeriod(789652L, 8745L).futureValue
-      result.reallocation must contain allElementsOf reallocationFromAccPeriodWithThreeElements.reallocation
+      val result = connector.getClientByCrn("STN003", "123456", "BUX300").futureValue
+      result mustEqual allClients
     }
 
     "return INTERNAL_ERROR when service failed" in {
       stubFor(
-        get(urlPathEqualTo(url(123L, 12L)))
+        get(urlPathEqualTo(url("STN003", "123456", "BUX300")))
           .willReturn(
             aResponse()
               .withStatus(INTERNAL_SERVER_ERROR)
@@ -142,13 +124,13 @@ class GetClientByCrnRdsProxyConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getReallocationFromAccPeriod(123L, 12L).futureValue
+        connector.getClientByCrn("STN003", "123456", "BUX300").futureValue
       }
       ex.getMessage.toLowerCase must include("boom")
     }
     "return 400 when BE returns BAD_REQUEST " in {
       stubFor(
-        get(urlPathEqualTo(url(123L, 12L)))
+        get(urlPathEqualTo(url("STN003", "123456", "BUX300")))
           .willReturn(
             aResponse()
               .withStatus(BAD_REQUEST)
@@ -157,14 +139,14 @@ class GetClientByCrnRdsProxyConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getReallocationFromAccPeriod(123L, 12L).futureValue
+        connector.getClientByCrn("STN003", "123456", "BUX300").futureValue
       }
       ex.getMessage must include("Invalid Request")
     }
 
     "return 404 when BE returns NOT_FOUND " in {
       stubFor(
-        get(urlPathEqualTo(url(128L, 12L)))
+        get(urlPathEqualTo(url("STN003", "123456", "BUX300")))
           .willReturn(
             aResponse()
               .withStatus(NOT_FOUND)
@@ -173,7 +155,7 @@ class GetClientByCrnRdsProxyConnectorISpec
       )
 
       val ex = intercept[Exception] {
-        connector.getReallocationFromAccPeriod(128L, 12L).futureValue
+        connector.getClientByCrn("STN003", "123456", "BUX300").futureValue
       }
       ex.getMessage must include("Not found")
     }
