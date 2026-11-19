@@ -17,58 +17,46 @@
 package uk.gov.hmrc.corporationtax.services
 
 import play.api.Logging
-//import uk.gov.hmrc.corporationtax.connectors.ClientListDownloadStatusConnector
-//import uk.gov.hmrc.corporationtax.models.ClientDownloadStatus
+import uk.gov.hmrc.corporationtax.connectors.ClientListDownloadStatusConnector
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.corporationtax.models.ClientDownloadStatus
+import uk.gov.hmrc.corporationtax.connectors.manageClient.AllClientsConnector
+import uk.gov.hmrc.corporationtax.services.manageClient.AllClientsService
 import uk.gov.hmrc.corporationtax.models.manageClient.AllClients
-import uk.gov.hmrc.corporationtax.utils.ClientListStubs
+//import uk.gov.hmrc.corporationtax.utils.ClientListStubs
+import uk.gov.hmrc.corporationtax.utils.ClientListStatusHelper
 
 import javax.inject.Inject
-//import scala.concurrent.Future
+import scala.concurrent.Future
 
 // connector: ClientListDownloadStatusConnector
-class ClientListService @Inject() () extends Logging {
+class ClientListService @Inject() (
+  clientListDownloadStatusConnector: ClientListDownloadStatusConnector,
+  allClientsConnector: AllClientsConnector
+)(implicit hc: HeaderCarrier)
+    extends Logging {
 
-  def getClientList(credentialId: String, pStart: Int, pCount: Int, sortOrder: String): Option[AllClients] = {
-//    val clientListDownloadStatusService: ClientListDownloadStatusService = new ClientListDownloadStatusService(
-//      connector
-//    )
-
-//    val result: Int = clientListDownloadStatusService
-//      .getClientListDownloadStatus(credentialId)
-//      .map(response => response.status)
-
-    val result: Int = 1
-
-    // DIDN'T SUCCEED?
-    if (result != 1) {
-      return Some(null)
-    }
-
-    val lastIndex: Int = pStart + pCount
-
-    val clientList = sortOrder.toLowerCase() match {
-      case "asc"  => ClientListStubs
-        .paginatedClients
-        .clientList
-        .sortBy(item => item.companyName)
-        .slice(pStart, lastIndex)
-      case "desc" => ClientListStubs
-        .paginatedClients
-        .clientList
-        .sortBy(item => item.companyName).reverse
-        .slice(pStart, lastIndex)
-      case _ => ClientListStubs
-        .paginatedClients
-        .clientList
-        .slice(pStart, lastIndex)
-    }
-
-    val filteredClients: AllClients = AllClients(
-      clientCount = clientList.size,
-      clientList = clientList,
-      clientNameStartChars = ClientListStubs.paginatedClients.clientNameStartChars
+  def getClientList(
+    irAgentId: String,
+    credentialId: String,
+    start: Int,
+    count: Int,
+    sort: Int,
+    order: String
+  ): Future[AllClients] = {
+    val clientListDownloadStatusService: ClientListDownloadStatusService = new ClientListDownloadStatusService(
+      clientListDownloadStatusConnector
     )
 
-    Some(filteredClients)
+    val clientDownloadStatus: Int = clientListDownloadStatusService.getClientListDownloadStatus(credentialId).value.get
+
+    // DIDN'T SUCCEED?
+    if (!ClientListStatusHelper.hasSucceeded(clientDownloadStatus)) {
+      return null
+    }
+
+    val allClientsService: AllClientsService = new AllClientsService(allClientsConnector)
+
+    allClientsService.getAllClients(irAgentId, credentialId, start, count, sort, order)
   }
 }
