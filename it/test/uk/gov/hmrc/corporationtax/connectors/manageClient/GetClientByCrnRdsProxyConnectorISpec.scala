@@ -110,7 +110,7 @@ class GetClientByCrnRdsProxyConnectorISpec
       )
 
       val result = connector.getClientByCrn("STN003", "123456", "BUX300").futureValue
-      result mustEqual allClients
+      result mustEqual allClients1
     }
 
     "return INTERNAL_ERROR when service failed" in {
