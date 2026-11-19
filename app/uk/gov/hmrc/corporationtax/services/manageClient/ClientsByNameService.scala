@@ -25,11 +25,19 @@ import javax.inject.Inject
 import scala.concurrent.Future
 
 class ClientsByNameService @Inject() (
-                                    clientsByNameConnector: ClientsByNameConnector
-                                  ) extends Logging {
+  clientsByNameConnector: ClientsByNameConnector
+) extends Logging {
 
-  def getClientsByName(irAgentId: String, credentialId: String, name: String, start: Int, count: Int, sort: Int, order: String)(implicit
-                                                                                                               hc: HeaderCarrier
+  def getClientsByName(
+    irAgentId: String,
+    credentialId: String,
+    name: String,
+    start: Int,
+    count: Int,
+    sort: Int,
+    order: String
+  )(implicit
+    hc: HeaderCarrier
   ): Future[AllClients] = {
     logger.info(
       s"Calling connector for irAgentId: $irAgentId, credentialId: $credentialId, name: $name, start: $start, count: $count, sort: $sort, order: $order"

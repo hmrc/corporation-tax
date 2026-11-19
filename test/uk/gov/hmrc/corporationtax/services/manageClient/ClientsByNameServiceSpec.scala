@@ -34,7 +34,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 class ClientsByNameServiceSpec
-  extends AnyWordSpec
+    extends AnyWordSpec
     with Matchers
     with ScalaFutures
     with MockitoSugar
@@ -46,7 +46,7 @@ class ClientsByNameServiceSpec
     implicit val ec: ExecutionContext    = cc.executionContext
 
     val mockConnector: ClientsByNameConnector = mock[ClientsByNameConnector]
-    val service                            = new ClientsByNameService(mockConnector)
+    val service                               = new ClientsByNameService(mockConnector)
   }
 
   "getClientsByName" should {

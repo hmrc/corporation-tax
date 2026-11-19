@@ -29,11 +29,19 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ClientsByNameConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit
-                                                                               ec: ExecutionContext
+  ec: ExecutionContext
 ) extends Logging {
 
-  def getClientsByName(irAgentId: String, credentialId: String, name: String, start: Int, count: Int, sort: Int, order: String)(implicit
-                                                                                                               hc: HeaderCarrier
+  def getClientsByName(
+    irAgentId: String,
+    credentialId: String,
+    name: String,
+    start: Int,
+    count: Int,
+    sort: Int,
+    order: String
+  )(implicit
+    hc: HeaderCarrier
   ): Future[AllClients] = {
     val url: URL =
       url"${appConfig.rdsDatacacheProxyFullUrl}/clients-by-name/$irAgentId/$credentialId/$name?start=$start&count=$count&sort=$sort&order=$order"
