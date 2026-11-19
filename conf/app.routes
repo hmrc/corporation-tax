@@ -54,4 +54,4 @@ GET        /initiate-client-list-download                                       
 
 # Manage Clients Routes
 GET        /all-clients                                                         uk.gov.hmrc.corporationtax.controllers.manageClient.AllClientsController.getAllClients(start: Int ?= 0, count: Int ?= 30, sort: Int ?= 0, order: String ?= "ASC")
-GET        /clients-by-name                                                     uk.gov.hmrc.corporationtax.controllers.manageClient.ClientsByNameController.getClientsByName(start: Int ?= 0, count: Int ?= -1, sort: Int ?= 0, order: String ?= "ASC")
+GET        /clients-by-name/:name                                               uk.gov.hmrc.corporationtax.controllers.manageClient.ClientsByNameController.getClientsByName(name: String, start: Int ?= 0, count: Int ?= -1, sort: Int ?= 0, order: String ?= "ASC")

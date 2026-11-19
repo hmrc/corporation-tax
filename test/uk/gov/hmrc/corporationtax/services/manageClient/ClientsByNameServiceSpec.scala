@@ -45,7 +45,7 @@ class ClientsByNameServiceSpec
     implicit val hc: HeaderCarrier       = HeaderCarrier()
     implicit val ec: ExecutionContext    = cc.executionContext
 
-    val mockConnector: AllClientsConnector = mock[ClientsByNameConnector]
+    val mockConnector: ClientsByNameConnector = mock[ClientsByNameConnector]
     val service                            = new ClientsByNameService(mockConnector)
   }
 
