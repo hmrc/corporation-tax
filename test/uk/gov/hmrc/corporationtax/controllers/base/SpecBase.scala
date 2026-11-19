@@ -53,6 +53,7 @@ trait SpecBase
   implicit val ec: ExecutionContext                    = cc.executionContext
   val bodyParsers: PlayBodyParsers                     = app.injector.instanceOf[PlayBodyParsers]
   val fakeIdentifierAction                             = new FakeIdentifierAction(bodyParsers)
+  val fakeIdentifierActionWithoutAgentReference        = new FakeIdentifierAction(bodyParsers, irAgentReference = None)
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
 }

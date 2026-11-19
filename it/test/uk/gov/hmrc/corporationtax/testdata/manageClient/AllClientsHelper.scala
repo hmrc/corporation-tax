@@ -20,6 +20,38 @@ import uk.gov.hmrc.corporationtax.models.manageClient.{AllClients, ClientList}
 
 trait AllClientsHelper {
 
+
+  val allClients1: AllClients = AllClients(
+    clientCount = 3,
+    clientList = List(
+      ClientList(
+        utr = "1234567890",
+        companyRegNo = Some("01234567"),
+        companyName = "ABC Limited",
+        agentOwnRef = Some("AGENT001")
+      ),
+      ClientList(
+        utr = "9876543210",
+        companyRegNo = None,
+        companyName = "XYZ Solutions Ltd",
+        agentOwnRef = Some("AGENT002")
+      ),
+      ClientList(
+        utr = "5678901234",
+        companyRegNo = Some("09876543"),
+        companyName = "Global Technologies Ltd",
+        agentOwnRef = None
+      )
+    ),
+    clientNameStartChars = List("A", "G", "X")
+  )
+
+  val emptyAllClients: AllClients = AllClients(
+    clientCount = 0,
+    clientList = List.empty[ClientList],
+    clientNameStartChars = List.empty[String]
+  )
+
   val allClients: AllClients = AllClients(
     clientCount = 100,
     clientList = List(

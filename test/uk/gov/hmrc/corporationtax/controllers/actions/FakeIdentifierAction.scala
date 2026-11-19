@@ -21,18 +21,17 @@ import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.corporationtax.models.auth.IdentifierRequest
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject() (bodyParsers: PlayBodyParsers) extends IdentifierAction {
+class FakeIdentifierAction(bodyParsers: PlayBodyParsers, irAgentReference: Option[String] = Some("HX12345"))
+    extends IdentifierAction {
 
   /** Stub credential identifier for tests */
-  private val FakeIrAgentReference: Option[String] = Some("fake-irAgent-reference")
-  private val FakeCredentialId: String             = "fake-credential-id"
-  private val AffinityGroup: AffinityGroup         = Organisation
+  private val FakeCredentialId: String     = "fake-credential-id"
+  private val AffinityGroup: AffinityGroup = Organisation
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(IdentifierRequest(request, FakeCredentialId, FakeIrAgentReference, AffinityGroup))
+    block(IdentifierRequest(request, FakeCredentialId, irAgentReference, AffinityGroup))
 
   override def parser: BodyParser[AnyContent] =
     bodyParsers.default

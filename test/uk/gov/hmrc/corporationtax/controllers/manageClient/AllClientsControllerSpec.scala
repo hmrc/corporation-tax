@@ -18,24 +18,21 @@ package uk.gov.hmrc.corporationtax.controllers.manageClient
 
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
-import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.http.Status
 import play.api.libs.json.Json
-import play.api.mvc.{Request, Result}
+import play.api.mvc.Result
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.corporationtax.controllers.base.SpecBase
 import uk.gov.hmrc.corporationtax.helpers.manageClient.AllClientsHelper
 import uk.gov.hmrc.corporationtax.services.manageClient.AllClientsService
-import uk.gov.hmrc.corporationtax.controllers.actions.FakeIdentifierAction
-import uk.gov.hmrc.corporationtax.models.auth.IdentifierRequest
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AllClientsControllerSpec extends AnyWordSpec with Matchers with AllClientsHelper {
+class AllClientsControllerSpec extends SpecBase with AllClientsHelper {
 
   private trait Setup {
     val mockService: AllClientsService = mock[AllClientsService]
@@ -43,16 +40,7 @@ class AllClientsControllerSpec extends AnyWordSpec with Matchers with AllClients
     val cc                            = Helpers.stubControllerComponents()
     implicit val ec: ExecutionContext = cc.executionContext
 
-    val fakeRequest          = FakeRequest("GET", "/all-clients")
-    val fakeIdentifierAction = FakeIdentifierAction(cc.parsers)
-
-    val fake400IdentifierAction = new FakeIdentifierAction(cc.parsers) {
-      override def invokeBlock[A](
-        request: Request[A],
-        block: IdentifierRequest[A] => Future[Result]
-      ): Future[Result] =
-        block(IdentifierRequest(request, "fakeCredId", None, AffinityGroup.Agent))
-    }
+    val fakeRequest = FakeRequest("GET", "/all-clients")
 
     val controller =
       new AllClientsController(mockService, fakeIdentifierAction, Helpers.stubControllerComponents())
@@ -71,7 +59,7 @@ class AllClientsControllerSpec extends AnyWordSpec with Matchers with AllClients
 
       verify(mockService)
         .getAllClients(
-          eqTo("fake-irAgent-reference"),
+          eqTo("HX12345"),
           eqTo("fake-credential-id"),
           eqTo(0),
           eqTo(30),
@@ -93,7 +81,7 @@ class AllClientsControllerSpec extends AnyWordSpec with Matchers with AllClients
 
       verify(mockService)
         .getAllClients(
-          eqTo("fake-irAgent-reference"),
+          eqTo("HX12345"),
           eqTo("fake-credential-id"),
           eqTo(0),
           eqTo(30),
@@ -115,7 +103,7 @@ class AllClientsControllerSpec extends AnyWordSpec with Matchers with AllClients
 
       verify(mockService)
         .getAllClients(
-          eqTo("fake-irAgent-reference"),
+          eqTo("HX12345"),
           eqTo("fake-credential-id"),
           eqTo(0),
           eqTo(30),
@@ -131,7 +119,11 @@ class AllClientsControllerSpec extends AnyWordSpec with Matchers with AllClients
         .thenReturn(Future.successful(multipleItemsClientNameAllClients))
 
       val controller400 =
-        new AllClientsController(mockService, fake400IdentifierAction, Helpers.stubControllerComponents())
+        new AllClientsController(
+          mockService,
+          fakeIdentifierActionWithoutAgentReference,
+          Helpers.stubControllerComponents()
+        )
 
       val result: Future[Result] =
         controller400.getAllClients(0, 30, 0, "ASC")(fakeRequest)
@@ -154,7 +146,7 @@ class AllClientsControllerSpec extends AnyWordSpec with Matchers with AllClients
 
       verify(mockService)
         .getAllClients(
-          eqTo("fake-irAgent-reference"),
+          eqTo("HX12345"),
           eqTo("fake-credential-id"),
           eqTo(0),
           eqTo(30),
