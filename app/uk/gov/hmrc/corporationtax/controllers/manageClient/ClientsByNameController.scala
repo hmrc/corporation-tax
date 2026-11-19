@@ -28,15 +28,15 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ClientsByNameController @Inject() (
-                                       clientsByNameService: ClientsByNameService,
-                                       identify: IdentifierAction,
-                                       cc: ControllerComponents
-                                     )(implicit ec: ExecutionContext)
-  extends BackendController(cc)
+  clientsByNameService: ClientsByNameService,
+  identify: IdentifierAction,
+  cc: ControllerComponents
+)(implicit ec: ExecutionContext)
+    extends BackendController(cc)
     with Logging {
 
-  def getClientsByName(name: String, start: Int, count: Int, sort: Int, order: String): Action[AnyContent] = identify.async {
-    implicit request =>
+  def getClientsByName(name: String, start: Int, count: Int, sort: Int, order: String): Action[AnyContent] =
+    identify.async { implicit request =>
       (request.irAgentReference, request.credentialId) match {
         case (Some(agentId), credId) =>
           clientsByNameService
@@ -54,5 +54,5 @@ class ClientsByNameController @Inject() (
             BadRequest(Json.obj("message" -> "irAgentReference or credentialId was not provided in the request"))
           )
       }
-  }
+    }
 }

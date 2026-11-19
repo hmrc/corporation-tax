@@ -48,9 +48,9 @@ class ClientsByNameControllerSpec extends AnyWordSpec with Matchers with AllClie
 
     val fake400IdentifierAction = new FakeIdentifierAction(cc.parsers) {
       override def invokeBlock[A](
-                                   request: Request[A],
-                                   block: IdentifierRequest[A] => Future[Result]
-                                 ): Future[Result] =
+        request: Request[A],
+        block: IdentifierRequest[A] => Future[Result]
+      ): Future[Result] =
         block(IdentifierRequest(request, "fakeCredId", None, AffinityGroup.Agent))
     }
 
