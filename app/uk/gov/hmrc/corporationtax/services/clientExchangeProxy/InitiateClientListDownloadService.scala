@@ -27,8 +27,8 @@ import scala.concurrent.Future
 class InitiateClientListDownloadService @Inject (connector: ClientExchangeProxyConnector) extends Logging {
 
   def initiateClientListDownload(
-                                  credentialId: String
-                                )(implicit hc: HeaderCarrier): Future[AsynchronousProcessWaitTime] = {
+    credentialId: String
+  )(implicit hc: HeaderCarrier): Future[AsynchronousProcessWaitTime] = {
     logger.info("Invoking connector to get the client list download ")
     connector.initiateClientListDownload(credentialId)
   }
