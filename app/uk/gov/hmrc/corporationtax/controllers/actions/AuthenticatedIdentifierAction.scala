@@ -52,12 +52,15 @@ class AuthenticatedIdentifierAction @Inject() (
           Retrievals.credentialRole and
           Retrievals.credentials
       ) {
-        case Some(_) ~ Enrolments(enrolments) ~ Some(Agent) ~ Some(User) ~ Some(Credentials(credId, _))
+        case Some(_) ~ (allEnrolments @ Enrolments(enrolments)) ~ Some(Agent) ~ Some(User) ~ Some(
+              Credentials(credId, _)
+            )
             if enrolments
               .find(_.key == agentEnrollment)
               .exists(e => permittedEnrollmentStates.contains(e.state.toLowerCase())) =>
           logger.info(s"Authorisation requested as Agent")
-          block(IdentifierRequest(request, credId, Agent))
+          val irAgentReference = AuthenticatedIdentifierAction.getAgentEnrolments(allEnrolments)
+          block(IdentifierRequest(request, credId, irAgentReference, Agent))
 
         case _ ~ _ ~ _ ~ _ ~ _ =>
           throw InternalError("Authentication error: expected enrollments and/or affinity group not found")
@@ -70,5 +73,14 @@ class AuthenticatedIdentifierAction @Inject() (
         Future.successful(Forbidden)
       }
   }
+
+}
+
+object AuthenticatedIdentifierAction {
+  def getAgentEnrolments(enrolment: Enrolments): Option[String] =
+    enrolment
+      .getEnrolment("IR-CT-AGENT")
+      .flatMap(_.getIdentifier("IRAgentReference"))
+      .map(_.value)
 
 }
