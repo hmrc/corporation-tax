@@ -64,7 +64,7 @@ class ClientsByNameControllerSpec extends AnyWordSpec with Matchers with AllClie
       when(mockService.getClientsByName(any(), any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(allClients))
 
-      val result: Future[Result] = controller.getClientsByName(0, -1, 0, "ASC")(fakeRequest)
+      val result: Future[Result] = controller.getClientsByName("name1", 0, -1, 0, "ASC")(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(allClients)
@@ -73,7 +73,7 @@ class ClientsByNameControllerSpec extends AnyWordSpec with Matchers with AllClie
         .getClientsByName(
           eqTo("fake-irAgent-reference"),
           eqTo("fake-credential-id"),
-          eqTo("fake-name"),
+          eqTo("name1"),
           eqTo(0),
           eqTo(-1),
           eqTo(0),
@@ -84,10 +84,10 @@ class ClientsByNameControllerSpec extends AnyWordSpec with Matchers with AllClie
     }
 
     "return 200 and a successful response of clients by name with multiple items of client list" in new Setup {
-      when(mockService.getClientsByName,(any(), any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
+      when(mockService.getClientsByName(any(), any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(multipleClientListAllClients))
 
-      val result: Future[Result] = controller.getClientsByName(0, -1, 0, "ASC")(fakeRequest)
+      val result: Future[Result] = controller.getClientsByName("name2", 0, -1, 0, "ASC")(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(multipleClientListAllClients)
@@ -96,7 +96,7 @@ class ClientsByNameControllerSpec extends AnyWordSpec with Matchers with AllClie
         .getClientsByName(
           eqTo("fake-irAgent-reference"),
           eqTo("fake-credential-id"),
-          eqTo("fake-name"),
+          eqTo("name2"),
           eqTo(0),
           eqTo(-1),
           eqTo(0),
@@ -110,7 +110,7 @@ class ClientsByNameControllerSpec extends AnyWordSpec with Matchers with AllClie
       when(mockService.getClientsByName(any(), any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(multipleItemsClientNameAllClients))
 
-      val result: Future[Result] = controller.getClientsByName(0, -1, 0, "ASC")(fakeRequest)
+      val result: Future[Result] = controller.getClientsByName("name3", 0, -1, 0, "ASC")(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(multipleItemsClientNameAllClients)
@@ -119,7 +119,7 @@ class ClientsByNameControllerSpec extends AnyWordSpec with Matchers with AllClie
         .getClientsByName(
           eqTo("fake-irAgent-reference"),
           eqTo("fake-credential-id"),
-          eqTo("fake-name"),
+          eqTo("name3"),
           eqTo(0),
           eqTo(-1),
           eqTo(0),
@@ -134,10 +134,10 @@ class ClientsByNameControllerSpec extends AnyWordSpec with Matchers with AllClie
         .thenReturn(Future.successful(multipleItemsClientNameAllClients))
 
       val controller400 =
-        new ClientsByNamesController(mockService, fake400IdentifierAction, Helpers.stubControllerComponents())
+        new ClientsByNameController(mockService, fake400IdentifierAction, Helpers.stubControllerComponents())
 
       val result: Future[Result] =
-        controller400.getClientsByName(0, -1, 0, "ASC")(fakeRequest)
+        controller400.getClientsByName("nameNON", 0, -1, 0, "ASC")(fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
 
@@ -150,7 +150,7 @@ class ClientsByNameControllerSpec extends AnyWordSpec with Matchers with AllClie
         .thenReturn(Future.failed(new RuntimeException("error")))
 
       val result: Future[Result] =
-        controller.getClientsByName(0, -1, 0, "ASC")(fakeRequest)
+        controller.getClientsByName("nameNA", 0, -1, 0, "ASC")(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
 
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve clients by name"
@@ -159,7 +159,7 @@ class ClientsByNameControllerSpec extends AnyWordSpec with Matchers with AllClie
         .getClientsByName(
           eqTo("fake-irAgent-reference"),
           eqTo("fake-credential-id"),
-          eqTo("fake-name"),
+          eqTo("nameNA"),
           eqTo(0),
           eqTo(-1),
           eqTo(0),

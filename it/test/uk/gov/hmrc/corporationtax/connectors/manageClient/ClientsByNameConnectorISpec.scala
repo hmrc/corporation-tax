@@ -142,7 +142,7 @@ class ClientsByNameConnectorISpec
 
     "return clients by name with non default params" in {
       stubFor(
-        get(urlEqualTo(url("irAgentId4", "credentialId4", "name4", 0, -1, 3, "DESC")))
+        get(urlEqualTo(url("irAgentId4", "credentialId4", "name4", 0, -1, 2, "DESC")))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -151,28 +151,22 @@ class ClientsByNameConnectorISpec
                    |  "clientCount": 100,
                    |  "clientList": [
                    |    {
-                   |      "utr": "12345",
-                   |      "companyRegNo": "01234A",
-                   |      "companyName": "ABC Limited",
-                   |      "agentOwnRef": "ABC10"
-                   |    },
-                   |    {
-                   |      "utr": "67890",
-                   |      "companyRegNo": "6789B",
-                   |      "companyName": "DEF Limited",
-                   |      "agentOwnRef": "DEF10"
+                   |      "utr": "111213",
+                   |      "companyRegNo": "111213C",
+                   |      "companyName": "GHI Limited",
+                   |      "agentOwnRef": "GHI10"
                    |    }
                    |  ],
                    |  "clientNameStartChars": [
-                   |    "D"
+                   |    "G", "H", "I"
                    |  ]
                    |}""".stripMargin
               )
           )
       )
 
-      val result = connector.getClientsByName("irAgentId4", "credentialId4", "name4", 0, -1, 3, "DESC").futureValue
-      result mustBe getParamCombo("irAgentId4", "credbhjentialId4", 0, -1, 3, "DESC")
+      val result = connector.getClientsByName("irAgentId4", "credentialId4", "name4", 0, -1, 2, "DESC").futureValue
+      result mustBe getParamCombo(0, -1, 2, "DESC")
     }
 
     "return INTERNAL_ERROR when service failed" in {

@@ -35,10 +35,10 @@ class ClientsByNameController @Inject() (
   extends BackendController(cc)
     with Logging {
 
-  def getClientsByName(start: Int, count: Int, sort: Int, order: String): Action[AnyContent] = identify.async {
+  def getClientsByName(name: String, start: Int, count: Int, sort: Int, order: String): Action[AnyContent] = identify.async {
     implicit request =>
-      (request.irAgentReference, request.credentialId, request.name) match {
-        case (Some(agentId), credId, name) =>
+      (request.irAgentReference, request.credentialId) match {
+        case (Some(agentId), credId) =>
           clientsByNameService
             .getClientsByName(agentId, credId, name, start, count, sort, order)
             .map { clientsByName =>
@@ -49,9 +49,9 @@ class ClientsByNameController @Inject() (
               InternalServerError(Json.obj("error" -> "Failed to retrieve clients by name"))
             }
         case _                       =>
-          logger.error("Error while retrieving irAgentReference, credentialId and name")
+          logger.error("Error while retrieving irAgentReference and credentialId")
           Future.successful(
-            BadRequest(Json.obj("message" -> "irAgentReference, credentialId or name was not provided in the request"))
+            BadRequest(Json.obj("message" -> "irAgentReference or credentialId was not provided in the request"))
           )
       }
   }
