@@ -172,7 +172,7 @@ class AllClientsConnectorISpec
       )
 
       val result = connector.getAllClients("irAgentId4", "credentialId4", 0, 30, 3, "DESC").futureValue
-      result mustBe getParamCombo("irAgentId4", "credentialId4", 0, 30, 3, "DESC")
+      result mustBe getParamCombo(0, 30, 3, "DESC")
     }
 
     "return INTERNAL_ERROR when service failed" in {
