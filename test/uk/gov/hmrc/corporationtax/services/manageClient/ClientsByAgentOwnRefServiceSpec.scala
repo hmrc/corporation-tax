@@ -41,11 +41,11 @@ class ClientsByAgentOwnRefServiceSpec extends AnyWordSpec with Matchers with Sca
     implicit val ec: ExecutionContext    = cc.executionContext
 
     val mockConnector: ClientsByAgentOwnRefConnector = mock[ClientsByAgentOwnRefConnector]
-    val service                                  = new ClientsByAgentOwnRefService(mockConnector)
+    val service                                      = new ClientsByAgentOwnRefService(mockConnector)
 
     val irAgentReference = "SN003"
     val credentialId     = "637763"
-    val clientId     = "CTR692001"
+    val clientId         = "CTR692001"
 
     val allClients: AllClients = AllClients(
       clientCount = 3,
@@ -80,13 +80,16 @@ class ClientsByAgentOwnRefServiceSpec extends AnyWordSpec with Matchers with Sca
       when(mockConnector.getClientsByAgentOwnRef(any(), any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(allClients))
 
-      val result: AllClients = service.getClientsByAgentOwnRef(irAgentReference, credentialId, clientId, 0, -1, 0, "ASC").futureValue
+      val result: AllClients =
+        service.getClientsByAgentOwnRef(irAgentReference, credentialId, clientId, 0, -1, 0, "ASC").futureValue
 
       result shouldBe allClients
 
       verify(mockConnector).getClientsByAgentOwnRef("SN003", "637763", "CTR692001", 0, -1, 0, "ASC")
 
-      verify(mockConnector, times(1)).getClientsByAgentOwnRef(any(), any(), any(), any(), any(), any(), any())(any[HeaderCarrier])
+      verify(mockConnector, times(1)).getClientsByAgentOwnRef(any(), any(), any(), any(), any(), any(), any())(
+        any[HeaderCarrier]
+      )
 
     }
     "propagate any errors or exceptions from connector" in new BaseSetup {
@@ -100,7 +103,9 @@ class ClientsByAgentOwnRefServiceSpec extends AnyWordSpec with Matchers with Sca
 
       ex.getMessage should include("boom")
 
-      verify(mockConnector, times(1)).getClientsByAgentOwnRef(any(), any(), any(), any(), any(), any(), any())(any[HeaderCarrier])
+      verify(mockConnector, times(1)).getClientsByAgentOwnRef(any(), any(), any(), any(), any(), any(), any())(
+        any[HeaderCarrier]
+      )
 
     }
   }

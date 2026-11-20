@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ClientsByAgentOwnRefController @Inject()(
+class ClientsByAgentOwnRefController @Inject() (
   cc: ControllerComponents,
   auth: IdentifierAction,
   service: ClientsByAgentOwnRefService
@@ -35,7 +35,7 @@ class ClientsByAgentOwnRefController @Inject()(
     extends BackendController(cc)
     with Logging {
 
-  def getClientsByAgentOwnRef(clientId: String, start: Int, count: Int, sort: Int, order: String): Action[AnyContent] = 
+  def getClientsByAgentOwnRef(clientId: String, start: Int, count: Int, sort: Int, order: String): Action[AnyContent] =
     auth.async { implicit request =>
       (request.irAgentReference, request.credentialId) match {
         case (Some(irAgentReference), credentialId) =>
@@ -49,11 +49,11 @@ class ClientsByAgentOwnRefController @Inject()(
               case u: UpstreamErrorResponse =>
                 logger.error("Error response from Upstream", u)
                 Status(u.statusCode)(Json.obj("message" -> u.message))
-              case t: Throwable =>
+              case t: Throwable             =>
                 logger.error("Error while retrieving AllClients", t)
                 InternalServerError(Json.obj("error" -> "Failed to retrieve AllClients"))
             }
-        case _ =>
+        case _                                      =>
           logger.info("Failed to retrieve agentReference or credentialId")
           Future.successful(
             BadRequest(

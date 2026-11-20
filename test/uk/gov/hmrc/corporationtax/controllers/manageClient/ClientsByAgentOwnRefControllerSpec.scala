@@ -36,7 +36,7 @@ class ClientsByAgentOwnRefControllerSpec extends SpecBase {
 
   private trait Fixture {
     val mockService: ClientsByAgentOwnRefService = mock[ClientsByAgentOwnRefService]
-    private val cc: ControllerComponents   = stubControllerComponents()
+    private val cc: ControllerComponents         = stubControllerComponents()
 
     implicit val ec: ExecutionContext                    = cc.executionContext
     val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/clients-by-agent-own-ref")
@@ -132,7 +132,7 @@ class ClientsByAgentOwnRefControllerSpec extends SpecBase {
 
       when(mockService.getClientsByAgentOwnRef(any(), any(), any(), any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(err))
-      
+
       val result: Future[Result] = controller.getClientsByAgentOwnRef(clientId, 0, -1, 0, "ASC")(fakeRequest)
 
       status(result) shouldBe BAD_GATEWAY

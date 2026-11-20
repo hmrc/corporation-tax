@@ -24,17 +24,19 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class ClientsByAgentOwnRefService @Inject()(
+class ClientsByAgentOwnRefService @Inject() (
   connector: ClientsByAgentOwnRefConnector
 ) extends Logging {
 
-  def getClientsByAgentOwnRef(irAgentReference: String, 
-                              credentialId: String,
-                              clientId: String,
-                              start: Int,
-                              count: Int,
-                              sort: Int,
-                              order: String)(implicit
+  def getClientsByAgentOwnRef(
+    irAgentReference: String,
+    credentialId: String,
+    clientId: String,
+    start: Int,
+    count: Int,
+    sort: Int,
+    order: String
+  )(implicit
     hc: HeaderCarrier
   ): Future[AllClients] = {
     logger.info(

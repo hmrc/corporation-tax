@@ -28,11 +28,19 @@ import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ClientsByAgentOwnRefConnector @Inject()(http: HttpClientV2, appConfig: AppConfig)(implicit
-                                                                                        ec: ExecutionContext
+class ClientsByAgentOwnRefConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit
+  ec: ExecutionContext
 ) extends Logging {
 
-  def getClientsByAgentOwnRef(irAgentId: String, credentialId: String, clientId: String, start: Int, count: Int, sort: Int, order: String)(implicit
+  def getClientsByAgentOwnRef(
+    irAgentId: String,
+    credentialId: String,
+    clientId: String,
+    start: Int,
+    count: Int,
+    sort: Int,
+    order: String
+  )(implicit
     hc: HeaderCarrier
   ): Future[AllClients] = {
     val url: URL =
