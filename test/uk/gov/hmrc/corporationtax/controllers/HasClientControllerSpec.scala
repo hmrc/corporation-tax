@@ -16,10 +16,9 @@
 
 package uk.gov.hmrc.corporationtax.controllers
 
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 import org.scalatest.matchers.must.Matchers.mustBe
-import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.http.Status
@@ -27,13 +26,14 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
+import uk.gov.hmrc.corporationtax.controllers.base.SpecBase
 import uk.gov.hmrc.corporationtax.models.HasClientResponse
 import uk.gov.hmrc.corporationtax.services.HasClientService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class HasClientControllerSpec extends AnyWordSpec with Matchers {
+class HasClientControllerSpec extends SpecBase {
 
   private trait Setup {
     val mockHasClientService: HasClientService = mock[HasClientService]
@@ -42,7 +42,8 @@ class HasClientControllerSpec extends AnyWordSpec with Matchers {
     implicit val ec: ExecutionContext = cc.executionContext
 
     val fakeRequest          = FakeRequest("GET", "/has-client")
-    val controller           = new HasClientController(Helpers.stubControllerComponents(), mockHasClientService)
+    val controller           =
+      new HasClientController(Helpers.stubControllerComponents(), mockHasClientService, fakeIdentifierAction)
     val utr: Long            = 1234567890L
     val irAgentId: String    = "AGENT123"
     val credentialId: String = "0903840830080480"
@@ -55,12 +56,12 @@ class HasClientControllerSpec extends AnyWordSpec with Matchers {
         .thenReturn(Future.successful(HasClientResponse(status = true)))
 
       val result: Future[Result] =
-        controller.getHasClient(utr, irAgentId, credentialId)(fakeRequest)
+        controller.getHasClient(utr)(fakeRequest)
 
       status(result) mustBe Status.OK
       contentAsJson(result) mustBe Json.obj("status" -> true)
 
-      verify(mockHasClientService).hasClient(eqTo(utr), eqTo(irAgentId), eqTo(credentialId))(any[HeaderCarrier])
+      verify(mockHasClientService).hasClient(any(), any(), any())(any[HeaderCarrier])
     }
 
     "return 200 and false when the client does not exist" in new Setup {
@@ -68,12 +69,12 @@ class HasClientControllerSpec extends AnyWordSpec with Matchers {
         .thenReturn(Future.successful(HasClientResponse(status = false)))
 
       val result: Future[Result] =
-        controller.getHasClient(utr, irAgentId, credentialId)(fakeRequest)
+        controller.getHasClient(utr)(fakeRequest)
 
       status(result) mustBe Status.OK
       contentAsJson(result) mustBe Json.obj("status" -> false)
 
-      verify(mockHasClientService).hasClient(eqTo(utr), eqTo(irAgentId), eqTo(credentialId))(any[HeaderCarrier])
+      verify(mockHasClientService).hasClient(any(), any(), any())(any[HeaderCarrier])
     }
 
     "return 500: INTERNAL_SERVER_ERROR" in new Setup {
@@ -81,12 +82,29 @@ class HasClientControllerSpec extends AnyWordSpec with Matchers {
         .thenReturn(Future.failed(new RuntimeException("error")))
 
       val result: Future[Result] =
-        controller.getHasClient(utr, irAgentId, credentialId)(fakeRequest)
+        controller.getHasClient(utr)(fakeRequest)
 
       status(result) mustBe Status.INTERNAL_SERVER_ERROR
-      (contentAsJson(result) \ "error").as[String] mustBe "Failed to retrieve Has Client"
+      (contentAsJson(result) \ "error").as[String] mustBe "Failed to retrieve HasClient"
 
-      verify(mockHasClientService).hasClient(eqTo(utr), eqTo(irAgentId), eqTo(credentialId))(any[HeaderCarrier])
+      verify(mockHasClientService).hasClient(any(), any(), any())(any[HeaderCarrier])
+    }
+
+    "return 400: BAD_REQUEST when IRAgentReference has not been provided" in new Setup {
+      override val controller: HasClientController =
+        new HasClientController(cc, mockHasClientService, fakeIdentifierActionWithoutAgentReference)
+
+      when(mockHasClientService.hasClient(any(), any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful("status" -> false))
+
+      val result: Future[Result] = controller.getHasClient(utr)(fakeRequest)
+      status(result) shouldBe Status.BAD_REQUEST
+
+      contentAsJson(result) shouldBe Json.obj(
+        "message" -> "Request could not be processed: the IR agent reference and/or credential ID is missing from the authenticated session"
+      )
+
+      verifyNoInteractions(mockHasClientService)
     }
   }
 }
