@@ -1,5 +1,7 @@
 package uk.gov.hmrc.corporationtax.utils
 
+import uk.gov.hmrc.corporationtax.models.ClientDownloadStatus
+
 object ClientListStatusHelper {
 
   def hasSucceeded(status: Int): Boolean = {
