@@ -23,17 +23,18 @@ import uk.gov.hmrc.corporationtax.models.ClientDownloadStatus
 import uk.gov.hmrc.corporationtax.connectors.manageClient.AllClientsConnector
 import uk.gov.hmrc.corporationtax.services.manageClient.AllClientsService
 import uk.gov.hmrc.corporationtax.models.manageClient.AllClients
-//import uk.gov.hmrc.corporationtax.utils.ClientListStubs
+
+import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.corporationtax.utils.ClientListStatusHelper
 
 import javax.inject.Inject
 import scala.concurrent.Future
+import scala.util.Try
 
-// connector: ClientListDownloadStatusConnector
 class ClientListService @Inject() (
   clientListDownloadStatusConnector: ClientListDownloadStatusConnector,
   allClientsConnector: AllClientsConnector
-)(implicit hc: HeaderCarrier)
+)(implicit hc: HeaderCarrier, ec: ExecutionContext)
     extends Logging {
 
   def getClientList(
@@ -48,10 +49,12 @@ class ClientListService @Inject() (
       clientListDownloadStatusConnector
     )
 
-    val clientDownloadStatus: Int = clientListDownloadStatusService.getClientListDownloadStatus(credentialId).value.get
-
+    val result: Future[ClientDownloadStatus] = clientListDownloadStatusService.getClientListDownloadStatus(credentialId)
+    
+    val status : Int = result.value.getOrElse(0)
+    
     // DIDN'T SUCCEED?
-    if (!ClientListStatusHelper.hasSucceeded(clientDownloadStatus)) {
+    if (!ClientListStatusHelper.hasSucceeded(status)) {
       return null
     }
 
