@@ -32,13 +32,13 @@ class HasClientService @Inject() (
 
   def hasClient(
     utr: Long,
-    irAgentId: String,
+    irAgentReference: String,
     credentialId: String
   )(implicit hc: HeaderCarrier): Future[HasClientResponse] = {
     logger.info(s"Calling Has Client for UTR: $utr")
 
     connector
-      .hasClient(utr, irAgentId, credentialId)
+      .hasClient(utr, irAgentReference, credentialId)
       .map(response => HasClientResponse(status = CommonBooleanTransformation.toBool(response.status.toString)))
   }
 }

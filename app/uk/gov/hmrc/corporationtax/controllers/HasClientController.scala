@@ -19,32 +19,50 @@ package uk.gov.hmrc.corporationtax.controllers
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import uk.gov.hmrc.corporationtax.controllers.actions.IdentifierAction
 import uk.gov.hmrc.corporationtax.services.HasClientService
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class HasClientController @Inject() (
   cc: ControllerComponents,
-  service: HasClientService
+  service: HasClientService,
+  auth: IdentifierAction
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def getHasClient(
-    utr: Long,
-    irAgentId: String,
-    credentialId: String
-  ): Action[AnyContent] = Action.async { implicit request =>
-    service
-      .hasClient(utr, irAgentId, credentialId)
-      .map { hasClient =>
-        Ok(Json.toJson(hasClient))
-      }
-      .recover { case ex: Exception =>
-        logger.error("Error while retrieving Has Client", ex)
-        InternalServerError(Json.obj("error" -> "Failed to retrieve Has Client"))
-      }
+  def getHasClient(utr: Long): Action[AnyContent] = auth.async { implicit request =>
+    (request.irAgentReference, request.credentialId) match {
+      case (Some(irAgentReference), credentialId) =>
+        logger.info("Successfully retrieved agentReference and credentialId")
+        service
+          .hasClient(utr, irAgentReference, credentialId)
+          .map { response =>
+            Ok(Json.toJson(response))
+          }
+          .recover {
+            case u: UpstreamErrorResponse =>
+              logger.error("Error response from Upstream", u)
+              Status(u.statusCode)(Json.obj("message" -> u.message))
+            case t: Throwable             =>
+              logger.error("Error while retrieving HasClient", t)
+              InternalServerError(Json.obj("error" -> "Failed to retrieve HasClient"))
+          }
+      case _                                      =>
+        logger.info("Failed to retrieve agentReference or credentialId")
+        Future.successful(
+          BadRequest(
+            Json.obj(
+              "message" -> "Request could not be processed: the IR agent reference and/or credential ID is missing from the authenticated session"
+            )
+          )
+        )
+
+    }
+
   }
 }
