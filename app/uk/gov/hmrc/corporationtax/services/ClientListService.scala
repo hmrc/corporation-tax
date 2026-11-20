@@ -16,24 +16,31 @@
 
 package uk.gov.hmrc.corporationtax.services
 
+import org.apache.pekko.actor.ActorSystem
 import play.api.Logging
-import uk.gov.hmrc.corporationtax.connectors.ClientListDownloadStatusConnector
+import uk.gov.hmrc.corporationtax.config.AppConfig
+import uk.gov.hmrc.corporationtax.connectors.clientExchangeProxy.ClientExchangeProxyConnector
+import uk.gov.hmrc.corporationtax.services.clientExchangeProxy.ClientExchangeProxyService
+import uk.gov.hmrc.corporationtax.models.clientExchangeProxy.ClientListDownloadStatusTransformed
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.corporationtax.models.ClientDownloadStatus
 import uk.gov.hmrc.corporationtax.connectors.manageClient.AllClientsConnector
 import uk.gov.hmrc.corporationtax.services.manageClient.AllClientsService
 import uk.gov.hmrc.corporationtax.models.manageClient.AllClients
+import uk.gov.hmrc.corporationtax.connectors.ClientListDownloadStatusConnector
+import uk.gov.hmrc.corporationtax.services.ClientListDownloadStatusService
 
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.corporationtax.utils.ClientListStatusHelper
 
 import javax.inject.Inject
 import scala.concurrent.Future
-import scala.util.Try
 
 class ClientListService @Inject() (
   clientListDownloadStatusConnector: ClientListDownloadStatusConnector,
-  allClientsConnector: AllClientsConnector
+  clientExchangeProxyConnector: ClientExchangeProxyConnector,
+  allClientsConnector: AllClientsConnector,
+  appConfig: AppConfig,
+  actorSystem: ActorSystem
 )(implicit hc: HeaderCarrier, ec: ExecutionContext)
     extends Logging {
 
@@ -49,11 +56,17 @@ class ClientListService @Inject() (
       clientListDownloadStatusConnector
     )
 
-    val status: Int = Future.successful(
-      clientListDownloadStatusService
-        .getClientListDownloadStatus(credentialId)
-        .map(item => item.status)
+    val clientExchangeProxyService: ClientExchangeProxyService = new ClientExchangeProxyService(
+      clientExchangeProxyConnector,
+      clientListDownloadStatusService,
+      appConfig,
+      actorSystem
     )
+
+    val downloadStatusTransformed: Future[ClientListDownloadStatusTransformed] =
+      clientExchangeProxyService.getStatus(credentialId)
+
+    val status : Int = downloadStatusTransformed.map(item => item.asInt)
 
     // DIDN'T SUCCEED?
     if (!ClientListStatusHelper.hasSucceeded(status)) {
