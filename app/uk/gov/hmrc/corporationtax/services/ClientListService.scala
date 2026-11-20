@@ -49,10 +49,12 @@ class ClientListService @Inject() (
       clientListDownloadStatusConnector
     )
 
-    val result: Future[ClientDownloadStatus] = clientListDownloadStatusService.getClientListDownloadStatus(credentialId)
-    
-    val status : Int = result.value.getOrElse(0)
-    
+    val status: Int = Future.successful(
+      clientListDownloadStatusService
+        .getClientListDownloadStatus(credentialId)
+        .map(item => item.status)
+    )
+
     // DIDN'T SUCCEED?
     if (!ClientListStatusHelper.hasSucceeded(status)) {
       return null
