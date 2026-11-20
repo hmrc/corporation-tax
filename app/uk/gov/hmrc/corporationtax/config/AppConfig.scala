@@ -38,6 +38,11 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
     servicesConfig.baseUrl("client-exchange-proxy")
 
   lazy val clientExchangeProxyEndpoint: String =
-    servicesConfig.getString("microservice.services.client-exchange-proxy.path") + "/corporation-tax"
+    servicesConfig.getString("microservice.services.client-exchange-proxy.path")
 
   lazy val clientExchangeProxyFullUrl: String = clientExchangeProxyBaseUrl + clientExchangeProxyEndpoint
+
+  val ctServiceName: String                    = config.get[String]("ct.serviceName")
+  val ctDefaultBrowserIntervalMs: Long         = config.get[Long]("ct.defaultBrowserIntervalMs")
+  val ctDefaultBusinessIntervalsMs: List[Long] = config.get[Seq[Long]]("ct.defaultBusinessIntervalsMs").toList
+  val ctGracePeriodSeconds: Int                = config.get[Int]("ct.gracePeriodSeconds")

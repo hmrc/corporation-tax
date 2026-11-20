@@ -51,26 +51,26 @@ class ClientListDownloadStatusControllerSpec extends AnyWordSpec with Matchers {
   "GET /" should {
 
     "return 200: OK" in new Fixture {
-      when(mockService.getClientListDownloadStatus(any())(any[HeaderCarrier]))
+      when(mockService.getClientListDownloadStatus(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(initiateDownload))
 
-      val result: Future[Result] = controller.getClientListDownloadStatus("1")(fakeRequest)
+      val result: Future[Result] = controller.getClientListDownloadStatus("1", "CT", 14400)(fakeRequest)
       status(result) shouldBe Status.OK
 
       contentAsJson(result) shouldBe Json.toJson(initiateDownload)
 
-      verify(mockService).getClientListDownloadStatus(eqTo("1"))(any[HeaderCarrier])
+      verify(mockService).getClientListDownloadStatus(eqTo("1"), eqTo("CT"), eqTo(14400))(any[HeaderCarrier])
     }
 
     "return 500: INTERNAL_SERVER_ERROR" in new Fixture {
-      when(mockService.getClientListDownloadStatus(any())(any[HeaderCarrier]))
+      when(mockService.getClientListDownloadStatus(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("unexpected")))
 
-      val result: Future[Result] = controller.getClientListDownloadStatus("1")(fakeRequest)
+      val result: Future[Result] = controller.getClientListDownloadStatus("1", "CT", 14400)(fakeRequest)
       status(result)                               shouldBe Status.INTERNAL_SERVER_ERROR
       (contentAsJson(result) \ "error").as[String] shouldBe "Failed to retrieve client list download status"
 
-      verify(mockService).getClientListDownloadStatus(eqTo("1"))(any[HeaderCarrier])
+      verify(mockService).getClientListDownloadStatus(eqTo("1"), eqTo("CT"), eqTo(14400))(any[HeaderCarrier])
     }
 
   }

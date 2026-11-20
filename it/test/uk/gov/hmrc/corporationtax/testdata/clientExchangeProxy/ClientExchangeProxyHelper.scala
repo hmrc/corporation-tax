@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.corporationtax.testdata.clientExchangeProxy
 
-import uk.gov.hmrc.corporationtax.models.clientExchangeProxy.ClientExchangeProxyResponse
+import uk.gov.hmrc.corporationtax.models.clientExchangeProxy.AsynchronousProcessWaitTime
 
 trait ClientExchangeProxyHelper {
 
-  val clientExchangeResponse: ClientExchangeProxyResponse =
-    ClientExchangeProxyResponse(browserInterval = 4500, businessServiceInterval = 600)
+  val asynchronousProcessWaitTimeResponse: AsynchronousProcessWaitTime =
+    AsynchronousProcessWaitTime(browserIntervalMs = 1000, businessIntervalsMs = List(2000, 3000))
 
 }

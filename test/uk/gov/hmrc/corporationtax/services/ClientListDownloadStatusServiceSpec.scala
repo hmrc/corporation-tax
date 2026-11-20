@@ -41,27 +41,28 @@ class ClientListDownloadStatusServiceSpec extends AnyWordSpec with Matchers with
 
   "getClientListDownloadStatus returns Client List Download Status retrieved from connector" in new Setup {
 
-    when(mockConnector.getClientListDownloadStatus(any[String])(any[HeaderCarrier]))
+    when(mockConnector.getClientListDownloadStatus(any[String], any[String], any[Int])(any[HeaderCarrier]))
       .thenReturn(Future.successful(initiateDownload))
 
-    val result: ClientDownloadStatus = service.getClientListDownloadStatus("1").futureValue
+    val result: ClientDownloadStatus = service.getClientListDownloadStatus("1", "CT", 14400).futureValue
 
     result mustBe initiateDownload
 
-    verify(mockConnector).getClientListDownloadStatus("1")(hc)
+    verify(mockConnector).getClientListDownloadStatus("1", "CT", 14400)(hc)
   }
 
   "getClientListDownloadStatus returns failure from connector" in new Setup {
 
     val ex = new RuntimeException("boom")
 
-    when(mockConnector.getClientListDownloadStatus(any())(any[HeaderCarrier])).thenReturn(Future.failed(ex))
+    when(mockConnector.getClientListDownloadStatus(any[String], any[String], any[Int])(any[HeaderCarrier]))
+      .thenReturn(Future.failed(ex))
 
-    val result: Throwable = service.getClientListDownloadStatus("1").failed.futureValue
+    val result: Throwable = service.getClientListDownloadStatus("1", "CT", 14400).failed.futureValue
 
     result mustBe ex
 
-    verify(mockConnector).getClientListDownloadStatus("1")(hc)
+    verify(mockConnector).getClientListDownloadStatus("1", "CT", 14400)(hc)
     verifyNoMoreInteractions(mockConnector)
 
   }

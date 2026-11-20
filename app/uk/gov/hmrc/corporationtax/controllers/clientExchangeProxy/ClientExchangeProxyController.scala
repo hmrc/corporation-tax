@@ -20,7 +20,7 @@ import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.corporationtax.controllers.actions.IdentifierAction
-import uk.gov.hmrc.corporationtax.services.clientExchangeProxy.ClientExchangeProxyService
+import uk.gov.hmrc.corporationtax.services.clientExchangeProxy.*
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -30,13 +30,14 @@ import scala.concurrent.ExecutionContext
 class ClientExchangeProxyController @Inject() (
   cc: ControllerComponents,
   auth: IdentifierAction,
-  service: ClientExchangeProxyService
+  clientExchangeProxyService: ClientExchangeProxyService,
+  initiateClientListDownloadService: InitiateClientListDownloadService
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
   def initiateClientListDownload(): Action[AnyContent] = auth.async { implicit request =>
-    service
+    initiateClientListDownloadService
       .initiateClientListDownload(request.credentialId)
       .map { response =>
         Ok(Json.toJson(response))
@@ -50,4 +51,13 @@ class ClientExchangeProxyController @Inject() (
       }
   }
 
+  def start(): Action[AnyContent] = auth.async { implicit request =>
+    clientExchangeProxyService
+      .process(request.credentialId)
+      .map(status => Ok(Json.obj("result" -> status.asInt)))
+      .recover { case e: NoBusinessIntervalsException =>
+        logger.error("[ClientListController][start] - no business intervals found", e)
+        InternalServerError(Json.obj("result" -> "system-error"))
+      }
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,13 @@
 
 package uk.gov.hmrc.corporationtax.models.clientExchangeProxy
 
-import play.api.libs.json.{Json, OFormat}
+sealed trait ClientListDownloadStatusTransformed { val asInt: Int }
 
-case class ClientExchangeProxyResponse(browserInterval: Int, businessServiceInterval: Int)
+object ClientListDownloadStatusTransformed {
 
-object ClientExchangeProxyResponse {
-  implicit val format: OFormat[ClientExchangeProxyResponse] = Json.format[ClientExchangeProxyResponse]
+  case object InitiateDownload extends ClientListDownloadStatusTransformed { val asInt = -1 }
+  case object InProgress extends ClientListDownloadStatusTransformed { val asInt = 0 }
+  case object Succeeded extends ClientListDownloadStatusTransformed { val asInt = 1 }
+  case object Failed extends ClientListDownloadStatusTransformed { val asInt = 2 }
+
 }
