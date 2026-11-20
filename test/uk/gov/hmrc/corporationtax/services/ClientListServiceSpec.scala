@@ -19,6 +19,7 @@ class ClientListServiceSpec
     with MockitoSugar {
 
   private trait BaseSetup {
+    val irAfgentID: String                  = "1000000"
     val credentialId: String                = "1000000"
     val service                             = new ClientListService()
   }
@@ -29,7 +30,7 @@ class ClientListServiceSpec
       val pStart: Int = 0
       val pCount: Int = 10
       val sortOrder = "ASC"
-      val result: AllClients = service.getClientList(credentialId, pStart, pCount, sortOrder).get
+      val result: AllClients = service.getClientList(irAfgentID, credentialId, pStart, pCount, sortOrder).get
 
       result.clientCount shouldBe 10
       result.clientList.size shouldBe 10
@@ -56,7 +57,7 @@ class ClientListServiceSpec
       val pStart: Int = 0
       val pCount: Int = 10
       val sortOrder = "DESC"
-      val result: AllClients = service.getClientList(credentialId, pStart, pCount, sortOrder).get
+      val result: AllClients = service.getClientList((irAfgentID, credentialId, pStart, pCount, sortOrder).get
 
       result.clientCount shouldBe 10
       result.clientList.size shouldBe 10
@@ -83,7 +84,7 @@ class ClientListServiceSpec
       val pStart: Int = 10
       val pCount: Int = 10
       val sortOrder = "ASC"
-      val result: AllClients = service.getClientList(credentialId, pStart, pCount, sortOrder).get
+      val result: AllClients = service.getClientList((irAfgentID, credentialId, pStart, pCount, sortOrder).get
 
       result.clientCount shouldBe 10
       result.clientList.size shouldBe 10
@@ -110,7 +111,7 @@ class ClientListServiceSpec
       val pStart: Int = 10
       val pCount: Int = 10
       val sortOrder = "DESC"
-      val result: AllClients = service.getClientList(credentialId, pStart, pCount, sortOrder).get
+      val result: AllClients = service.getClientList((irAfgentID, credentialId, pStart, pCount, sortOrder).get
 
       result.clientCount shouldBe 10
       result.clientList.size shouldBe 10
@@ -137,7 +138,7 @@ class ClientListServiceSpec
       val pStart: Int = 0
       val pCount: Int = 10
       val sortOrder = ""
-      val result: AllClients = service.getClientList(credentialId, pStart, pCount, sortOrder).get
+      val result: AllClients = service.getClientList((irAfgentID, credentialId, pStart, pCount, sortOrder).get
 
       result.clientCount shouldBe 10
       result.clientList.size shouldBe 10
