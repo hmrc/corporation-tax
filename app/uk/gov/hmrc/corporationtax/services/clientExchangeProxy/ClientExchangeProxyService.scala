@@ -69,7 +69,9 @@ class ClientExchangeProxyService @Inject (
     actorSystem.scheduler.scheduleOnce(ms.millis)(p.success(()))
     p.future
 
-  def getStatus(credId: String)(implicit hc: HeaderCarrier): Future[ClientListDownloadStatusTransformed] =
+  private[clientExchangeProxy] def getStatus(
+    credId: String
+  )(implicit hc: HeaderCarrier): Future[ClientListDownloadStatusTransformed] =
     clientListDownloadStatusService.getClientListDownloadStatus(credId, serviceName, ctGracePeriodSeconds).map {
       response =>
         response.status match {
