@@ -27,10 +27,8 @@ import uk.gov.hmrc.corporationtax.connectors.manageClient.AllClientsConnector
 import uk.gov.hmrc.corporationtax.services.manageClient.AllClientsService
 import uk.gov.hmrc.corporationtax.models.manageClient.AllClients
 import uk.gov.hmrc.corporationtax.connectors.ClientListDownloadStatusConnector
-import uk.gov.hmrc.corporationtax.services.ClientListDownloadStatusService
 
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.corporationtax.utils.ClientListStatusHelper
 
 import javax.inject.Inject
 import scala.concurrent.Future
@@ -63,16 +61,13 @@ class ClientListService @Inject() (
       actorSystem
     )
 
-    val downloadStatusTransformed: Future[ClientListDownloadStatusTransformed] =
-      clientExchangeProxyService.getStatus(credentialId)
-
-    val status : Int = downloadStatusTransformed.map(item => item.asInt)
-
+    val downloadStatusTransformed: Future[ClientListDownloadStatusTransformed] = clientExchangeProxyService.getStatus(credentialId)
+     
     // DIDN'T SUCCEED?
-    if (!ClientListStatusHelper.hasSucceeded(status)) {
+    if (downloadStatusTransformed != ClientListDownloadStatusTransformed.Succeeded) {
       return null
     }
-
+    
     val allClientsService: AllClientsService = new AllClientsService(allClientsConnector)
 
     allClientsService.getAllClients(irAgentId, credentialId, start, count, sort, order)
