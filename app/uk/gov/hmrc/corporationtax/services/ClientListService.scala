@@ -16,17 +16,14 @@
 
 package uk.gov.hmrc.corporationtax.services
 
-import org.apache.pekko.actor.ActorSystem
 import play.api.Logging
-import uk.gov.hmrc.corporationtax.config.AppConfig
-import uk.gov.hmrc.corporationtax.connectors.clientExchangeProxy.ClientExchangeProxyConnector
 import uk.gov.hmrc.corporationtax.services.clientExchangeProxy.ClientExchangeProxyService
 import uk.gov.hmrc.corporationtax.models.clientExchangeProxy.ClientListDownloadStatusTransformed
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.corporationtax.connectors.manageClient.AllClientsConnector
 import uk.gov.hmrc.corporationtax.services.manageClient.AllClientsService
 import uk.gov.hmrc.corporationtax.models.manageClient.AllClients
-import uk.gov.hmrc.corporationtax.connectors.ClientListDownloadStatusConnector
+import uk.gov.hmrc.corporationtax.models.manageClient.{ClientsError, FailedDownloadStatusError, FailedRetrieveAllClients}
+import scala.util.control.NonFatal
 
 import scala.concurrent.ExecutionContext
 
@@ -34,11 +31,8 @@ import javax.inject.Inject
 import scala.concurrent.Future
 
 class ClientListService @Inject() (
-  clientListDownloadStatusConnector: ClientListDownloadStatusConnector,
-  clientExchangeProxyConnector: ClientExchangeProxyConnector,
-  allClientsConnector: AllClientsConnector,
-  appConfig: AppConfig,
-  actorSystem: ActorSystem
+                                    clientExchangeProxyService: ClientExchangeProxyService,
+                                    allClientsService: AllClientsService
 )(implicit hc: HeaderCarrier, ec: ExecutionContext)
     extends Logging {
 
@@ -49,27 +43,19 @@ class ClientListService @Inject() (
     count: Int,
     sort: Int,
     order: String
-  ): Future[AllClients] = {
-    val clientListDownloadStatusService: ClientListDownloadStatusService = new ClientListDownloadStatusService(
-      clientListDownloadStatusConnector
-    )
+  ): Future[Either[ClientsError, AllClients]] = {
 
-    val clientExchangeProxyService: ClientExchangeProxyService = new ClientExchangeProxyService(
-      clientExchangeProxyConnector,
-      clientListDownloadStatusService,
-      appConfig,
-      actorSystem
-    )
+    clientExchangeProxyService.process(credentialId).flatMap {
+      case ClientListDownloadStatusTransformed.Succeeded =>
+        allClientsService
+          .getAllClients(irAgentId, credentialId, start, count, sort, order)
+          .map(Right(_))
+          .recover { case NonFatal(e) =>
+            Left(FailedRetrieveAllClients("Error message"))
+          }
 
-    val downloadStatusTransformed: Future[ClientListDownloadStatusTransformed] = clientExchangeProxyService.getStatus(credentialId)
-     
-    // DIDN'T SUCCEED?
-    if (downloadStatusTransformed != ClientListDownloadStatusTransformed.Succeeded) {
-      return null
+      case _ =>
+        Future.successful(Left(FailedDownloadStatusError("Error message")))
     }
-    
-    val allClientsService: AllClientsService = new AllClientsService(allClientsConnector)
-
-    allClientsService.getAllClients(irAgentId, credentialId, start, count, sort, order)
   }
 }
