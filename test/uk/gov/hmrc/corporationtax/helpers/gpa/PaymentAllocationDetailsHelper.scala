@@ -26,13 +26,13 @@ trait PaymentAllocationDetailsHelper {
     PaymentAllocationDetails(
       gppEndDate = LocalDate.of(2024, 7, 24),
       gppTotalGroupPayment = BigDecimal(10),
-      gppTotalGroupTax = BigDecimal(10),
+      gppTotalGroupTax = BigDecimal(-10.00),
       gppStatus = "O",
       gppApportionmentMethod = "O",
       participatingCompanyDesc = "ABC Limited",
       participatorAccPeriodEnd = LocalDate.of(2024, 7, 24),
       participatorTaxCharge = BigDecimal(-10.00),
-      participatorAllocPayments = BigDecimal(10),
+      participatorAllocPayments = BigDecimal(-10.00),
       gpaUtr = BigDecimal(10),
       gppContractVersionOut = BigDecimal(10),
       allocationDetails = List(
@@ -48,13 +48,13 @@ trait PaymentAllocationDetailsHelper {
     PaymentAllocationDetails(
       gppEndDate = LocalDate.of(2025, 7, 24),
       gppTotalGroupPayment = BigDecimal(20),
-      gppTotalGroupTax = BigDecimal(20),
+      gppTotalGroupTax = BigDecimal(-20.00),
       gppStatus = "C",
       gppApportionmentMethod = "C",
       participatingCompanyDesc = "DEF Limited",
       participatorAccPeriodEnd = LocalDate.of(2025, 7, 24),
       participatorTaxCharge = BigDecimal(-20.00),
-      participatorAllocPayments = BigDecimal(20),
+      participatorAllocPayments = BigDecimal(-20.00),
       gpaUtr = BigDecimal(20),
       gppContractVersionOut = BigDecimal(20),
       allocationDetails = List(
@@ -80,7 +80,7 @@ trait PaymentAllocationDetailsHelper {
       participatingCompanyDesc = "GHI Limited",
       participatorAccPeriodEnd = LocalDate.of(2026, 7, 24),
       participatorTaxCharge = BigDecimal(-30.00),
-      participatorAllocPayments = BigDecimal(30),
+      participatorAllocPayments = BigDecimal(-30.00),
       gpaUtr = BigDecimal(30),
       gppContractVersionOut = BigDecimal(30),
       allocationDetails = List(

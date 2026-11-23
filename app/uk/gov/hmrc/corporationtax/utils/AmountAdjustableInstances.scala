@@ -151,7 +151,12 @@ object AmountAdjustableInstances {
         )
       ] =
         List(
-          (item => Some(item.participatorTaxCharge), (item, newValue) => item.copy(participatorTaxCharge = newValue))
+          (item => Some(item.participatorTaxCharge), (item, newValue) => item.copy(participatorTaxCharge = newValue)),
+          (item => item.gppTotalGroupTax, (item, newValue) => item.copy(gppTotalGroupTax = Some(newValue))),
+          (
+            item => Some(item.participatorAllocPayments),
+            (item, newValue) => item.copy(participatorAllocPayments = newValue)
+          )
         )
     }
 

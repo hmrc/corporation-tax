@@ -41,7 +41,7 @@ class HasClientServiceSpec extends AnyWordSpec with Matchers with ScalaFutures {
     val mockConnector: HasClientConnector = mock[HasClientConnector]
     val service                           = new HasClientService(mockConnector)
     val utr: Long                         = 1234567890L
-    val irAgentId: String                 = "AGENT123"
+    val irAgentReference: String          = "AGENT123"
     val credentialId: String              = "0903840830080480"
   }
 
@@ -51,10 +51,10 @@ class HasClientServiceSpec extends AnyWordSpec with Matchers with ScalaFutures {
       when(mockConnector.hasClient(any[Long], any[String], any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(HasClient(1)))
 
-      val result: HasClientResponse = service.hasClient(utr, irAgentId, credentialId).futureValue
+      val result: HasClientResponse = service.hasClient(utr, irAgentReference, credentialId).futureValue
 
       result mustBe HasClientResponse(status = true)
-      verify(mockConnector).hasClient(utr, irAgentId, credentialId)(hc)
+      verify(mockConnector).hasClient(utr, irAgentReference, credentialId)(hc)
       verifyNoMoreInteractions(mockConnector)
     }
 
@@ -62,10 +62,10 @@ class HasClientServiceSpec extends AnyWordSpec with Matchers with ScalaFutures {
       when(mockConnector.hasClient(any[Long], any[String], any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(HasClient(0)))
 
-      val result: HasClientResponse = service.hasClient(utr, irAgentId, credentialId).futureValue
+      val result: HasClientResponse = service.hasClient(utr, irAgentReference, credentialId).futureValue
 
       result mustBe HasClientResponse(status = false)
-      verify(mockConnector).hasClient(utr, irAgentId, credentialId)(hc)
+      verify(mockConnector).hasClient(utr, irAgentReference, credentialId)(hc)
       verifyNoMoreInteractions(mockConnector)
     }
 
@@ -73,10 +73,10 @@ class HasClientServiceSpec extends AnyWordSpec with Matchers with ScalaFutures {
       when(mockConnector.hasClient(any[Long], any[String], any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(HasClient(2)))
 
-      val result: HasClientResponse = service.hasClient(utr, irAgentId, credentialId).futureValue
+      val result: HasClientResponse = service.hasClient(utr, irAgentReference, credentialId).futureValue
 
       result mustBe HasClientResponse(status = false)
-      verify(mockConnector).hasClient(utr, irAgentId, credentialId)(hc)
+      verify(mockConnector).hasClient(utr, irAgentReference, credentialId)(hc)
       verifyNoMoreInteractions(mockConnector)
     }
 
@@ -86,10 +86,10 @@ class HasClientServiceSpec extends AnyWordSpec with Matchers with ScalaFutures {
       when(mockConnector.hasClient(any[Long], any[String], any[String])(any[HeaderCarrier]))
         .thenReturn(Future.failed(ex))
 
-      val result: Throwable = service.hasClient(utr, irAgentId, credentialId).failed.futureValue
+      val result: Throwable = service.hasClient(utr, irAgentReference, credentialId).failed.futureValue
 
       result mustBe ex
-      verify(mockConnector).hasClient(utr, irAgentId, credentialId)(hc)
+      verify(mockConnector).hasClient(utr, irAgentReference, credentialId)(hc)
       verifyNoMoreInteractions(mockConnector)
     }
   }
