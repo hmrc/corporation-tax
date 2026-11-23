@@ -35,12 +35,12 @@ class HasClientConnector @Inject() (
 
   def hasClient(
     utr: Long,
-    irAgentId: String,
+    irAgentReference: String,
     credentialId: String
   )(implicit hc: HeaderCarrier): Future[HasClient] = {
 
     val url: URL =
-      url"${appConfig.rdsDatacacheProxyFullUrl}/has-client/$utr/$irAgentId/$credentialId"
+      url"${appConfig.rdsDatacacheProxyFullUrl}/has-client/$utr/$irAgentReference/$credentialId"
 
     http
       .get(url)
