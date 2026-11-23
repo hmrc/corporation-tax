@@ -71,7 +71,7 @@ class ClientsByNameControllerSpec extends AnyWordSpec with Matchers with AllClie
 
       verify(mockService)
         .getClientsByName(
-          eqTo("fake-irAgent-reference"),
+          eqTo("HX12345"),
           eqTo("fake-credential-id"),
           eqTo("name1"),
           eqTo(0),
@@ -94,7 +94,7 @@ class ClientsByNameControllerSpec extends AnyWordSpec with Matchers with AllClie
 
       verify(mockService)
         .getClientsByName(
-          eqTo("fake-irAgent-reference"),
+          eqTo("HX12345"),
           eqTo("fake-credential-id"),
           eqTo("name2"),
           eqTo(0),
@@ -117,7 +117,7 @@ class ClientsByNameControllerSpec extends AnyWordSpec with Matchers with AllClie
 
       verify(mockService)
         .getClientsByName(
-          eqTo("fake-irAgent-reference"),
+          eqTo("HX12345"),
           eqTo("fake-credential-id"),
           eqTo("name3"),
           eqTo(0),
@@ -157,7 +157,7 @@ class ClientsByNameControllerSpec extends AnyWordSpec with Matchers with AllClie
 
       verify(mockService)
         .getClientsByName(
-          eqTo("fake-irAgent-reference"),
+          eqTo("HX12345"),
           eqTo("fake-credential-id"),
           eqTo("nameNA"),
           eqTo(0),
