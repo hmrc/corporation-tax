@@ -1,5 +1,7 @@
 package uk.gov.hmrc.corporationtax.services
 
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.corporationtax.services.clientExchangeProxy.ClientExchangeProxyService
@@ -7,23 +9,24 @@ import uk.gov.hmrc.corporationtax.services.manageClient.AllClientsService
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.matchers.should.Matchers.shouldBe
 import org.scalatestplus.mockito.MockitoSugar
+import uk.gov.hmrc.corporationtax.models.ClientDownloadStatus
 import uk.gov.hmrc.corporationtax.models.manageClient.{AllClients, ClientList}
-import uk.gov.hmrc.corporationtax.models.manageClient.{
-  ClientsError, FailedRetrieveAllClients
-}
+import uk.gov.hmrc.corporationtax.models.manageClient.{ClientsError, FailedRetrieveAllClients}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.corporationtax.helpers.manageClient.ClientListHelper
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-class ClientListServiceSpec extends AnyWordSpec with ScalaFutures with MockitoSugar {
+class ClientListServiceSpec extends AnyWordSpec with ScalaFutures with MockitoSugar with ClientListHelper {
   implicit val hc: HeaderCarrier    = HeaderCarrier()
   implicit val ec: ExecutionContext = ExecutionContext.global
 
   private trait BaseSetup {
-    val irAfgentID: String                                                 = "1000000"
-    val credentialId: String                                               = "1000000"
-    private val mockClientExchangeProxyService: ClientExchangeProxyService = mock[ClientExchangeProxyService]
-    private val mockClientService: AllClientsService                       = mock[AllClientsService]
+    val irAfgentID: String                                         = "1000000"
+    val credentialId: String                                       = "1000000"
+    val mockClientExchangeProxyService: ClientExchangeProxyService = mock[ClientExchangeProxyService]
+    val mockClientService: AllClientsService                       = mock[AllClientsService]
+    val successfulDownload: ClientDownloadStatus                   = ClientDownloadStatus(1)
 
     val service = new ClientListService(mockClientExchangeProxyService, mockClientService)
   }
@@ -31,10 +34,18 @@ class ClientListServiceSpec extends AnyWordSpec with ScalaFutures with MockitoSu
   "ClientListService.getClientClist" should {
 
     "should retrieve the first 10 clients, in ASC ascending order" in new BaseSetup {
-      val pStart: Int                              = 0
-      val pCount: Int                              = 10
-      val sort: Int                                = 0
-      val order: String                            = "ASC"
+      val pStart: Int   = 0
+      val pCount: Int   = 10
+      val sort: Int     = 0
+      val order: String = "ASC"
+      when(mockClientExchangeProxyService.getStatus(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(successfulDownload))
+      when(
+        mockClientService.getAllClients(any[String], any[String], any[Int], any[Int], any[Int], any[String])(
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.successful(paginatedClients))
+
       val result: Either[ClientsError, AllClients] =
         service.getClientList(irAfgentID, credentialId, pStart, pCount, sort, order).futureValue
 
@@ -116,6 +127,14 @@ class ClientListServiceSpec extends AnyWordSpec with ScalaFutures with MockitoSu
       val pCount: Int                              = 10
       val sort: Int                                = 0
       val order: String                            = "DESC"
+      when(mockClientExchangeProxyService.getStatus(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(successfulDownload))
+      when(
+        mockClientService.getAllClients(any[String], any[String], any[Int], any[Int], any[Int], any[String])(
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.successful(paginatedClients))
+
       val result: Either[ClientsError, AllClients] =
         service.getClientList(irAfgentID, credentialId, pStart, pCount, sort, order).futureValue
 
@@ -196,6 +215,14 @@ class ClientListServiceSpec extends AnyWordSpec with ScalaFutures with MockitoSu
       val pCount: Int                              = 10
       val sort: Int                                = 0
       val order: String                            = "ASC"
+      when(mockClientExchangeProxyService.getStatus(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(successfulDownload))
+      when(
+        mockClientService.getAllClients(any[String], any[String], any[Int], any[Int], any[Int], any[String])(
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.successful(paginatedClients))
+
       val result: Either[ClientsError, AllClients] =
         service.getClientList(irAfgentID, credentialId, pStart, pCount, sort, order).futureValue
 
@@ -276,6 +303,14 @@ class ClientListServiceSpec extends AnyWordSpec with ScalaFutures with MockitoSu
       val pCount: Int                              = 10
       val sort: Int                                = 0
       val order: String                            = "DESC"
+      when(mockClientExchangeProxyService.getStatus(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(successfulDownload))
+      when(
+        mockClientService.getAllClients(any[String], any[String], any[Int], any[Int], any[Int], any[String])(
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.successful(paginatedClients))
+
       val result: Either[ClientsError, AllClients] =
         service.getClientList(irAfgentID, credentialId, pStart, pCount, sort, order).futureValue
 
@@ -361,6 +396,14 @@ class ClientListServiceSpec extends AnyWordSpec with ScalaFutures with MockitoSu
       val pCount: Int                              = 10
       val sort: Int                                = 0
       val order: String                            = ""
+      when(mockClientExchangeProxyService.getStatus(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(successfulDownload))
+      when(
+        mockClientService.getAllClients(any[String], any[String], any[Int], any[Int], any[Int], any[String])(
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.successful(paginatedClients))
+
       val result: Either[ClientsError, AllClients] =
         service.getClientList(irAfgentID, credentialId, pStart, pCount, sort, order).futureValue
 
@@ -437,10 +480,18 @@ class ClientListServiceSpec extends AnyWordSpec with ScalaFutures with MockitoSu
     }
 
     "should retrieve an FailedRetrieveAllClients error" in new BaseSetup {
-      val pStart: Int = -1
-      val pCount: Int = -10
-      val sort: Int = 0
-      val order: String = "ASC"
+      val pStart: Int                              = -1
+      val pCount: Int                              = -10
+      val sort: Int                                = 0
+      val order: String                            = "ASC"
+      when(mockClientExchangeProxyService.getStatus(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(successfulDownload))
+      when(
+        mockClientService.getAllClients(any[String], any[String], any[Int], any[Int], any[Int], any[String])(
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.successful(paginatedClients))
+
       val result: Either[ClientsError, AllClients] =
         service.getClientList(irAfgentID, credentialId, pStart, pCount, sort, order).futureValue
 
