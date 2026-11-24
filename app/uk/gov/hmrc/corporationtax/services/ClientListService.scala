@@ -22,7 +22,9 @@ import uk.gov.hmrc.corporationtax.models.clientExchangeProxy.ClientListDownloadS
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.corporationtax.services.manageClient.AllClientsService
 import uk.gov.hmrc.corporationtax.models.manageClient.AllClients
-import uk.gov.hmrc.corporationtax.models.manageClient.{ClientsError, FailedDownloadStatusError, FailedRetrieveAllClients}
+import uk.gov.hmrc.corporationtax.models.manageClient.{
+  ClientsError, FailedDownloadStatusError, FailedRetrieveAllClients
+}
 import scala.util.control.NonFatal
 
 import scala.concurrent.ExecutionContext
@@ -31,8 +33,8 @@ import javax.inject.Inject
 import scala.concurrent.Future
 
 class ClientListService @Inject() (
-                                    clientExchangeProxyService: ClientExchangeProxyService,
-                                    allClientsService: AllClientsService
+  clientExchangeProxyService: ClientExchangeProxyService,
+  allClientsService: AllClientsService
 )(implicit hc: HeaderCarrier, ec: ExecutionContext)
     extends Logging {
 
@@ -43,8 +45,7 @@ class ClientListService @Inject() (
     count: Int,
     sort: Int,
     order: String
-  ): Future[Either[ClientsError, AllClients]] = {
-
+  ): Future[Either[ClientsError, AllClients]] =
     clientExchangeProxyService.process(credentialId).flatMap {
       case ClientListDownloadStatusTransformed.Succeeded =>
         allClientsService
@@ -57,5 +58,4 @@ class ClientListService @Inject() (
       case _ =>
         Future.successful(Left(FailedDownloadStatusError("Error message")))
     }
-  }
 }
