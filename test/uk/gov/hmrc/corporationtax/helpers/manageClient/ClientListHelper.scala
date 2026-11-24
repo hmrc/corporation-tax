@@ -40,5 +40,30 @@ trait ClientListHelper {
     ),
     clientNameStartChars = List("alpha", "bravo", "charlie")
   )
+
+  def filterPaginatedList(start: Int,
+                          count: Int,
+                          order: String): AllClients = {
+    val lastIndex: Int = start + count
+
+    val clientList = order.toLowerCase() match {
+      case "asc"  => this
+        .paginatedClients
+        .clientList
+        .sortBy(item => item.companyName)
+        .slice(start, lastIndex)
+      case "desc" => this
+        .paginatedClients
+        .clientList
+        .sortBy(item => item.companyName).reverse
+        .slice(start, lastIndex)
+      case _ => this
+        .paginatedClients
+        .clientList
+        .slice(start, lastIndex)
+    }
+
+    AllClients(clientCount = clientList.size, clientList = clientList, clientNameStartChars = this.paginatedClients.clientNameStartChars)
+  }
   
 }
