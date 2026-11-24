@@ -173,7 +173,7 @@ class PaymentsOnAccountService @Inject (
     }
 
   private[payments] def hasPenalty(matchingAccPeriod: AccountingPeriodList): Boolean =
-    matchingAccPeriod.taxChargePresent && matchingAccPeriod.penaltyTotal < zeroAmount
+    matchingAccPeriod.taxChargePresent || matchingAccPeriod.penaltyTotal < zeroAmount
 
   private def applyReallocations(
     currentPosting: PaymentPostingRow,
