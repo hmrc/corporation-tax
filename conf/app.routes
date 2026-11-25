@@ -48,8 +48,9 @@ GET        /all-accounting-period/:taxRef                                      u
 GET        /posting-summary/:taxRef/:postingType                                uk.gov.hmrc.corporationtax.controllers.payments.PostingSummaryByTypeController.getPostingSummaryByType(taxRef: Long, postingType:String)
 GET        /payment-postings/:taxRef                                           uk.gov.hmrc.corporationtax.controllers.payments.PaymentPostingsController.getPaymentPostings(taxRef: Long)
 GET        /determine-payment-allocation/:taxRef                                uk.gov.hmrc.corporationtax.controllers.payments.DeterminePaymentAllocationController.getPaymentType(taxRef: Long, queryParams: uk.gov.hmrc.corporationtax.queryParams.PaymentSearchResultQueryParams)
+GET        /payments-on-account/:taxRef                                        uk.gov.hmrc.corporationtax.controllers.payments.PaymentOnAccountController.getPaymentsOnAccount(taxRef: Long)
 
-# Client-list-download
+#Client-list-download
 GET        /initiate-client-list-download                                       uk.gov.hmrc.corporationtax.controllers.clientExchangeProxy.ClientExchangeProxyController.initiateClientListDownload()
 GET        /client-list-download-status                                         uk.gov.hmrc.corporationtax.controllers.clientExchangeProxy.ClientExchangeProxyController.start()
 

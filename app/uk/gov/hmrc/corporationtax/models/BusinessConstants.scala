@@ -22,5 +22,9 @@ object BusinessConstants {
   val LATE_PAYMENT_INTEREST          = "IDE"
   val APPEND_DUE_DATE_MONTHS: String = "M"
   val APPEND_DUE_DATE_DAYS: String   = "A"
+  val rfrPostingType: String         = "RFR"
+  val repPostingType: String         = "REP"
+  val zeroAccPeriod: Long            = 0
+  val zeroAmount: BigDecimal         = BigDecimal(0)
 
 }
